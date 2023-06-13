@@ -442,6 +442,36 @@ ID3D12Resource* CreateBufferResuorce(ID3D12Device* device, size_t sizeInBytes) {
 	return vertexResuorce;
 }
 
+ID3D12Resource* CreateDepthStencilTextureResource(ID3D12Device* device, int32_t width, int32_t height) {
+	D3D12_RESOURCE_DESC resourceDesc{};
+	resourceDesc.Width = width;
+	resourceDesc.Height = height;
+	resourceDesc.DepthOrArraySize = 1;
+	resourceDesc.Format = DXGI_FORMAT_D32_FLOAT;
+	resourceDesc.SampleDesc.Count = 1;
+	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+	resourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+
+	D3D12_HEAP_PROPERTIES heapProperties{};
+	heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
+
+	D3D12_CLEAR_VALUE depthClearValue{};
+	depthClearValue.DepthStencil.Depth = 1.0f;
+	depthClearValue.Format = DXGI_FORMAT_D32_FLOAT;
+
+	ID3D12Resource* resource = nullptr;
+	HRESULT hr = device->CreateCommittedResource(
+		&heapProperties,
+		D3D12_HEAP_FLAG_NONE,
+		&resourceDesc,
+		D3D12_RESOURCE_STATE_DEPTH_WRITE,
+		&depthClearValue,
+		IID_PPV_ARGS(&resource));
+	assert(SUCCEEDED(hr));
+
+	return resource;
+}
+
 void Engine::InitalizeDraw() {
 	// WVP用のリソースを作る
 	wvpResource = CreateBufferResuorce(device, sizeof(Mat4x4));
@@ -453,10 +483,28 @@ void Engine::InitalizeDraw() {
 	*wvpData = MakeMatrixIndentity();
 
 	// 実際に頂点リソースを作る
-	vertexResuorce = CreateBufferResuorce(device, sizeof(VertexData) * 3);
+	vertexResuorce = CreateBufferResuorce(device, sizeof(VertexData) * 6);
 	assert(vertexResuorce);
 
+	// DepthStencilTextureをウィンドウサイズで作成
+	depthStencilResource = CreateDepthStencilTextureResource(device, clientWidth, clientHeight);
+	assert(depthStencilResource);
 
+	D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc{};
+	dsvHeapDesc.NumDescriptors = 1;
+	dsvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
+
+	dsvHeap = nullptr;
+	HRESULT hr = device->CreateDescriptorHeap(&dsvHeapDesc, IID_PPV_ARGS(&dsvHeap));
+	assert(SUCCEEDED(hr));
+
+
+	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
+	dsvDesc.Format = DXGI_FORMAT_D32_FLOAT;
+	dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+	dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
+
+	device->CreateDepthStencilView(depthStencilResource, &dsvDesc, dsvHeap->GetCPUDescriptorHandleForHeapStart());
 }
 
 
@@ -602,6 +650,13 @@ void Engine::LoadShader() {
 	// どのように画面に打ち込むかの設定
 	graphicsPipelineStateDesc.SampleDesc.Count = 1;
 	graphicsPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
+	// 
+	graphicsPipelineStateDesc.DepthStencilState.DepthEnable = true;
+	graphicsPipelineStateDesc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+	graphicsPipelineStateDesc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS;
+	graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
+
+
 	// 実際に生成
 	graphicsPipelineState = nullptr;
 	HRESULT hr = device->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&graphicsPipelineState));
@@ -615,7 +670,7 @@ void Engine::DrawTriangle(const Vector3D& pos, const Vector3D& size, const Vecto
 	// リソースの先頭のアドレスから使う
 	vertexBufferView.BufferLocation = vertexResuorce->GetGPUVirtualAddress();
 	// 私用するリソースのサイズは頂点3つ分のサイズ
-	vertexBufferView.SizeInBytes = sizeof(VertexData) * 3;
+	vertexBufferView.SizeInBytes = sizeof(VertexData) * 6;
 	// 1頂点当たりのサイズ
 	vertexBufferView.StrideInBytes = sizeof(VertexData);
 
@@ -633,6 +688,17 @@ void Engine::DrawTriangle(const Vector3D& pos, const Vector3D& size, const Vecto
 	vertexData[2].position = { 0.5f, -0.5f, 0.0f, 1.0f };
 	vertexData[2].color = Vector3D(0.0f, 0.0f, 1.0f);
 
+	// 二枚目
+// 左下
+	vertexData[3].position = { -0.5f, -0.5f, 0.5f, 1.0f };
+	vertexData[3].color = Vector3D(1.0f, 0.0f, 0.0f);
+	// 上
+	vertexData[4].position = { 0.0f, 0.0f,  0.0f, 1.0f };
+	vertexData[4].color = Vector3D(0.0f, 1.0f, 0.0f);
+	// 右下
+	vertexData[5].position = { 0.5f, -0.5f, -0.5f, 1.0f };
+	vertexData[5].color = Vector3D(0.0f, 0.0f, 1.0f);
+
 	Mat4x4 cameraMatrix;
 	Mat4x4 viewMatrix;
 	Mat4x4 projectionMatrix;
@@ -642,7 +708,7 @@ void Engine::DrawTriangle(const Vector3D& pos, const Vector3D& size, const Vecto
 	cameraMatrix = MakeMatrixAffin({ 1.0f,1.0f,1.0f }, Vector3D(), cameraPos);
 	viewMatrix = MakeMatrixInverse(cameraMatrix);
 	projectionMatrix = MakeMatrixPerspectiveFov(0.45f, static_cast<float>(clientWidth) / static_cast<float>(clientHeight), 0.1f, 100.0f);
-	*wvpData = MakeMatrixAffin(size, Vector3D(), pos);
+	*wvpData = MakeMatrixAffin(size, Vector3D(), pos) * viewMatrix * projectionMatrix;
 
 
 	// パイプラインステートの設定
@@ -656,7 +722,7 @@ void Engine::DrawTriangle(const Vector3D& pos, const Vector3D& size, const Vecto
 	// CBVをセット（ワールド行列）
 	commandList->SetGraphicsRootConstantBufferView(1, wvpResource->GetGPUVirtualAddress());
 	// 描画コマンド
-	commandList->DrawInstanced(3, 1, 0, 0);
+	commandList->DrawInstanced(6, 1, 0, 0);
 }
 
 
@@ -702,7 +768,9 @@ void Engine::FrameStart() {
 	commandList->ResourceBarrier(1, &barrier);
 
 	// 描画先をRTVを設定する
-	commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false, nullptr);
+	auto dsvH = dsvHeap->GetCPUDescriptorHandleForHeapStart();
+	commandList->ClearDepthStencilView(dsvH, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+	commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false, &dsvH);
 	// 指定した色で画面全体をクリアする
 	float clearColor[] = { 0.1f, 0.25f, 0.5f, 1.0f };
 	commandList->ClearRenderTargetView(rtvHandles[backBufferIndex], clearColor, 0, nullptr);
@@ -804,6 +872,8 @@ Engine::~Engine() {
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
 
+	dsvHeap->Release();
+	depthStencilResource->Release();
 	vertexResuorce->Release();
 	wvpResource->Release();
 	graphicsPipelineState->Release();

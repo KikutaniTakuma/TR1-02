@@ -136,6 +136,9 @@ private:
 	ID3D12Resource* vertexResuorce = nullptr;
 	ID3D12Resource* indexBufferResuorce = nullptr;
 
+	ID3D12Resource* depthStencilResource = nullptr;
+	ID3D12DescriptorHeap* dsvHeap = nullptr;
+
 	ID3D12PipelineState* graphicsPipelineState = nullptr;
 
 
