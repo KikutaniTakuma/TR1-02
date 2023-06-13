@@ -7,7 +7,7 @@ ConstantBuffer<TransformationMatrix> gTransformationMatrix : register(b0);
 
 struct VertexShaderInput {
 	float32_t4 position : POSITION0;
-	float32_t3 color : COLOR;
+	float32_t4 color : COLOR0;
 };
 
 

@@ -406,7 +406,7 @@ bool Engine::InitalizeDirect12() {
 
 struct VertexData {
 	Vector4 position;
-	Vector3D color;
+	Vector4 color;
 };
 
 ID3D12Resource* CreateBufferResuorce(ID3D12Device* device, size_t sizeInBytes) {
@@ -610,7 +610,7 @@ void Engine::LoadShader() {
 	inputElementDescs[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
 	inputElementDescs[1].SemanticName = "COLOR";
 	inputElementDescs[1].SemanticIndex = 0;
-	inputElementDescs[1].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+	inputElementDescs[1].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
 	inputElementDescs[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
 	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
 	inputLayoutDesc.pInputElementDescs = inputElementDescs;
@@ -652,13 +652,13 @@ void Engine::LoadShader() {
 	graphicsPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 	// 
 	graphicsPipelineStateDesc.DepthStencilState.DepthEnable = true;
-	graphicsPipelineStateDesc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
-	graphicsPipelineStateDesc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS;
+	graphicsPipelineStateDesc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+	graphicsPipelineStateDesc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 	graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
 
 	graphicsPipelineStateDesc.BlendState.RenderTarget[0].BlendEnable = true;
-	graphicsPipelineStateDesc.BlendState.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
-	graphicsPipelineStateDesc.BlendState.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+	graphicsPipelineStateDesc.BlendState.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;  // D3D12_BLEND_ZERO;
+	graphicsPipelineStateDesc.BlendState.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;  // D3D12_BLEND_SRC_COLOR;
 	graphicsPipelineStateDesc.BlendState.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
 	graphicsPipelineStateDesc.BlendState.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
 	graphicsPipelineStateDesc.BlendState.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
@@ -670,7 +670,12 @@ void Engine::LoadShader() {
 	assert(SUCCEEDED(hr));
 }
 
-void Engine::DrawTriangle(const Vector3D& pos, const Vector3D& size, const Vector3D& color) {
+Vector4 UintToVector4(uint32_t color) {
+	float normal = 1.0f / 255.0f;
+	return Vector4(static_cast<float>((color & 0xff000000) >> 24) * normal, static_cast<float>((color & 0xff0000) >> 16) * normal, static_cast<float>((color & 0xff00) >> 8) * normal, static_cast<float>(color & 0xff) * normal);
+}
+
+void Engine::DrawTriangle(const Vector3D& pos, const Vector3D& size, uint32_t color) {
 	// vertexbufferViewを作成する
 	// 頂点バッファビューを作成する
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
@@ -687,24 +692,24 @@ void Engine::DrawTriangle(const Vector3D& pos, const Vector3D& size, const Vecto
 	vertexResuorce->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
 	// 左下
 	vertexData[0].position = { -0.5f, -0.5f, 0.0f, 1.0f };
-	vertexData[0].color = color;
+	vertexData[0].color = UintToVector4(color);
 	// 上
 	vertexData[1].position = { 0.0f, 0.5f,  0.0f, 1.0f };
-	vertexData[1].color = Vector3D(1.0f,0.0f,0.0f);
+	vertexData[1].color = UintToVector4(color);
 	// 右下
 	vertexData[2].position = { 0.5f, -0.5f, 0.0f, 1.0f };
-	vertexData[2].color = Vector3D(0.0f, 0.0f, 1.0f);
+	vertexData[2].color = UintToVector4(color);
 
 	// 二枚目
 // 左下
 	vertexData[3].position = { -0.5f, -0.5f, 0.5f, 1.0f };
-	vertexData[3].color = Vector3D(1.0f, 0.0f, 0.0f);
+	vertexData[3].color = UintToVector4(0x36f3f7ff);
 	// 上
 	vertexData[4].position = { 0.0f, 0.0f,  0.0f, 1.0f };
-	vertexData[4].color = Vector3D(0.0f, 1.0f, 0.0f);
+	vertexData[4].color = UintToVector4(0x36f3f7ff);
 	// 右下
 	vertexData[5].position = { 0.5f, -0.5f, -0.5f, 1.0f };
-	vertexData[5].color = Vector3D(0.0f, 0.0f, 1.0f);
+	vertexData[5].color = UintToVector4(0x36f3f7ff);
 
 	Mat4x4 cameraMatrix;
 	Mat4x4 viewMatrix;

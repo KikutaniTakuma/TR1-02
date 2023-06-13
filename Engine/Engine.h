@@ -126,7 +126,7 @@ public:
 	/// </summary>
 	void Draw();
 
-	void DrawTriangle(const Vector3D& pos, const Vector3D& size, const Vector3D& color);
+	void DrawTriangle(const Vector3D& pos, const Vector3D& size, uint32_t color);
 
 private:
 	// Ç±ÇÍÇÁÇÕå„Ç≈ëùÇ‚Ç∑

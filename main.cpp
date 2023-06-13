@@ -16,7 +16,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	while (enigne.WindowMassage()) {
 		enigne.FrameStart();
 
-		enigne.DrawTriangle({0.0f,0.0f,0.0f}, { 1.0f,1.0f,1.0f }, { 1.0f,1.0f,1.0f });
+		enigne.DrawTriangle({0.0f,0.0f,0.0f}, { 1.0f,1.0f,1.0f }, 0xff0000aa);
 		
 		enigne.FrameEnd();
 	}
