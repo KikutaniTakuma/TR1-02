@@ -46,6 +46,9 @@
     <Filter Include="Math">
       <UniqueIdentifier>{f4d2bb2b-5300-4906-bcac-3c4a0124dcf7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Model">
+      <UniqueIdentifier>{75878dc3-228d-4f78-a159-c89a43ffafe2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Engine.h">

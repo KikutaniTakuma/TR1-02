@@ -13,5 +13,7 @@ PixelShaderOutPut main(VertexShaderOutput input)
 
 	output.color.xyz = input.color;
 
+	output.color.a = 0.4f;
+
 	return output;
 }
