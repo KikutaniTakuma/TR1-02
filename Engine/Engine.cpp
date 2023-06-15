@@ -18,7 +18,7 @@ void Log(const std::string& meg) {
 /// 
 /// string to wstring
 /// 
-std::wstring ConvertString(const std::string& msg) {
+std::wstring Engine::ConvertString(const std::string& msg) {
 	if (msg.empty()) {
 		return std::wstring();
 	}
@@ -35,7 +35,7 @@ std::wstring ConvertString(const std::string& msg) {
 /// 
 /// wstring to string
 /// 
-std::string ConvertString(const std::wstring& msg) {
+std::string Engine::ConvertString(const std::wstring& msg) {
 	if (msg.empty()) {
 		return std::string();
 	}
@@ -55,22 +55,32 @@ std::string ConvertString(const std::wstring& msg) {
 /// 各種初期化処理
 /// 
 
+Engine* Engine::engine = nullptr;
+
 void Engine::Initalize(int windowWidth, int windowHeight, const std::string& windowName) {
+	engine = new Engine();
+	assert(engine);
+
 	// Window生成
-	assert(this->InitalizeWindow(windowWidth, windowHeight, ConvertString(windowName)));
+	assert(engine->InitalizeWindow(windowWidth, windowHeight, ConvertString(windowName)));
 
 #ifdef _DEBUG
 	// DebugLayer有効化
-	InitalizeDebugLayer();
+	engine->InitalizeDebugLayer();
 #endif
 
 	// Direct3D生成
-	assert(this->InitalizeDirect3D());
+	assert(engine->InitalizeDirect3D());
 
 	// DirectX12生成
-	this->InitalizeDirect12();
+	engine->InitalizeDirect12();
 
-	this->InitalizeDraw();
+	engine->InitalizeDraw();
+}
+
+void Engine::Finalize() {
+	delete engine;
+	engine = nullptr;
 }
 
 
@@ -250,15 +260,15 @@ bool Engine::InitalizeDirect3D() {
 /// DirectX12
 /// 
 
-ID3D12DescriptorHeap* CreateDescriptorHeap(
-	ID3D12Device* device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderrVisible
+ID3D12DescriptorHeap* Engine::CreateDescriptorHeap(
+	D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderrVisible
 ) {
 	ID3D12DescriptorHeap* descriptorHeap = nullptr;
 	D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc{};
 	descriptorHeapDesc.Type = heapType;
 	descriptorHeapDesc.NumDescriptors = numDescriptors;
 	descriptorHeapDesc.Flags = shaderrVisible ? D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE : D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-	HRESULT hr = device->CreateDescriptorHeap(&descriptorHeapDesc, IID_PPV_ARGS(&descriptorHeap));
+	HRESULT hr = engine->device->CreateDescriptorHeap(&descriptorHeapDesc, IID_PPV_ARGS(&descriptorHeap));
 	assert(SUCCEEDED(hr));
 	return descriptorHeap;
 }
@@ -297,10 +307,10 @@ bool Engine::InitalizeDirect12() {
 
 
 	// デスクリプタヒープの作成
-	rtvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
+	rtvDescriptorHeap = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
 
 	// SRV用のヒープ
-	srvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
+	srvDescriptorHeap = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
 
 	// SwepChainのメモリとディスクリプタと関連付け
 	// バックバッファの数を取得
@@ -409,8 +419,8 @@ struct VertexData {
 	Vector4 color;
 };
 
-ID3D12Resource* CreateBufferResuorce(ID3D12Device* device, size_t sizeInBytes) {
-	if (!device) {
+ID3D12Resource* Engine::CreateBufferResuorce(size_t sizeInBytes) {
+	if (!engine->device) {
 		OutputDebugStringA("device is nullptr!!");
 		return nullptr;
 	}
@@ -433,7 +443,7 @@ ID3D12Resource* CreateBufferResuorce(ID3D12Device* device, size_t sizeInBytes) {
 	vertexResouceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 	// 実際に頂点リソースを作る
 	ID3D12Resource* vertexResuorce = nullptr;
-	HRESULT hr = device->CreateCommittedResource(&uploadHeapPropaerties, D3D12_HEAP_FLAG_NONE, &vertexResouceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&vertexResuorce));
+	HRESULT hr = engine->device->CreateCommittedResource(&uploadHeapPropaerties, D3D12_HEAP_FLAG_NONE, &vertexResouceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&vertexResuorce));
 	if (!SUCCEEDED(hr)) {
 		OutputDebugStringA("CreateCommittedResource Function Failed!!");
 		return nullptr;
@@ -442,7 +452,7 @@ ID3D12Resource* CreateBufferResuorce(ID3D12Device* device, size_t sizeInBytes) {
 	return vertexResuorce;
 }
 
-ID3D12Resource* CreateDepthStencilTextureResource(ID3D12Device* device, int32_t width, int32_t height) {
+ID3D12Resource* Engine::CreateDepthStencilTextureResource(int32_t width, int32_t height) {
 	D3D12_RESOURCE_DESC resourceDesc{};
 	resourceDesc.Width = width;
 	resourceDesc.Height = height;
@@ -460,7 +470,7 @@ ID3D12Resource* CreateDepthStencilTextureResource(ID3D12Device* device, int32_t 
 	depthClearValue.Format = DXGI_FORMAT_D32_FLOAT;
 
 	ID3D12Resource* resource = nullptr;
-	HRESULT hr = device->CreateCommittedResource(
+	HRESULT hr = engine->device->CreateCommittedResource(
 		&heapProperties,
 		D3D12_HEAP_FLAG_NONE,
 		&resourceDesc,
@@ -474,7 +484,7 @@ ID3D12Resource* CreateDepthStencilTextureResource(ID3D12Device* device, int32_t 
 
 void Engine::InitalizeDraw() {
 	// WVP用のリソースを作る
-	wvpResource = CreateBufferResuorce(device, sizeof(Mat4x4));
+	wvpResource = CreateBufferResuorce(sizeof(Mat4x4));
 	// データを書き込む
 	wvpData = nullptr;
 	// 書き込むためのアドレスを取得
@@ -483,11 +493,11 @@ void Engine::InitalizeDraw() {
 	*wvpData = MakeMatrixIndentity();
 
 	// 実際に頂点リソースを作る
-	vertexResuorce = CreateBufferResuorce(device, sizeof(VertexData) * 6);
+	vertexResuorce = CreateBufferResuorce(sizeof(VertexData) * 6);
 	assert(vertexResuorce);
 
 	// DepthStencilTextureをウィンドウサイズで作成
-	depthStencilResource = CreateDepthStencilTextureResource(device, clientWidth, clientHeight);
+	depthStencilResource = CreateDepthStencilTextureResource(clientWidth, clientHeight);
 	assert(depthStencilResource);
 
 	D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc{};
@@ -508,22 +518,18 @@ void Engine::InitalizeDraw() {
 }
 
 
-IDxcBlob* CompilerShader(
+IDxcBlob* Engine::CompilerShader(
 	// CompilerするShaderファイルへのパス
 	const std::wstring& filePath,
 	// Compilerに使用するProfile
-	const wchar_t* profile,
-	// 初期化で生成したものを3つ
-	IDxcUtils* dxcUtils,
-	IDxcCompiler3* dxcCompiler,
-	IDxcIncludeHandler* includeHandler)
+	const wchar_t* profile)
 {
 	// 1. hlslファイルを読む
 	// これからシェーダーをコンパイルする旨をログに出す
 	Log(ConvertString(std::format(L"Begin CompilerShader, path:{}, profile:{}\n", filePath, profile)));
 	// hlslファイルを読む
 	IDxcBlobEncoding* shaderSource = nullptr;
-	HRESULT hr = dxcUtils->LoadFile(filePath.c_str(), nullptr, &shaderSource);
+	HRESULT hr = engine->dxcUtils->LoadFile(filePath.c_str(), nullptr, &shaderSource);
 	// 読めなかったら止める
 	assert(SUCCEEDED(hr));
 	// 読み込んだファイルの内容を設定する
@@ -544,11 +550,11 @@ IDxcBlob* CompilerShader(
 	};
 	// 実際にShaderをコンパイルする
 	IDxcResult* shaderResult = nullptr;
-	hr = dxcCompiler->Compile(
+	hr = engine->dxcCompiler->Compile(
 		&shaderSourceBuffer, // 読みこんだファイル
 		arguments,           // コンパイルオプション
 		_countof(arguments), // コンパイルオプションの数
-		includeHandler,      // includeが含まれた諸々
+		engine->includeHandler,      // includeが含まれた諸々
 		IID_PPV_ARGS(&shaderResult) // コンパイル結果
 	);
 	// コンパイルエラーではなくdxcが起動できないなど致命的な状況
@@ -591,13 +597,13 @@ void Engine::LoadShader() {
 
 	// shaderをコンパイルする
 	for (auto& vsFileName : vsShaderFilePath) {
-		IDxcBlob* vertexShaderBlob = CompilerShader(vsFileName, L"vs_6_0", dxcUtils, dxcCompiler, includeHandler);
+		IDxcBlob* vertexShaderBlob = CompilerShader(vsFileName, L"vs_6_0");
 		assert(vertexShaderBlob != nullptr);
 		vertexShaders.insert(std::make_pair<std::string, IDxcBlob*>(vsFileName.filename().generic_string(), std::move(vertexShaderBlob)));
 	}
 
 	for (auto& psFileName : psShaderFilePath) {
-		IDxcBlob* pixelShaderBlob = CompilerShader(psFileName, L"ps_6_0", dxcUtils, dxcCompiler, includeHandler);
+		IDxcBlob* pixelShaderBlob = CompilerShader(psFileName, L"ps_6_0");
 		assert(pixelShaderBlob != nullptr);
 		pixelShaders.insert(std::make_pair<std::string, IDxcBlob*>(psFileName.filename().generic_string(), std::move(pixelShaderBlob)));
 	}
@@ -670,7 +676,7 @@ void Engine::LoadShader() {
 	assert(SUCCEEDED(hr));
 }
 
-Vector4 UintToVector4(uint32_t color) {
+Vector4 Engine::UintToVector4(uint32_t color) {
 	float normal = 1.0f / 255.0f;
 	return Vector4(static_cast<float>((color & 0xff000000) >> 24) * normal, static_cast<float>((color & 0xff0000) >> 16) * normal, static_cast<float>((color & 0xff00) >> 8) * normal, static_cast<float>(color & 0xff) * normal);
 }
@@ -749,12 +755,12 @@ void Engine::DrawTriangle(const Vector3D& pos, const Vector3D& size, uint32_t co
 /// 
 
 bool Engine::WindowMassage() {
-	if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
+	if (PeekMessage(&engine->msg, nullptr, 0, 0, PM_REMOVE)) {
+		TranslateMessage(&engine->msg);
+		DispatchMessage(&engine->msg);
 	}
 
-	return msg.message != WM_QUIT;
+	return engine->msg.message != WM_QUIT;
 }
 
 void Engine::FrameStart() {
@@ -763,7 +769,7 @@ void Engine::FrameStart() {
 	ImGui::NewFrame();
 
 	// これから書き込むバックバッファのインデックスを取得
-	UINT backBufferIndex = swapChain->GetCurrentBackBufferIndex();
+	UINT backBufferIndex = engine->swapChain->GetCurrentBackBufferIndex();
 	// TransitionBarrierの設定
 	D3D12_RESOURCE_BARRIER barrier{};
 	// 今回のバリアはTransition
@@ -771,59 +777,60 @@ void Engine::FrameStart() {
 	// Noneにしておく
 	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 	// バリアを張る対象のリソース。現在のバックバッファに対して行う
-	barrier.Transition.pResource = swapChianResource[backBufferIndex];
+	barrier.Transition.pResource = engine->swapChianResource[backBufferIndex];
 	// 遷移前(現在)のResouceState
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
 	// 遷移後のResouceState
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	// TransitionBarrierを張る
-	commandList->ResourceBarrier(1, &barrier);
+	engine->commandList->ResourceBarrier(1, &barrier);
 
 	// 描画先をRTVを設定する
-	auto dsvH = dsvHeap->GetCPUDescriptorHandleForHeapStart();
-	commandList->ClearDepthStencilView(dsvH, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
-	commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false, &dsvH);
+	auto dsvH = engine->dsvHeap->GetCPUDescriptorHandleForHeapStart();
+	engine->commandList->OMSetRenderTargets(1, &engine->rtvHandles[backBufferIndex], false, &dsvH);
+	engine->commandList->ClearDepthStencilView(dsvH, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+
 	// 指定した色で画面全体をクリアする
-	float clearColor[] = { 0.1f, 0.25f, 0.5f, 1.0f };
-	commandList->ClearRenderTargetView(rtvHandles[backBufferIndex], clearColor, 0, nullptr);
+	float clearColor[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+	engine->commandList->ClearRenderTargetView(engine->rtvHandles[backBufferIndex], clearColor, 0, nullptr);
 
 
 	ID3D12DescriptorHeap* descriptorHeaps[] = {
-		srvDescriptorHeap
+		engine->srvDescriptorHeap
 	};
-	commandList->SetDescriptorHeaps(1, descriptorHeaps);
+	engine->commandList->SetDescriptorHeaps(1, descriptorHeaps);
 
 
 	// ビューポート
 	D3D12_VIEWPORT viewport{};
 	// クライアント領域のサイズと一緒にして画面全体に表示
-	viewport.Width = static_cast<float>(clientWidth);
-	viewport.Height = static_cast<float>(clientHeight);
+	viewport.Width = static_cast<float>(engine->clientWidth);
+	viewport.Height = static_cast<float>(engine->clientHeight);
 	viewport.TopLeftX = 0;
 	viewport.TopLeftY = 0;
 	viewport.MinDepth = 0.0f;
 	viewport.MaxDepth = 1.0f;
-	commandList->RSSetViewports(1, &viewport);
+	engine->commandList->RSSetViewports(1, &viewport);
 
 
 	// シザー矩形
 	D3D12_RECT scissorRect{};
 	// 基本的にビューポートと同じ矩形が構成されるようになる
 	scissorRect.left = 0;
-	scissorRect.right = clientWidth;
+	scissorRect.right = engine->clientWidth;
 	scissorRect.top = 0;
-	scissorRect.bottom = clientHeight;
-	commandList->RSSetScissorRects(1, &scissorRect);
+	scissorRect.bottom = engine->clientHeight;
+	engine->commandList->RSSetScissorRects(1, &scissorRect);
 
 }
 
 void Engine::FrameEnd() {
 	ImGui::Render();
-	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList);
+	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), engine->commandList);
 
 
 	// これから書き込むバックバッファのインデックスを取得
-	UINT backBufferIndex = swapChain->GetCurrentBackBufferIndex();
+	UINT backBufferIndex = engine->swapChain->GetCurrentBackBufferIndex();
 	// TransitionBarrierの設定
 	D3D12_RESOURCE_BARRIER barrier{};
 	// 今回のバリアはTransition
@@ -831,44 +838,44 @@ void Engine::FrameEnd() {
 	// Noneにしておく
 	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 	// バリアを張る対象のリソース。現在のバックバッファに対して行う
-	barrier.Transition.pResource = swapChianResource[backBufferIndex];
+	barrier.Transition.pResource = engine->swapChianResource[backBufferIndex];
 	// 遷移前(現在)のResouceState
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	// 遷移後のResouceState
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
 	// TransitionBarrierを張る
-	commandList->ResourceBarrier(1, &barrier);
+	engine->commandList->ResourceBarrier(1, &barrier);
 
 	// コマンドリストを確定させる
-	HRESULT hr = commandList->Close();
+	HRESULT hr = engine->commandList->Close();
 	assert(SUCCEEDED(hr));
 
 	// GPUにコマンドリストの実行を行わせる
-	ID3D12CommandList* commandLists[] = { commandList };
-	commandQueue->ExecuteCommandLists(1, commandLists);
+	ID3D12CommandList* commandLists[] = { engine->commandList };
+	engine->commandQueue->ExecuteCommandLists(1, commandLists);
 
 
 	// GPUとOSに画面の交換を行うように通知する
-	swapChain->Present(1, 0);
+	engine->swapChain->Present(1, 0);
 
 	// Fenceの値を更新
-	fenceVal++;
+	engine->fenceVal++;
 	// GPUがここまでたどり着いたときに、Fenceの値を指定した値に代入するようにSignalを送る
-	commandQueue->Signal(fence, fenceVal);
+	engine->commandQueue->Signal(engine->fence, engine->fenceVal);
 
 	// Fenceの値が指定したSigna値にたどり着いているか確認する
 	// GetCompletedValueの初期値はFence作成時に渡した初期値
-	if (fence->GetCompletedValue() < fenceVal) {
+	if (engine->fence->GetCompletedValue() < engine->fenceVal) {
 		// 指定したSignal値にたどり着いていないので、たどり着くまで待つようにイベントを設定する
-		fence->SetEventOnCompletion(fenceVal, fenceEvent);
+		engine->fence->SetEventOnCompletion(engine->fenceVal, engine->fenceEvent);
 		// イベントを待つ
-		WaitForSingleObject(fenceEvent, INFINITE);
+		WaitForSingleObject(engine->fenceEvent, INFINITE);
 	}
 
 	// 次フレーム用のコマンドリストを準備
-	hr = commandAllocator->Reset();
+	hr = engine->commandAllocator->Reset();
 	assert(SUCCEEDED(hr));
-	hr = commandList->Reset(commandAllocator, nullptr);
+	hr = engine->commandList->Reset(engine->commandAllocator, nullptr);
 	assert(SUCCEEDED(hr));
 }
 

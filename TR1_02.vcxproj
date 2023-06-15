@@ -153,6 +153,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Math\Mat4x4\Mat4x4.cpp" />
     <ClCompile Include="Math\Vector2D\Vector2D.cpp" />
     <ClCompile Include="Math\Vector3D\Vector3D.cpp" />
+    <ClCompile Include="Model\Model.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Engine.h" />
@@ -168,6 +169,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Math\Vector2D\Vector2D.h" />
     <ClInclude Include="Math\Vector3D\Vector3D.h" />
     <ClInclude Include="Math\Vector4\Vector4.h" />
+    <ClInclude Include="Model\Model.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

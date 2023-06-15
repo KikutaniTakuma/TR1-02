@@ -20,17 +20,65 @@
 
 class Engine {
 public:
+/// <summary>
+/// 静的関数
+/// </summary>
+	static ID3D12DescriptorHeap* CreateDescriptorHeap(
+		D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderrVisible
+	);
+
+	static ID3D12Resource* CreateBufferResuorce(size_t sizeInBytes);
+
+	static ID3D12Resource* CreateDepthStencilTextureResource(int32_t width, int32_t height);
+	static IDxcBlob* CompilerShader(
+		// CompilerするShaderファイルへのパス
+		const std::wstring& filePath,
+		// Compilerに使用するProfile
+		const wchar_t* profile
+	);
+
+	static std::wstring ConvertString(const std::string& msg);
+	static std::string ConvertString(const std::wstring& msg);
+
+	static Vector4 UintToVector4(uint32_t color);
+
+private:
 	Engine() = default;
 	~Engine();
 
-
+public:
 	/// <summary>
 	/// 失敗した場合内部でassertで止められる
 	/// </summary>
 	/// <param name="windowWidth">Windowの横幅</param>
 	/// <param name="windowHeight">Windowの縦幅</param>
 	/// <param name="windowName">Windowの名前</param>
-	void Initalize(int windowWidth, int windowHeight, const std::string& windowName);
+	static void Initalize(int windowWidth, int windowHeight, const std::string& windowName);
+
+	static void Finalize();
+
+private:
+	/// <summary>
+	/// シングルトンインスタンス
+	/// </summary>
+	static Engine* engine;
+
+public:
+	static inline Engine* GetInstance() {
+		return engine;
+	}
+
+	static ID3D12GraphicsCommandList* GetCommandList() {
+		return engine->commandList;
+	}
+
+	static ID3D12RootSignature* GetRootSignature() {
+		return engine->rootSignature;
+	}
+
+	static ID3D12Device* GetDevice() {
+		return engine->device;
+	}
 
 
 	///
@@ -43,6 +91,7 @@ private:
 	WNDCLASSEX w{};
 	HWND hwnd{};
 
+public:
 	int clientWidth = 0;
 	int clientHeight = 0;
 
@@ -119,12 +168,6 @@ public:
 	void InitalizeDraw();
 
 	void LoadShader();
-	void LoadObj(const std::string& fileName);
-
-	/// <summary>
-	/// 読み込んだobjファイルを元に描画していく
-	/// </summary>
-	void Draw();
 
 	void DrawTriangle(const Vector3D& pos, const Vector3D& size, uint32_t color);
 
@@ -155,11 +198,11 @@ private:
 	/// MainLoop
 	/// 
 public:
-	bool WindowMassage();
+	static bool WindowMassage();
 
-	void FrameStart();
+	static void FrameStart();
 
-	void FrameEnd();
+	static void FrameEnd();
 
 private:
 	MSG msg{};
