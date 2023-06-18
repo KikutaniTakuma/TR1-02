@@ -17,6 +17,7 @@
 #include "Math/Mat4x4/Mat4x4.h"
 #include "Math/Vector2D/Vector2D.h"
 #include "Math/Vector4/Vector4.h" 
+#include "RenderTarget/RenderTarget.h"
 
 class Engine {
 public:
@@ -41,6 +42,8 @@ public:
 	static std::string ConvertString(const std::wstring& msg);
 
 	static Vector4 UintToVector4(uint32_t color);
+
+	static void Barrier(ID3D12Resource* resource, D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after);
 
 private:
 	Engine() = default;
@@ -72,12 +75,24 @@ public:
 		return engine->commandList;
 	}
 
-	static ID3D12RootSignature* GetRootSignature() {
-		return engine->rootSignature;
-	}
-
 	static ID3D12Device* GetDevice() {
 		return engine->device;
+	}
+
+	static ID3D12DescriptorHeap* GetDSVHeap() {
+		return engine->dsvHeap;
+	}
+
+	static D3D12_DESCRIPTOR_HEAP_DESC GetMainRTVDesc() {
+		return engine->rtvDescriptorHeap->GetDesc();
+	}
+
+	static D3D12_RESOURCE_DESC GetSwapchainBufferDesc() {
+		return engine->swapChianResource[0]->GetDesc();
+	}
+
+	static D3D12_CPU_DESCRIPTOR_HANDLE GetDsvHandle() {
+		return engine->dsvHeap->GetCPUDescriptorHandleForHeapStart();
 	}
 
 
@@ -85,15 +100,15 @@ public:
 	/// Window生成用
 	/// 
 private:
-	bool InitalizeWindow(int windowWidth, int windowHeight, const std::wstring& windowName);
+	bool InitalizeWindow(const std::wstring& windowName);
 
 private:
 	WNDCLASSEX w{};
 	HWND hwnd{};
 
 public:
-	int clientWidth = 0;
-	int clientHeight = 0;
+	int32_t clientWidth = 0;
+	int32_t clientHeight = 0;
 
 
 
@@ -153,11 +168,6 @@ private:
 
 	IDxcIncludeHandler* includeHandler = nullptr;
 
-	ID3DBlob* signatureBlob = nullptr;
-	ID3DBlob* errorBlob = nullptr;
-
-	ID3D12RootSignature* rootSignature = nullptr;
-
 
 
 
@@ -169,28 +179,21 @@ public:
 
 	void LoadShader();
 
-	void DrawTriangle(const Vector3D& pos, const Vector3D& size, uint32_t color);
 
 private:
-	// これらは後で増やす
-	ID3D12Resource* wvpResource = nullptr;
-	Mat4x4* wvpData = nullptr;
-
-	ID3D12Resource* vertexResuorce = nullptr;
-	ID3D12Resource* indexBufferResuorce = nullptr;
-
 	ID3D12Resource* depthStencilResource = nullptr;
 	ID3D12DescriptorHeap* dsvHeap = nullptr;
-
-	ID3D12PipelineState* graphicsPipelineState = nullptr;
 
 
 	std::unordered_map<std::string, IDxcBlob*> vertexShaders;
 	std::unordered_map<std::string, IDxcBlob*> pixelShaders;
+	
 
 
+	// ポストエフェクト用
+	void CreatePera();
 
-
+	PeraRender pera;
 
 
 

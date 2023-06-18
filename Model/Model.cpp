@@ -5,6 +5,8 @@
 #include <vector>
 #include <algorithm>
 #include <cassert>
+#include <numbers>
+
 
 Model::Model() :
 	meshData(),
@@ -32,7 +34,12 @@ Model::Model() :
 	dirLig->ligDirection = {nor.x,nor.y,nor.z,0.0f};
 	Vector4 colorTmp = Engine::UintToVector4(0xffffadff);
 	dirLig->ligColor = { colorTmp.x,colorTmp.y, colorTmp.z };
-	dirLigResource->Unmap(0,nullptr);
+
+	dirLig->ptPos = { 0.0f,10.0f,10.0f };
+	dirLig->ptColor = { 15.0f,15.0f,15.0f };
+	dirLig->ptRange = 300.0f;
+
+	dirLigResource->Unmap(0, nullptr);
 }
 
 void Model::LoadObj(const std::string& fileName) {
@@ -40,6 +47,7 @@ void Model::LoadObj(const std::string& fileName) {
 		std::ifstream objFile(fileName);
 		if (!objFile) { return; }
 
+		std::vector<Vector3D> normalPos(0);
 		uint32_t vertPositionNum = 0;
 		meshData.indexNum = 0;
 
@@ -54,6 +62,20 @@ void Model::LoadObj(const std::string& fileName) {
 					{
 						meshData.indexNum++;
 					}
+				}
+				else if (lineBuf.find("vn") != std::string::npos) {
+					std::string buff;
+					std::vector<float> posBuf(0);
+					while (getline(line, buff, ' '))
+					{
+						if (std::any_of(buff.begin(), buff.end(), isdigit)) {
+							posBuf.push_back(std::stof(buff));
+						}
+					}
+					if (posBuf.size() == 3) {
+						normalPos.push_back({ posBuf[0], posBuf[1], posBuf[2]});
+					}
+
 				}
 				else if (lineBuf.find("v") != std::string::npos && lineBuf.find("vn") == std::string::npos && lineBuf.find("vt") == std::string::npos) {
 					vertPositionNum++;
@@ -108,8 +130,7 @@ void Model::LoadObj(const std::string& fileName) {
 					}
 					if (posBuf.size() == 3) {
 						meshData.vertMap[i].position = Vector4(posBuf[0], posBuf[1], posBuf[2], 1.0f);
-						meshData.vertMap[i].color = Engine::UintToVector4(0x36f3f755); // Color
-						meshData.vertMap[i].normal = Vector4();
+						meshData.vertMap[i].color = Engine::UintToVector4(0x36f3f7aa); // Color
 					}
 					i++;
 					if (i >= vertPositionNum) {
@@ -134,6 +155,8 @@ void Model::LoadObj(const std::string& fileName) {
 						}
 						if (!num[0].empty()) {
 							meshData.indexMap[meshData.indexNum] = static_cast<int16_t>(std::stoi(num[0]) - 1);
+							Vector3D normal = normalPos[std::stoi(num[2]) - 1];
+							meshData.vertMap[std::stoi(num[2]) - 1].normal = { normal.x, normal.y, normal.z,0.0f };
 							meshData.indexNum++;
 						}
 					}
@@ -156,6 +179,10 @@ void Model::LoadShader(const std::string& vertexFileName, const std::string& pix
 		assert(pixelShaderBlob != nullptr);
 		geometoryShaderBlob = Engine::CompilerShader(Engine::ConvertString(geometoryFileName), L"gs_6_0");
 		assert(geometoryShaderBlob != nullptr);
+	/*	hullShaderBlob = Engine::CompilerShader(Engine::ConvertString("WaveShader/Wave.HS.hlsl"), L"hs_6_0");
+		assert(hullShaderBlob != nullptr);
+		domainShaderBlob = Engine::CompilerShader(Engine::ConvertString("WaveShader/Wave.DS.hlsl"), L"ds_6_0");
+		assert(domainShaderBlob != nullptr);*/
 
 		loadShaderFlg = true;
 	}
@@ -233,20 +260,30 @@ void Model::CreateGraphicsPipeline() {
 			vertexShaderBlob->GetBufferPointer(),
 			vertexShaderBlob->GetBufferSize()
 		};
-		graphicsPipelineStateDesc.PS = {
-			pixelShaderBlob->GetBufferPointer(),
-			pixelShaderBlob->GetBufferSize()
-		};
 		graphicsPipelineStateDesc.GS = {
 			geometoryShaderBlob->GetBufferPointer(),
 			geometoryShaderBlob->GetBufferSize()
 		};
+		graphicsPipelineStateDesc.PS = {
+			pixelShaderBlob->GetBufferPointer(),
+			pixelShaderBlob->GetBufferSize()
+		};
+		/*graphicsPipelineStateDesc.HS = {
+			hullShaderBlob->GetBufferPointer(),
+			hullShaderBlob->GetBufferSize()
+		};
+		graphicsPipelineStateDesc.DS = {
+			domainShaderBlob->GetBufferPointer(),
+			domainShaderBlob->GetBufferSize()
+		};*/
+
 		graphicsPipelineStateDesc.BlendState = blendDec;
 		graphicsPipelineStateDesc.RasterizerState = rasterizerDesc;
 		// 書き込むRTVの情報
 		graphicsPipelineStateDesc.NumRenderTargets = 1;
-		graphicsPipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+		graphicsPipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
 		// 利用するトポロジ(形状)のタイプ
+		//graphicsPipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_PATCH;
 		graphicsPipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 		// どのように画面に打ち込むかの設定
 		graphicsPipelineStateDesc.SampleDesc.Count = 1;
@@ -260,7 +297,7 @@ void Model::CreateGraphicsPipeline() {
 
 		graphicsPipelineStateDesc.BlendState.RenderTarget[0].BlendEnable = true;
 		graphicsPipelineStateDesc.BlendState.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;  // D3D12_BLEND_ZERO;
-		graphicsPipelineStateDesc.BlendState.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;  // D3D12_BLEND_SRC_COLOR;87tytyfhugfyuftfdyturyutrfy
+		graphicsPipelineStateDesc.BlendState.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;  // D3D12_BLEND_SRC_COLOR;
 		graphicsPipelineStateDesc.BlendState.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
 		graphicsPipelineStateDesc.BlendState.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
 		graphicsPipelineStateDesc.BlendState.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
@@ -294,6 +331,7 @@ void Model::Draw(const Mat4x4& worldMat, const Mat4x4& viewProjectionMat, const 
 
 	Engine::GetCommandList()->SetPipelineState(this->graphicsPipelineState);
 	Engine::GetCommandList()->SetGraphicsRootSignature(rootSignature);
+	//Engine::GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
 	Engine::GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	Engine::GetCommandList()->IASetVertexBuffers(0,1,&meshData.vertexView);
 	Engine::GetCommandList()->IASetIndexBuffer(&meshData.indexView);
@@ -320,6 +358,12 @@ Model::~Model() {
 	if (geometoryShaderBlob) {
 		geometoryShaderBlob->Release();
 	}
+	/*if (hullShaderBlob) {
+		hullShaderBlob->Release();
+	}
+	if (domainShaderBlob) {
+		domainShaderBlob->Release();
+	}*/
 	if (meshData.indexBuffer) {
 		meshData.indexBuffer->Release();
 	}

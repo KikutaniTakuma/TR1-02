@@ -38,6 +38,9 @@
     <ClCompile Include="Model\Model.cpp">
       <Filter>Model</Filter>
     </ClCompile>
+    <ClCompile Include="RenderTarget\RenderTarget.cpp">
+      <Filter>RenderTareget</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -51,6 +54,9 @@
     </Filter>
     <Filter Include="Model">
       <UniqueIdentifier>{75878dc3-228d-4f78-a159-c89a43ffafe2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RenderTareget">
+      <UniqueIdentifier>{b462a3d3-8e40-4103-8650-7a43265afb6a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -95,6 +101,9 @@
     </ClInclude>
     <ClInclude Include="Model\Model.h">
       <Filter>Model</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderTarget\RenderTarget.h">
+      <Filter>RenderTareget</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

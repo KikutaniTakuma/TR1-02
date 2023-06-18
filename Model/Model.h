@@ -41,8 +41,13 @@ class Model {
 	struct DirectionLight {
 		Vector4 ligDirection;
 		Vector3D ligColor;
-		float pad;
+		float pad0;
 		Vector3D eyePos;
+		float pad1;
+		Vector3D ptPos;
+		float pad2;
+		Vector3D ptColor;
+		float ptRange;
 	};
 
 public:
@@ -61,10 +66,12 @@ private:
 
 
 private:
+
 	Mesh meshData;
 	IDxcBlob* vertexShaderBlob = nullptr;
 	IDxcBlob* pixelShaderBlob = nullptr;
 	IDxcBlob* geometoryShaderBlob = nullptr;
+
 	ID3D12RootSignature* rootSignature = nullptr;
 	ID3D12PipelineState* graphicsPipelineState = nullptr;
 	

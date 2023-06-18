@@ -12,7 +12,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	model->LoadObj("Wave.obj");
 
-	model->LoadShader("Shaders/Object3D.VS.hlsl", "Shaders/Object3D.PS.hlsl", "Shaders/Object3D.GS.hlsl");
+	model->LoadShader("WaveShader/Wave.VS.hlsl", "WaveShader/Wave.PS.hlsl", "WaveShader/Wave.GS.hlsl");
 
 
 	Mat4x4 worldMat = MakeMatrixAffin(Vector3D(1.0f,1.0f,1.0f), Vector3D(), Vector3D());
