@@ -29,7 +29,7 @@ class Model {
 		uint16_t* indexMap = nullptr;
 
 		// indexêî
-		uint32_t indexNum;
+		uint32_t indexNum = 0;
 	};
 
 	struct ConstBuffer {
@@ -71,6 +71,8 @@ private:
 	IDxcBlob* vertexShaderBlob = nullptr;
 	IDxcBlob* pixelShaderBlob = nullptr;
 	IDxcBlob* geometoryShaderBlob = nullptr;
+	IDxcBlob* hullShaderBlob = nullptr;
+	IDxcBlob* domainShaderBlob = nullptr;
 
 	ID3D12RootSignature* rootSignature = nullptr;
 	ID3D12PipelineState* graphicsPipelineState = nullptr;

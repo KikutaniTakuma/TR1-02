@@ -2,6 +2,8 @@
 #include <cassert>
 #include <format>
 #include <filesystem>
+#include "WinApp/WinApp.h"
+#include "ConvertString/ConvertString.h"
 
 #include "externals/imgui/imgui.h"
 #include "externals/imgui/imgui_impl_dx12.h"
@@ -12,43 +14,6 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg
 void Log(const std::string& meg) {
 	OutputDebugStringA(meg.c_str());
 }
-
-
-#pragma region String type change Function
-/// 
-/// string to wstring
-/// 
-std::wstring Engine::ConvertString(const std::string& msg) {
-	if (msg.empty()) {
-		return std::wstring();
-	}
-
-	auto sizeNeeded = MultiByteToWideChar(CP_UTF8, 0, reinterpret_cast<const char*>(&msg[0]), static_cast<int>(msg.size()), NULL, 0);
-	if (sizeNeeded == 0) {
-		return std::wstring();
-	}
-	std::wstring result(sizeNeeded, 0);
-	MultiByteToWideChar(CP_UTF8, 0, reinterpret_cast<const char*>(&msg[0]), static_cast<int>(msg.size()), &result[0], sizeNeeded);
-	return result;
-}
-
-/// 
-/// wstring to string
-/// 
-std::string Engine::ConvertString(const std::wstring& msg) {
-	if (msg.empty()) {
-		return std::string();
-	}
-
-	auto sizeNeeded = WideCharToMultiByte(CP_UTF8, 0, msg.data(), static_cast<int>(msg.size()), NULL, 0, NULL, NULL);
-	if (sizeNeeded == 0) {
-		return std::string();
-	}
-	std::string result(sizeNeeded, 0);
-	WideCharToMultiByte(CP_UTF8, 0, msg.data(), static_cast<int>(msg.size()), result.data(), sizeNeeded, NULL, NULL);
-	return result;
-}
-#pragma endregion
 
 
 /// 
@@ -64,14 +29,17 @@ void Engine::Initalize(int windowWidth, int windowHeight, const std::string& win
 	engine->clientWidth = windowWidth;
 	engine->clientHeight = windowHeight;
 
+	WinApp::Initalize();
 
 	// Window生成
-	assert(engine->InitalizeWindow(ConvertString(windowName)));
+	WinApp::GetInstance()->Create(ConvertString(windowName), windowWidth, windowHeight);
 
 #ifdef _DEBUG
 	// DebugLayer有効化
 	engine->InitalizeDebugLayer();
 #endif
+
+	engine->pera = std::make_unique<PeraRender>();
 
 	// Direct3D生成
 	assert(engine->InitalizeDirect3D());
@@ -85,6 +53,8 @@ void Engine::Initalize(int windowWidth, int windowHeight, const std::string& win
 void Engine::Finalize() {
 	delete engine;
 	engine = nullptr;
+
+	WinApp::Finalize();
 }
 
 
@@ -108,36 +78,6 @@ LRESULT WindowProcedure(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
 	}
 
 	return DefWindowProc(hwnd, msg, wparam, lparam);
-}
-
-bool Engine::InitalizeWindow(const std::wstring& windowName) {
-	w.cbSize = sizeof(WNDCLASSEX);
-	w.lpfnWndProc = WindowProcedure;
-	w.lpszClassName = windowName.c_str();
-	w.hInstance = GetModuleHandle(nullptr);
-
-	RegisterClassEx(&w);
-
-	RECT wrc = { 0,0,clientWidth, clientHeight };
-
-	AdjustWindowRect(&wrc, WS_OVERLAPPEDWINDOW, false);
-
-	hwnd = CreateWindow(
-		w.lpszClassName,
-		windowName.c_str(),
-		WS_OVERLAPPEDWINDOW,
-		CW_USEDEFAULT,
-		CW_USEDEFAULT,
-		wrc.right - wrc.left,
-		wrc.bottom - wrc.top,
-		nullptr,
-		nullptr,
-		w.hInstance,
-		nullptr
-	);
-
-	// Window表示
-	return static_cast<bool>(!ShowWindow(hwnd, SW_SHOW));
 }
 
 
@@ -302,8 +242,11 @@ bool Engine::InitalizeDirect12() {
 	swapChainDesc.BufferCount = 2;
 	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 
-	hr = dxgiFactory->CreateSwapChainForHwnd(commandQueue, hwnd, &swapChainDesc, nullptr, nullptr, reinterpret_cast<IDXGISwapChain1**>(&swapChain));
+	hr = dxgiFactory->CreateSwapChainForHwnd(commandQueue, WinApp::GetInstance()->GetHwnd(), &swapChainDesc, nullptr, nullptr, reinterpret_cast<IDXGISwapChain1**>(&swapChain));
 	assert(SUCCEEDED(hr));
+
+	dxgiFactory->MakeWindowAssociation(
+		WinApp::GetInstance()->GetHwnd(), DXGI_MWA_NO_WINDOW_CHANGES | DXGI_MWA_NO_ALT_ENTER);
 
 
 	// デスクリプタヒープの作成
@@ -340,7 +283,7 @@ bool Engine::InitalizeDirect12() {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGui::StyleColorsDark();
-	ImGui_ImplWin32_Init(hwnd);
+	ImGui_ImplWin32_Init(WinApp::GetInstance()->GetHwnd());
 	ImGui_ImplDX12_Init(
 		device,
 		swapChainDesc.BufferCount,
@@ -480,13 +423,13 @@ void Engine::InitalizeDraw() {
 
 	CreatePera();
 
-	pera.CreateShader("PostShader/Post.VS.hlsl", "PostShader/PostNone.PS.hlsl");
+	pera->CreateShader("PostShader/Post.VS.hlsl", "PostShader/PostNone.PS.hlsl");
 	
-	pera.CreateGraphicsPipeline();
+	pera->CreateGraphicsPipeline();
 }
 
 void  Engine::CreatePera() {
-	pera.CreateDescriptor();
+	pera->CreateDescriptor();
 }
 
 
@@ -643,7 +586,7 @@ void Engine::FrameStart() {
 	engine->commandList->ClearDepthStencilView(engine->dsvHeap->GetCPUDescriptorHandleForHeapStart(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
 	// 指定した色で画面全体をクリアする
-	float clearColor[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+	float clearColor[] = { 0.4f, 0.7f, 1.0f, 1.0f };
 	engine->commandList->ClearRenderTargetView(engine->rtvHandles[backBufferIndex], clearColor, 0, nullptr);
 
 
@@ -668,7 +611,7 @@ void Engine::FrameStart() {
 	scissorRect.bottom = engine->clientHeight;
 	engine->commandList->RSSetScissorRects(1, &scissorRect);
 
-	engine->pera.PreDraw();
+	engine->pera->PreDraw();
 }
 
 void Engine::FrameEnd() {
@@ -678,7 +621,7 @@ void Engine::FrameEnd() {
 	auto dsvH = engine->dsvHeap->GetCPUDescriptorHandleForHeapStart();
 	engine->commandList->OMSetRenderTargets(1, &engine->rtvHandles[backBufferIndex], false, &dsvH);
 
-	engine->pera.Draw();
+	engine->pera->Draw();
 
 	ID3D12DescriptorHeap* descriptorHeaps[] = {
 		engine->srvDescriptorHeap
@@ -740,6 +683,8 @@ Engine::~Engine() {
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
 
+	pera.reset();
+
 	dsvHeap->Release();
 	depthStencilResource->Release();
 	for (auto& i : pixelShaders) {
@@ -765,7 +710,6 @@ Engine::~Engine() {
 #ifdef _DEBUG
 	debugController->Release();
 #endif
-	CloseWindow(hwnd);
 
 
 	// リソースリークチェック
@@ -776,7 +720,4 @@ Engine::~Engine() {
 		debug->ReportLiveObjects(DXGI_DEBUG_D3D12, DXGI_DEBUG_RLO_ALL);
 		debug->Release();
 	}
-
-
-	CoUninitialize();
 }

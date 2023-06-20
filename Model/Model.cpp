@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <cassert>
 #include <numbers>
+#include "Engine/ConvertString/ConvertString.h"
 
 
 Model::Model() :
@@ -173,15 +174,15 @@ void Model::LoadObj(const std::string& fileName) {
 
 void Model::LoadShader(const std::string& vertexFileName, const std::string& pixelFileName, const std::string& geometoryFileName) {
 	if (!loadShaderFlg) {
-		vertexShaderBlob = Engine::CompilerShader(Engine::ConvertString(vertexFileName).c_str(), L"vs_6_0");
+		vertexShaderBlob = Engine::CompilerShader(ConvertString(vertexFileName).c_str(), L"vs_6_0");
 		assert(vertexShaderBlob != nullptr);
-		pixelShaderBlob = Engine::CompilerShader(Engine::ConvertString(pixelFileName), L"ps_6_0");
+		pixelShaderBlob = Engine::CompilerShader(ConvertString(pixelFileName), L"ps_6_0");
 		assert(pixelShaderBlob != nullptr);
-		geometoryShaderBlob = Engine::CompilerShader(Engine::ConvertString(geometoryFileName), L"gs_6_0");
+		geometoryShaderBlob = Engine::CompilerShader(ConvertString(geometoryFileName), L"gs_6_0");
 		assert(geometoryShaderBlob != nullptr);
-	/*	hullShaderBlob = Engine::CompilerShader(Engine::ConvertString("WaveShader/Wave.HS.hlsl"), L"hs_6_0");
+	/*	hullShaderBlob = Engine::CompilerShader(ConvertString("WaveShader/Wave.HS.hlsl"), L"hs_6_0");
 		assert(hullShaderBlob != nullptr);
-		domainShaderBlob = Engine::CompilerShader(Engine::ConvertString("WaveShader/Wave.DS.hlsl"), L"ds_6_0");
+		domainShaderBlob = Engine::CompilerShader(ConvertString("WaveShader/Wave.DS.hlsl"), L"ds_6_0");
 		assert(domainShaderBlob != nullptr);*/
 
 		loadShaderFlg = true;

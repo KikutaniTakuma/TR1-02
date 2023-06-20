@@ -12,6 +12,8 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <memory>
+#include <chrono>
 
 #include "Math/Vector3D/Vector3D.h"
 #include "Math/Mat4x4/Mat4x4.h"
@@ -37,9 +39,6 @@ public:
 		// Compilerに使用するProfile
 		const wchar_t* profile
 	);
-
-	static std::wstring ConvertString(const std::string& msg);
-	static std::string ConvertString(const std::wstring& msg);
 
 	static Vector4 UintToVector4(uint32_t color);
 
@@ -99,13 +98,6 @@ public:
 	///
 	/// Window生成用
 	/// 
-private:
-	bool InitalizeWindow(const std::wstring& windowName);
-
-private:
-	WNDCLASSEX w{};
-	HWND hwnd{};
-
 public:
 	int32_t clientWidth = 0;
 	int32_t clientHeight = 0;
@@ -169,8 +161,6 @@ private:
 	IDxcIncludeHandler* includeHandler = nullptr;
 
 
-
-
 	/// 
 	/// 描画関係
 	/// 
@@ -193,7 +183,7 @@ private:
 	// ポストエフェクト用
 	void CreatePera();
 
-	PeraRender pera;
+	std::unique_ptr<PeraRender> pera;
 
 
 

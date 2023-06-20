@@ -1,6 +1,7 @@
 #include "RenderTarget.h"
 #include "Engine/Engine.h"
 #include <cassert>
+#include "Engine/ConvertString/ConvertString.h"
 
 PeraRender::PeraRender():
 	peraResource(nullptr),
@@ -77,9 +78,9 @@ void PeraRender::CreateDescriptor() {
 }
 
 void PeraRender::CreateShader(const std::string& vsFileName, const std::string& psFileName) {
-	peraVertexShader = Engine::CompilerShader(Engine::ConvertString(vsFileName), L"vs_6_0");
+	peraVertexShader = Engine::CompilerShader(ConvertString(vsFileName), L"vs_6_0");
 	assert(peraVertexShader);
-	peraPixelShader = Engine::CompilerShader(Engine::ConvertString(psFileName), L"ps_6_0");
+	peraPixelShader = Engine::CompilerShader(ConvertString(psFileName), L"ps_6_0");
 	assert(peraPixelShader);
 }
 
