@@ -33,3 +33,7 @@ std::string ConvertString(const std::wstring& msg) {
 	WideCharToMultiByte(CP_UTF8, 0, msg.data(), static_cast<int>(msg.size()), result.data(), sizeNeeded, NULL, NULL);
 	return result;
 }
+
+void Log(const std::string& meg) {
+	OutputDebugStringA(meg.c_str());
+}

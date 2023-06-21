@@ -22,9 +22,6 @@ void WinApp::Finalize() {
 	// ウィンドウクラスを登録解除
 	UnregisterClass(instance->w.lpszClassName, instance->w.hInstance);
 
-	// COM 終了
-	CoUninitialize();
-
 	// instanceを解放
 	delete instance;
 	instance = nullptr;

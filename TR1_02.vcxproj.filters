@@ -53,6 +53,9 @@
     <ClCompile Include="Engine\Gamepad\Gamepad.cpp">
       <Filter>Engine\Gamepad</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\ShaderManager\ShaderManager.cpp">
+      <Filter>Engine\ShaderManager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -81,6 +84,9 @@
     </Filter>
     <Filter Include="Engine\Gamepad">
       <UniqueIdentifier>{5ba5205c-920a-4591-82c3-2c13db824148}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\ShaderManager">
+      <UniqueIdentifier>{e9f17783-c021-4323-ae3b-d9f04d63298d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -140,6 +146,9 @@
     </ClInclude>
     <ClInclude Include="Engine\Gamepad\Gamepad.h">
       <Filter>Engine\Gamepad</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\ShaderManager\ShaderManager.h">
+      <Filter>Engine\ShaderManager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

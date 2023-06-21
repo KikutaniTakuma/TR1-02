@@ -11,7 +11,6 @@
 
 #include <string>
 #include <vector>
-#include <unordered_map>
 #include <memory>
 #include <chrono>
 
@@ -33,12 +32,6 @@ public:
 	static ID3D12Resource* CreateBufferResuorce(size_t sizeInBytes);
 
 	static ID3D12Resource* CreateDepthStencilTextureResource(int32_t width, int32_t height);
-	static IDxcBlob* CompilerShader(
-		// CompilerするShaderファイルへのパス
-		const std::wstring& filePath,
-		// Compilerに使用するProfile
-		const wchar_t* profile
-	);
 
 	static Vector4 UintToVector4(uint32_t color);
 
@@ -155,11 +148,6 @@ private:
 	uint64_t fenceVal = 0;
 	HANDLE fenceEvent = nullptr;
 
-	IDxcUtils* dxcUtils = nullptr;
-	IDxcCompiler3* dxcCompiler = nullptr;
-
-	IDxcIncludeHandler* includeHandler = nullptr;
-
 
 	/// 
 	/// 描画関係
@@ -167,16 +155,10 @@ private:
 public:
 	void InitalizeDraw();
 
-	void LoadShader();
-
 
 private:
 	ID3D12Resource* depthStencilResource = nullptr;
 	ID3D12DescriptorHeap* dsvHeap = nullptr;
-
-
-	std::unordered_map<std::string, IDxcBlob*> vertexShaders;
-	std::unordered_map<std::string, IDxcBlob*> pixelShaders;
 	
 
 

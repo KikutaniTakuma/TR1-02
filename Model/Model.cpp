@@ -7,6 +7,7 @@
 #include <cassert>
 #include <numbers>
 #include "Engine/ConvertString/ConvertString.h"
+#include "Engine/ShaderManager/ShaderManager.h"
 
 
 Model::Model() :
@@ -46,7 +47,7 @@ Model::Model() :
 void Model::LoadObj(const std::string& fileName) {
 	if (!loadObjFlg) {
 		std::ifstream objFile(fileName);
-		if (!objFile) { return; }
+		assert(objFile);
 
 		std::vector<Vector3D> normalPos(0);
 		uint32_t vertPositionNum = 0;
@@ -157,7 +158,7 @@ void Model::LoadObj(const std::string& fileName) {
 						if (!num[0].empty()) {
 							meshData.indexMap[meshData.indexNum] = static_cast<int16_t>(std::stoi(num[0]) - 1);
 							Vector3D normal = normalPos[std::stoi(num[2]) - 1];
-							meshData.vertMap[std::stoi(num[2]) - 1].normal = { normal.x, normal.y, normal.z,0.0f };
+							meshData.vertMap[std::stoi(num[0]) - 1].normal = { normal.x, normal.y, normal.z,0.0f };
 							meshData.indexNum++;
 						}
 					}
@@ -174,11 +175,11 @@ void Model::LoadObj(const std::string& fileName) {
 
 void Model::LoadShader(const std::string& vertexFileName, const std::string& pixelFileName, const std::string& geometoryFileName) {
 	if (!loadShaderFlg) {
-		vertexShaderBlob = Engine::CompilerShader(ConvertString(vertexFileName).c_str(), L"vs_6_0");
+		vertexShaderBlob = ShaderManager::GetInstance()->LoadVertexShader(vertexFileName);;
 		assert(vertexShaderBlob != nullptr);
-		pixelShaderBlob = Engine::CompilerShader(ConvertString(pixelFileName), L"ps_6_0");
+		pixelShaderBlob = ShaderManager::GetInstance()->LoadPixelShader(pixelFileName);
 		assert(pixelShaderBlob != nullptr);
-		geometoryShaderBlob = Engine::CompilerShader(ConvertString(geometoryFileName), L"gs_6_0");
+		geometoryShaderBlob = ShaderManager::GetInstance()->LoadGeometoryShader(geometoryFileName);
 		assert(geometoryShaderBlob != nullptr);
 	/*	hullShaderBlob = Engine::CompilerShader(ConvertString("WaveShader/Wave.HS.hlsl"), L"hs_6_0");
 		assert(hullShaderBlob != nullptr);
@@ -320,8 +321,6 @@ void Model::Update() {
 void Model::Draw(const Mat4x4& worldMat, const Mat4x4& viewProjectionMat, const Vector3D& cameraPos) {
 	if (!createGPFlg) {
 		this->CreateGraphicsPipeline();
-
-		createGPFlg = true;
 	}
 	assert(createGPFlg);
 
@@ -359,12 +358,6 @@ Model::~Model() {
 	if (geometoryShaderBlob) {
 		geometoryShaderBlob->Release();
 	}
-	/*if (hullShaderBlob) {
-		hullShaderBlob->Release();
-	}
-	if (domainShaderBlob) {
-		domainShaderBlob->Release();
-	}*/
 	if (meshData.indexBuffer) {
 		meshData.indexBuffer->Release();
 	}

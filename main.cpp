@@ -8,17 +8,17 @@
 #include "Engine/Gamepad/Gamepad.h"
 
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
-	Engine::Initalize(1920, 1080, "DirectXGame");
+	Engine::Initalize(1280, 720, "DirectXGame");
 	Gamepad::Initilize();
 
 	auto model = std::make_unique<Model>();
 
-	model->LoadObj("Wave.obj");
+	model->LoadObj("Obj/Cube.obj");
 
-	model->LoadShader("WaveShader/Wave.VS.hlsl", "WaveShader/Wave.PS.hlsl", "WaveShader/Wave.GS.hlsl");
+	model->LoadShader("Shaders/Object3D.VS.hlsl", "WaveShader/Wave.PS.hlsl", "WaveShader/Wave.GS.hlsl");
 
 
-	Mat4x4 worldMat = MakeMatrixAffin(Vector3D(5.0f,1.0f,5.0f), Vector3D(), Vector3D());
+	Mat4x4 worldMat = MakeMatrixAffin(Vector3D(1.0f,1.0f,1.0f), Vector3D(), Vector3D());
 
 	Mat4x4 viewMatrix;
 	Mat4x4 projectionMatrix;
@@ -55,6 +55,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		ImGui::DragFloat3("cameraPos", &cameraPos.x, 0.01f);
 		ImGui::DragFloat3("cameraRotate", &cameraRotate.x, 0.01f);
 		ImGui::DragFloat3("cameraScale", &cameraScale.x, 0.01f);
+		ImGui::DragFloat3("cameraMoveRotate", &cameraMoveRotate.x, 0.01f);
 		ImGui::End();
 
 		model->Update();

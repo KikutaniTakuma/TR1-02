@@ -3,17 +3,13 @@
 #include <format>
 #include <filesystem>
 #include "WinApp/WinApp.h"
+#include "ShaderManager/ShaderManager.h"
 #include "ConvertString/ConvertString.h"
 
 #include "externals/imgui/imgui.h"
 #include "externals/imgui/imgui_impl_dx12.h"
 #include "externals/imgui/imgui_impl_win32.h"
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wPram, LPARAM lPram);
-
-//デバッグ用
-void Log(const std::string& meg) {
-	OutputDebugStringA(meg.c_str());
-}
 
 
 /// 
@@ -23,6 +19,8 @@ void Log(const std::string& meg) {
 Engine* Engine::engine = nullptr;
 
 void Engine::Initalize(int windowWidth, int windowHeight, const std::string& windowName) {
+	CoInitializeEx(0, COINIT_MULTITHREADED);
+
 	engine = new Engine();
 	assert(engine);
 
@@ -33,6 +31,8 @@ void Engine::Initalize(int windowWidth, int windowHeight, const std::string& win
 
 	// Window生成
 	WinApp::GetInstance()->Create(ConvertString(windowName), windowWidth, windowHeight);
+
+	ShaderManager::Initalize();
 
 #ifdef _DEBUG
 	// DebugLayer有効化
@@ -51,10 +51,15 @@ void Engine::Initalize(int windowWidth, int windowHeight, const std::string& win
 }
 
 void Engine::Finalize() {
+	ShaderManager::Finalize();
+
 	delete engine;
 	engine = nullptr;
 
 	WinApp::Finalize();
+
+	// COM 終了
+	CoUninitialize();
 }
 
 
@@ -304,19 +309,7 @@ bool Engine::InitalizeDirect12() {
 	fenceEvent = nullptr;
 	fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 	assert(fenceEvent != nullptr);
-	
 
-	// dxcCompilerを初期化
-	dxcUtils = nullptr;
-	dxcCompiler = nullptr;
-	hr = DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&dxcUtils));
-	assert(SUCCEEDED(hr));
-	hr = DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&dxcCompiler));
-	assert(SUCCEEDED(hr));
-
-	includeHandler = nullptr;
-	hr = dxcUtils->CreateDefaultIncludeHandler(&includeHandler);
-	assert(SUCCEEDED(hr));
 
 	return true;
 }
@@ -430,99 +423,6 @@ void Engine::InitalizeDraw() {
 
 void  Engine::CreatePera() {
 	pera->CreateDescriptor();
-}
-
-
-IDxcBlob* Engine::CompilerShader(
-	// CompilerするShaderファイルへのパス
-	const std::wstring& filePath,
-	// Compilerに使用するProfile
-	const wchar_t* profile)
-{
-	// 1. hlslファイルを読む
-	// これからシェーダーをコンパイルする旨をログに出す
-	Log(ConvertString(std::format(L"Begin CompilerShader, path:{}, profile:{}\n", filePath, profile)));
-	// hlslファイルを読む
-	IDxcBlobEncoding* shaderSource = nullptr;
-	HRESULT hr = engine->dxcUtils->LoadFile(filePath.c_str(), nullptr, &shaderSource);
-	// 読めなかったら止める
-	assert(SUCCEEDED(hr));
-	// 読み込んだファイルの内容を設定する
-	DxcBuffer shaderSourceBuffer;
-	shaderSourceBuffer.Ptr = shaderSource->GetBufferPointer();
-	shaderSourceBuffer.Size = shaderSource->GetBufferSize();
-	shaderSourceBuffer.Encoding = DXC_CP_UTF8;
-
-
-	// 2. Compileする
-	LPCWSTR arguments[] = {
-		filePath.c_str(), // コンパイル対象のhlslファイル名
-		L"-E", L"main", // エントリーポイントの指定。基本的にmain以外にはしない
-		L"-T", profile, // ShaderProfileの設定
-		L"-Zi", L"-Qembed_debug", // デバッグ用の情報を埋め込む
-		L"-Od", // 最適化を外しておく
-		L"-Zpr" // メモリレイアウトを優先
-	};
-	// 実際にShaderをコンパイルする
-	IDxcResult* shaderResult = nullptr;
-	hr = engine->dxcCompiler->Compile(
-		&shaderSourceBuffer, // 読みこんだファイル
-		arguments,           // コンパイルオプション
-		_countof(arguments), // コンパイルオプションの数
-		engine->includeHandler,      // includeが含まれた諸々
-		IID_PPV_ARGS(&shaderResult) // コンパイル結果
-	);
-
-	// コンパイルエラーではなくdxcが起動できないなど致命的な状況
-	assert(SUCCEEDED(hr));
-
-	// 3. 警告・エラーが出てないか確認する
-	IDxcBlobUtf8* shaderError = nullptr;
-	shaderResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&shaderError), nullptr);
-	if (shaderError != nullptr && shaderError->GetStringLength() != 0) {
-		Log(shaderError->GetStringPointer());
-		// 警告・エラーダメゼッタイ
-		assert(false);
-	}
-
-	// 4. Compileを受け取って返す
-	IDxcBlob* shaderBlob = nullptr;
-	hr = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), nullptr);
-	assert(SUCCEEDED(hr));
-	// 成功したログを出す
-	Log(ConvertString(std::format(L"Compile Succeeded, path:{}, profile:{}\n", filePath, profile)));
-	// もう使わないリソースを解放
-	shaderSource->Release();
-	shaderResult->Release();
-	// 実行用バイナリをリターン
-	return shaderBlob;
-}
-
-
-void Engine::LoadShader() {
-	std::vector<std::filesystem::path> vsShaderFilePath(0);
-	std::vector<std::filesystem::path> psShaderFilePath(0);
-	for (auto& path : std::filesystem::directory_iterator("Shaders")) {
-		if (path.path().filename().string().find(".VS.hlsl") != std::string::npos) {
-			vsShaderFilePath.push_back(path.path());
-		}
-		else if (path.path().filename().string().find(".PS.hlsl") != std::string::npos) {
-			psShaderFilePath.push_back(path.path());
-		}
-	}
-
-	// shaderをコンパイルする
-	for (auto& vsFileName : vsShaderFilePath) {
-		IDxcBlob* vertexShaderBlob = CompilerShader(vsFileName, L"vs_6_0");
-		assert(vertexShaderBlob != nullptr);
-		vertexShaders.insert(std::make_pair<std::string, IDxcBlob*>(vsFileName.filename().generic_string(), std::move(vertexShaderBlob)));
-	}
-
-	for (auto& psFileName : psShaderFilePath) {
-		IDxcBlob* pixelShaderBlob = CompilerShader(psFileName, L"ps_6_0");
-		assert(pixelShaderBlob != nullptr);
-		pixelShaders.insert(std::make_pair<std::string, IDxcBlob*>(psFileName.filename().generic_string(), std::move(pixelShaderBlob)));
-	}
 }
 
 Vector4 Engine::UintToVector4(uint32_t color) {
@@ -687,12 +587,6 @@ Engine::~Engine() {
 
 	dsvHeap->Release();
 	depthStencilResource->Release();
-	for (auto& i : pixelShaders) {
-		i.second->Release();
-	}
-	for (auto& i : vertexShaders) {
-		i.second->Release();
-	}
 	CloseHandle(fenceEvent);
 	fence->Release();
 	srvDescriptorHeap->Release();

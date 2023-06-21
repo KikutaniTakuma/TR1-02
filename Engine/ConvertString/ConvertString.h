@@ -11,3 +11,5 @@ std::wstring ConvertString(const std::string& msg);
 /// wstring to string
 /// 
 std::string ConvertString(const std::wstring& msg);
+
+void Log(const std::string& meg);
