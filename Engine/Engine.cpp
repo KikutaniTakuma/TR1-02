@@ -2,53 +2,14 @@
 #include <cassert>
 #include <format>
 #include <filesystem>
+#include "WinApp/WinApp.h"
+#include "ShaderManager/ShaderManager.h"
+#include "ConvertString/ConvertString.h"
 
 #include "externals/imgui/imgui.h"
 #include "externals/imgui/imgui_impl_dx12.h"
 #include "externals/imgui/imgui_impl_win32.h"
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wPram, LPARAM lPram);
-
-//デバッグ用
-void Log(const std::string& meg) {
-	OutputDebugStringA(meg.c_str());
-}
-
-
-#pragma region String type change Function
-/// 
-/// string to wstring
-/// 
-std::wstring Engine::ConvertString(const std::string& msg) {
-	if (msg.empty()) {
-		return std::wstring();
-	}
-
-	auto sizeNeeded = MultiByteToWideChar(CP_UTF8, 0, reinterpret_cast<const char*>(&msg[0]), static_cast<int>(msg.size()), NULL, 0);
-	if (sizeNeeded == 0) {
-		return std::wstring();
-	}
-	std::wstring result(sizeNeeded, 0);
-	MultiByteToWideChar(CP_UTF8, 0, reinterpret_cast<const char*>(&msg[0]), static_cast<int>(msg.size()), &result[0], sizeNeeded);
-	return result;
-}
-
-/// 
-/// wstring to string
-/// 
-std::string Engine::ConvertString(const std::wstring& msg) {
-	if (msg.empty()) {
-		return std::string();
-	}
-
-	auto sizeNeeded = WideCharToMultiByte(CP_UTF8, 0, msg.data(), static_cast<int>(msg.size()), NULL, 0, NULL, NULL);
-	if (sizeNeeded == 0) {
-		return std::string();
-	}
-	std::string result(sizeNeeded, 0);
-	WideCharToMultiByte(CP_UTF8, 0, msg.data(), static_cast<int>(msg.size()), result.data(), sizeNeeded, NULL, NULL);
-	return result;
-}
-#pragma endregion
 
 
 /// 
@@ -58,20 +19,27 @@ std::string Engine::ConvertString(const std::wstring& msg) {
 Engine* Engine::engine = nullptr;
 
 void Engine::Initalize(int windowWidth, int windowHeight, const std::string& windowName) {
+	CoInitializeEx(0, COINIT_MULTITHREADED);
+
 	engine = new Engine();
 	assert(engine);
 
 	engine->clientWidth = windowWidth;
 	engine->clientHeight = windowHeight;
 
+	WinApp::Initalize();
 
 	// Window生成
-	assert(engine->InitalizeWindow(ConvertString(windowName)));
+	WinApp::GetInstance()->Create(ConvertString(windowName), windowWidth, windowHeight);
+
+	ShaderManager::Initalize();
 
 #ifdef _DEBUG
 	// DebugLayer有効化
 	engine->InitalizeDebugLayer();
 #endif
+
+	engine->pera = std::make_unique<PeraRender>();
 
 	// Direct3D生成
 	assert(engine->InitalizeDirect3D());
@@ -83,8 +51,15 @@ void Engine::Initalize(int windowWidth, int windowHeight, const std::string& win
 }
 
 void Engine::Finalize() {
+	ShaderManager::Finalize();
+
 	delete engine;
 	engine = nullptr;
+
+	WinApp::Finalize();
+
+	// COM 終了
+	CoUninitialize();
 }
 
 
@@ -108,36 +83,6 @@ LRESULT WindowProcedure(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
 	}
 
 	return DefWindowProc(hwnd, msg, wparam, lparam);
-}
-
-bool Engine::InitalizeWindow(const std::wstring& windowName) {
-	w.cbSize = sizeof(WNDCLASSEX);
-	w.lpfnWndProc = WindowProcedure;
-	w.lpszClassName = windowName.c_str();
-	w.hInstance = GetModuleHandle(nullptr);
-
-	RegisterClassEx(&w);
-
-	RECT wrc = { 0,0,clientWidth, clientHeight };
-
-	AdjustWindowRect(&wrc, WS_OVERLAPPEDWINDOW, false);
-
-	hwnd = CreateWindow(
-		w.lpszClassName,
-		windowName.c_str(),
-		WS_OVERLAPPEDWINDOW,
-		CW_USEDEFAULT,
-		CW_USEDEFAULT,
-		wrc.right - wrc.left,
-		wrc.bottom - wrc.top,
-		nullptr,
-		nullptr,
-		w.hInstance,
-		nullptr
-	);
-
-	// Window表示
-	return static_cast<bool>(!ShowWindow(hwnd, SW_SHOW));
 }
 
 
@@ -302,8 +247,11 @@ bool Engine::InitalizeDirect12() {
 	swapChainDesc.BufferCount = 2;
 	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 
-	hr = dxgiFactory->CreateSwapChainForHwnd(commandQueue, hwnd, &swapChainDesc, nullptr, nullptr, reinterpret_cast<IDXGISwapChain1**>(&swapChain));
+	hr = dxgiFactory->CreateSwapChainForHwnd(commandQueue, WinApp::GetInstance()->GetHwnd(), &swapChainDesc, nullptr, nullptr, reinterpret_cast<IDXGISwapChain1**>(&swapChain));
 	assert(SUCCEEDED(hr));
+
+	dxgiFactory->MakeWindowAssociation(
+		WinApp::GetInstance()->GetHwnd(), DXGI_MWA_NO_WINDOW_CHANGES | DXGI_MWA_NO_ALT_ENTER);
 
 
 	// デスクリプタヒープの作成
@@ -340,7 +288,7 @@ bool Engine::InitalizeDirect12() {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGui::StyleColorsDark();
-	ImGui_ImplWin32_Init(hwnd);
+	ImGui_ImplWin32_Init(WinApp::GetInstance()->GetHwnd());
 	ImGui_ImplDX12_Init(
 		device,
 		swapChainDesc.BufferCount,
@@ -361,19 +309,7 @@ bool Engine::InitalizeDirect12() {
 	fenceEvent = nullptr;
 	fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 	assert(fenceEvent != nullptr);
-	
 
-	// dxcCompilerを初期化
-	dxcUtils = nullptr;
-	dxcCompiler = nullptr;
-	hr = DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&dxcUtils));
-	assert(SUCCEEDED(hr));
-	hr = DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&dxcCompiler));
-	assert(SUCCEEDED(hr));
-
-	includeHandler = nullptr;
-	hr = dxcUtils->CreateDefaultIncludeHandler(&includeHandler);
-	assert(SUCCEEDED(hr));
 
 	return true;
 }
@@ -480,106 +416,13 @@ void Engine::InitalizeDraw() {
 
 	CreatePera();
 
-	pera.CreateShader("PostShader/Post.VS.hlsl", "PostShader/PostNone.PS.hlsl");
+	pera->CreateShader("PostShader/Post.VS.hlsl", "PostShader/PostNone.PS.hlsl");
 	
-	pera.CreateGraphicsPipeline();
+	pera->CreateGraphicsPipeline();
 }
 
 void  Engine::CreatePera() {
-	pera.CreateDescriptor();
-}
-
-
-IDxcBlob* Engine::CompilerShader(
-	// CompilerするShaderファイルへのパス
-	const std::wstring& filePath,
-	// Compilerに使用するProfile
-	const wchar_t* profile)
-{
-	// 1. hlslファイルを読む
-	// これからシェーダーをコンパイルする旨をログに出す
-	Log(ConvertString(std::format(L"Begin CompilerShader, path:{}, profile:{}\n", filePath, profile)));
-	// hlslファイルを読む
-	IDxcBlobEncoding* shaderSource = nullptr;
-	HRESULT hr = engine->dxcUtils->LoadFile(filePath.c_str(), nullptr, &shaderSource);
-	// 読めなかったら止める
-	assert(SUCCEEDED(hr));
-	// 読み込んだファイルの内容を設定する
-	DxcBuffer shaderSourceBuffer;
-	shaderSourceBuffer.Ptr = shaderSource->GetBufferPointer();
-	shaderSourceBuffer.Size = shaderSource->GetBufferSize();
-	shaderSourceBuffer.Encoding = DXC_CP_UTF8;
-
-
-	// 2. Compileする
-	LPCWSTR arguments[] = {
-		filePath.c_str(), // コンパイル対象のhlslファイル名
-		L"-E", L"main", // エントリーポイントの指定。基本的にmain以外にはしない
-		L"-T", profile, // ShaderProfileの設定
-		L"-Zi", L"-Qembed_debug", // デバッグ用の情報を埋め込む
-		L"-Od", // 最適化を外しておく
-		L"-Zpr" // メモリレイアウトを優先
-	};
-	// 実際にShaderをコンパイルする
-	IDxcResult* shaderResult = nullptr;
-	hr = engine->dxcCompiler->Compile(
-		&shaderSourceBuffer, // 読みこんだファイル
-		arguments,           // コンパイルオプション
-		_countof(arguments), // コンパイルオプションの数
-		engine->includeHandler,      // includeが含まれた諸々
-		IID_PPV_ARGS(&shaderResult) // コンパイル結果
-	);
-
-	// コンパイルエラーではなくdxcが起動できないなど致命的な状況
-	assert(SUCCEEDED(hr));
-
-	// 3. 警告・エラーが出てないか確認する
-	IDxcBlobUtf8* shaderError = nullptr;
-	shaderResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&shaderError), nullptr);
-	if (shaderError != nullptr && shaderError->GetStringLength() != 0) {
-		Log(shaderError->GetStringPointer());
-		// 警告・エラーダメゼッタイ
-		assert(false);
-	}
-
-	// 4. Compileを受け取って返す
-	IDxcBlob* shaderBlob = nullptr;
-	hr = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), nullptr);
-	assert(SUCCEEDED(hr));
-	// 成功したログを出す
-	Log(ConvertString(std::format(L"Compile Succeeded, path:{}, profile:{}\n", filePath, profile)));
-	// もう使わないリソースを解放
-	shaderSource->Release();
-	shaderResult->Release();
-	// 実行用バイナリをリターン
-	return shaderBlob;
-}
-
-
-void Engine::LoadShader() {
-	std::vector<std::filesystem::path> vsShaderFilePath(0);
-	std::vector<std::filesystem::path> psShaderFilePath(0);
-	for (auto& path : std::filesystem::directory_iterator("Shaders")) {
-		if (path.path().filename().string().find(".VS.hlsl") != std::string::npos) {
-			vsShaderFilePath.push_back(path.path());
-		}
-		else if (path.path().filename().string().find(".PS.hlsl") != std::string::npos) {
-			psShaderFilePath.push_back(path.path());
-		}
-	}
-
-	// shaderをコンパイルする
-	for (auto& vsFileName : vsShaderFilePath) {
-		IDxcBlob* vertexShaderBlob = CompilerShader(vsFileName, L"vs_6_0");
-		assert(vertexShaderBlob != nullptr);
-		vertexShaders.insert(std::make_pair<std::string, IDxcBlob*>(vsFileName.filename().generic_string(), std::move(vertexShaderBlob)));
-	}
-
-	for (auto& psFileName : psShaderFilePath) {
-		IDxcBlob* pixelShaderBlob = CompilerShader(psFileName, L"ps_6_0");
-		assert(pixelShaderBlob != nullptr);
-		pixelShaders.insert(std::make_pair<std::string, IDxcBlob*>(psFileName.filename().generic_string(), std::move(pixelShaderBlob)));
-	}
+	pera->CreateDescriptor();
 }
 
 Vector4 Engine::UintToVector4(uint32_t color) {
@@ -643,7 +486,7 @@ void Engine::FrameStart() {
 	engine->commandList->ClearDepthStencilView(engine->dsvHeap->GetCPUDescriptorHandleForHeapStart(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
 	// 指定した色で画面全体をクリアする
-	float clearColor[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+	float clearColor[] = { 0.4f, 0.7f, 1.0f, 1.0f };
 	engine->commandList->ClearRenderTargetView(engine->rtvHandles[backBufferIndex], clearColor, 0, nullptr);
 
 
@@ -668,7 +511,7 @@ void Engine::FrameStart() {
 	scissorRect.bottom = engine->clientHeight;
 	engine->commandList->RSSetScissorRects(1, &scissorRect);
 
-	engine->pera.PreDraw();
+	engine->pera->PreDraw();
 }
 
 void Engine::FrameEnd() {
@@ -678,7 +521,7 @@ void Engine::FrameEnd() {
 	auto dsvH = engine->dsvHeap->GetCPUDescriptorHandleForHeapStart();
 	engine->commandList->OMSetRenderTargets(1, &engine->rtvHandles[backBufferIndex], false, &dsvH);
 
-	engine->pera.Draw();
+	engine->pera->Draw();
 
 	ID3D12DescriptorHeap* descriptorHeaps[] = {
 		engine->srvDescriptorHeap
@@ -740,14 +583,10 @@ Engine::~Engine() {
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
 
+	pera.reset();
+
 	dsvHeap->Release();
 	depthStencilResource->Release();
-	for (auto& i : pixelShaders) {
-		i.second->Release();
-	}
-	for (auto& i : vertexShaders) {
-		i.second->Release();
-	}
 	CloseHandle(fenceEvent);
 	fence->Release();
 	srvDescriptorHeap->Release();
@@ -765,7 +604,6 @@ Engine::~Engine() {
 #ifdef _DEBUG
 	debugController->Release();
 #endif
-	CloseWindow(hwnd);
 
 
 	// リソースリークチェック
@@ -776,7 +614,4 @@ Engine::~Engine() {
 		debug->ReportLiveObjects(DXGI_DEBUG_D3D12, DXGI_DEBUG_RLO_ALL);
 		debug->Release();
 	}
-
-
-	CoUninitialize();
 }

@@ -41,6 +41,21 @@
     <ClCompile Include="RenderTarget\RenderTarget.cpp">
       <Filter>RenderTareget</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\WinApp\WinApp.cpp">
+      <Filter>Engine\WinApp</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\ConvertString\ConvertString.cpp">
+      <Filter>Engine\ConvertString</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\KeyInput\KeyInput.cpp">
+      <Filter>Engine\KeyInput</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Gamepad\Gamepad.cpp">
+      <Filter>Engine\Gamepad</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\ShaderManager\ShaderManager.cpp">
+      <Filter>Engine\ShaderManager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -57,6 +72,21 @@
     </Filter>
     <Filter Include="RenderTareget">
       <UniqueIdentifier>{b462a3d3-8e40-4103-8650-7a43265afb6a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\WinApp">
+      <UniqueIdentifier>{b53c25de-314b-4648-8852-e97c158f0275}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\ConvertString">
+      <UniqueIdentifier>{5a7a3057-cf34-4af9-a2fc-9484d57e4dd8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\KeyInput">
+      <UniqueIdentifier>{54cbf6cd-6d5d-4737-917a-4febfd4a8d56}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Gamepad">
+      <UniqueIdentifier>{5ba5205c-920a-4591-82c3-2c13db824148}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\ShaderManager">
+      <UniqueIdentifier>{e9f17783-c021-4323-ae3b-d9f04d63298d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -104,6 +134,21 @@
     </ClInclude>
     <ClInclude Include="RenderTarget\RenderTarget.h">
       <Filter>RenderTareget</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\WinApp\WinApp.h">
+      <Filter>Engine\WinApp</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\ConvertString\ConvertString.h">
+      <Filter>Engine\ConvertString</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\KeyInput\KeyInput.h">
+      <Filter>Engine\KeyInput</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Gamepad\Gamepad.h">
+      <Filter>Engine\Gamepad</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\ShaderManager\ShaderManager.h">
+      <Filter>Engine\ShaderManager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
