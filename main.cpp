@@ -6,10 +6,10 @@
 #include <memory>
 #include "Engine/WinApp/WinApp.h"
 #include "Engine/Gamepad/Gamepad.h"
+#include "Engine/KeyInput/KeyInput.h"
 
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	Engine::Initalize(1280, 720, "DirectXGame");
-	Gamepad::Initilize();
 
 	auto model = std::make_unique<Model>();
 
@@ -35,6 +35,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	while (Engine::WindowMassage()) {
 		Engine::FrameStart();
 		Gamepad::GetInstans()->Input();
+		KeyInput::Input();
 
 		if ((Gamepad::GetInstans()->getStick(Gamepad::Stick::RIGHT_X) > 10000)) {
 			cameraMoveRotate.y += 0.01f;
@@ -49,6 +50,33 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		else if ((Gamepad::GetInstans()->getStick(Gamepad::Stick::RIGHT_Y) < -10000)) {
 			cameraMoveRotate.x -= 0.01f;
 		}
+
+		if (KeyInput::LongPush(VK_W)) {
+			cameraPos.z += 0.1f;
+		}
+		if (KeyInput::LongPush(VK_S)) {
+			cameraPos.z -= 0.1f;
+		}
+		if (KeyInput::LongPush(VK_A)) {
+			cameraPos.x -= 0.1f;
+		}
+		if (KeyInput::LongPush(VK_D)) {
+			cameraPos.x += 0.1f;
+		}
+
+		if (KeyInput::LongPush(VK_UP)) {
+			cameraRotate.x += 0.01f;
+		}
+		if (KeyInput::LongPush(VK_DOWN)) {
+			cameraRotate.x -= 0.01f;
+		}
+		if (KeyInput::LongPush(VK_LEFT)) {
+			cameraRotate.y -= 0.01f;
+		}
+		if (KeyInput::LongPush(VK_RIGHT)) {
+			cameraRotate.y += 0.01f;
+		}
+
 
 
 		ImGui::Begin("Camera");
@@ -66,11 +94,14 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		model->Draw(worldMat, viewMatrix * projectionMatrix, cameraPos);
 
 		Engine::FrameEnd();
+
+		if (KeyInput::Releaed(VK_ESCAPE)) {
+			break;
+		}
 	}
 
 
 	model.reset();
-	Gamepad::Finalize();
 
 	Engine::Finalize();
 

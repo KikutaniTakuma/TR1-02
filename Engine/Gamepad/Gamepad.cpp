@@ -2,25 +2,15 @@
 #include <iostream>
 #include <limits.h>
 
-Gamepad* Gamepad::pInstans = nullptr;
-
 Gamepad::Gamepad() :
 	preButton(0),
 	state({0}),
 	vibration({0})
 {}
 
-void Gamepad::Initilize() {
-	pInstans = new Gamepad();
-}
-
-void Gamepad::Finalize() {
-	delete pInstans;
-	pInstans = nullptr;
-}
-
 Gamepad* Gamepad::GetInstans() {
-	return pInstans;
+	static Gamepad pInstans;
+	return &pInstans;
 }
 
 void Gamepad::Input() {

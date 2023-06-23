@@ -11,20 +11,8 @@ WinApp::WinApp():
 	hwnd()
 {}
 
-WinApp* WinApp::instance = nullptr;
-
-void WinApp::Initalize() {
-	instance = new WinApp();
-	assert(instance);
-}
-
-void WinApp::Finalize() {
-	// ウィンドウクラスを登録解除
-	UnregisterClass(instance->w.lpszClassName, instance->w.hInstance);
-
-	// instanceを解放
-	delete instance;
-	instance = nullptr;
+WinApp::~WinApp() {
+	UnregisterClass(w.lpszClassName, w.hInstance);
 }
 
 LRESULT WinApp::WindowProcedure(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
@@ -44,7 +32,7 @@ LRESULT WinApp::WindowProcedure(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 }
 
 void WinApp::Create(const std::wstring& windowTitle, int32_t width, int32_t height) {
-	CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+	assert(SUCCEEDED(CoInitializeEx(nullptr, COINIT_MULTITHREADED)));
 
 	w.cbSize = sizeof(WNDCLASSEX);
 	w.lpfnWndProc = WindowProcedure;

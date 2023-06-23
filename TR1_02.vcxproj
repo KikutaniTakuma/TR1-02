@@ -147,6 +147,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </ClCompile>
     <ClCompile Include="Engine\Gamepad\Gamepad.cpp" />
     <ClCompile Include="Engine\KeyInput\KeyInput.cpp" />
+    <ClCompile Include="Engine\Mouse\Mouse.cpp" />
     <ClCompile Include="Engine\ShaderManager\ShaderManager.cpp" />
     <ClCompile Include="Engine\WinApp\WinApp.cpp" />
     <ClCompile Include="externals\imgui\imgui.cpp" />
@@ -168,6 +169,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Engine.h" />
     <ClInclude Include="Engine\Gamepad\Gamepad.h" />
     <ClInclude Include="Engine\KeyInput\KeyInput.h" />
+    <ClInclude Include="Engine\Mouse\Mouse.h" />
     <ClInclude Include="Engine\ShaderManager\ShaderManager.h" />
     <ClInclude Include="Engine\WinApp\WinApp.h" />
     <ClInclude Include="externals\imgui\imconfig.h" />

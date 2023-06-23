@@ -27,12 +27,8 @@ void Engine::Initalize(int windowWidth, int windowHeight, const std::string& win
 	engine->clientWidth = windowWidth;
 	engine->clientHeight = windowHeight;
 
-	WinApp::Initalize();
-
 	// Window生成
 	WinApp::GetInstance()->Create(ConvertString(windowName), windowWidth, windowHeight);
-
-	ShaderManager::Initalize();
 
 #ifdef _DEBUG
 	// DebugLayer有効化
@@ -51,12 +47,8 @@ void Engine::Initalize(int windowWidth, int windowHeight, const std::string& win
 }
 
 void Engine::Finalize() {
-	ShaderManager::Finalize();
-
 	delete engine;
 	engine = nullptr;
-
-	WinApp::Finalize();
 
 	// COM 終了
 	CoUninitialize();
@@ -270,7 +262,7 @@ bool Engine::InitalizeDirect12() {
 
 	// RTVの設定
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
-	rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 	rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 	// ディスクリプタの先頭を取得
 	rtvHandles.reserve(backBufferNum.BufferCount);
@@ -483,10 +475,10 @@ void Engine::FrameStart() {
 	// 描画先をRTVを設定する
 	auto dsvH = engine->dsvHeap->GetCPUDescriptorHandleForHeapStart();
 	engine->commandList->OMSetRenderTargets(1, &engine->rtvHandles[backBufferIndex], false, &dsvH);
-	engine->commandList->ClearDepthStencilView(engine->dsvHeap->GetCPUDescriptorHandleForHeapStart(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+	engine->commandList->ClearDepthStencilView(dsvH, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
 	// 指定した色で画面全体をクリアする
-	float clearColor[] = { 0.4f, 0.7f, 1.0f, 1.0f };
+	float clearColor[] = { 0.1f, 0.25f, 0.5f, 0.0f };
 	engine->commandList->ClearRenderTargetView(engine->rtvHandles[backBufferIndex], clearColor, 0, nullptr);
 
 

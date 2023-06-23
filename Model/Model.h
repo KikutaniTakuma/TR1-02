@@ -52,7 +52,10 @@ class Model {
 
 public:
 	Model();
+	Model(const Model&) = default;
 	~Model();
+
+	Model& operator=(const Model&) = default;
 
 public:
 	void LoadObj(const std::string& fileName);

@@ -12,20 +12,14 @@
 
 class ShaderManager {
 private:
-	ShaderManager() = default;
-	~ShaderManager() = default;
+	ShaderManager();
+	~ShaderManager();
 
 public:
 	static inline ShaderManager* GetInstance() {
-		return instance;
+		static ShaderManager instance;
+		return &instance;
 	}
-
-	static void Initalize();
-
-	static void Finalize();
-
-private:
-	static ShaderManager* instance;
 
 public:
 	IDxcBlob* LoadVertexShader(const std::string& fileName);

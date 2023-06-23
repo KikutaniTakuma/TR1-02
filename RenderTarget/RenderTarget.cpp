@@ -38,7 +38,7 @@ void PeraRender::CreateDescriptor() {
 	uploadHeapPropaerties.Type = D3D12_HEAP_TYPE_DEFAULT;
 	float clsValue[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 	D3D12_CLEAR_VALUE clearValue{};
-	clearValue.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	clearValue.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 	for (int32_t i = 0; i < _countof(clearValue.Color); i++) {
 		clearValue.Color[i] = clsValue[i];
 	}
@@ -54,7 +54,7 @@ void PeraRender::CreateDescriptor() {
 
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
 	rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
-	rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 
 	Engine::GetDevice()->CreateRenderTargetView(peraResource, &rtvDesc, peraRTVHeap->GetCPUDescriptorHandleForHeapStart());
 
@@ -200,7 +200,7 @@ void PeraRender::CreateGraphicsPipeline() {
 	graphicsPipelineStateDesc.RasterizerState = rasterizerDesc;
 	// 書き込むRTVの情報
 	graphicsPipelineStateDesc.NumRenderTargets = 1;
-	graphicsPipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+	graphicsPipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 	// 利用するトポロジ(形状)のタイプ
 	graphicsPipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 	// どのように画面に打ち込むかの設定
@@ -223,20 +223,11 @@ void PeraRender::CreateGraphicsPipeline() {
 }
 
 void PeraRender::PreDraw() {
-	// TransitionBarrierの設定
-	D3D12_RESOURCE_BARRIER peraBarrier{};
-	// 今回のバリアはTransition
-	peraBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	// Noneにしておく
-	peraBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	// バリアを張る対象のリソース。現在のバックバッファに対して行う
-	peraBarrier.Transition.pResource = peraResource;
-	// 遷移前(現在)のResouceState
-	peraBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-	// 遷移後のResouceState
-	peraBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	// TransitionBarrierを張る
-	Engine::GetCommandList()->ResourceBarrier(1, &peraBarrier);
+	Engine::Barrier(
+		peraResource,
+		D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
+		D3D12_RESOURCE_STATE_RENDER_TARGET
+	);
 
 	auto rtvHeapHandle = peraRTVHeap->GetCPUDescriptorHandleForHeapStart();
 	auto dsvH = Engine::GetDsvHandle();
@@ -247,20 +238,11 @@ void PeraRender::PreDraw() {
 }
 
 void PeraRender::Draw() {
-	// TransitionBarrierの設定
-	D3D12_RESOURCE_BARRIER peraBarrier{};
-	// 今回のバリアはTransition
-	peraBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	// Noneにしておく
-	peraBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	// バリアを張る対象のリソース
-	peraBarrier.Transition.pResource = peraResource;
-	// 遷移前(現在)のResouceState
-	peraBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	// 遷移後のResouceState
-	peraBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-	// TransitionBarrierを張る
-	Engine::GetCommandList()->ResourceBarrier(1, &peraBarrier);
+	Engine::Barrier(
+		peraResource,
+		D3D12_RESOURCE_STATE_RENDER_TARGET,
+		D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE
+	);
 
 	Engine::GetCommandList()->SetGraphicsRootSignature(rootSignature);
 	Engine::GetCommandList()->SetPipelineState(graphicsPipelineState);

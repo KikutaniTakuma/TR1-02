@@ -4,53 +4,45 @@
 #include <cassert>
 #include <format>
 
-ShaderManager* ShaderManager::instance = nullptr;
-
-void ShaderManager::Initalize() {
-	assert(!instance);
-	instance = new ShaderManager();
-	assert(instance);
-
-	instance->vertexShader.reserve(0);
-	instance->hullShader.reserve(0);
-	instance->domainShader.reserve(0);
-	instance->geometoryShader.reserve(0);
-	instance->pixelShader.reserve(0);
+ShaderManager::ShaderManager() {
+	vertexShader.reserve(0);
+	hullShader.reserve(0);
+	domainShader.reserve(0);
+	geometoryShader.reserve(0);
+	pixelShader.reserve(0);
 
 	// dxcCompiler‚ð‰Šú‰»
-	instance->dxcUtils = nullptr;
-	instance->dxcCompiler = nullptr;
-	HRESULT hr = DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&instance->dxcUtils));
+	dxcUtils = nullptr;
+	dxcCompiler = nullptr;
+	HRESULT hr = DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&dxcUtils));
 	assert(SUCCEEDED(hr));
-	hr = DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&instance->dxcCompiler));
+	hr = DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&dxcCompiler));
 	assert(SUCCEEDED(hr));
 
-	instance->includeHandler = nullptr;
-	hr = instance->dxcUtils->CreateDefaultIncludeHandler(&instance->includeHandler);
+	includeHandler = nullptr;
+	hr = dxcUtils->CreateDefaultIncludeHandler(&includeHandler);
 	assert(SUCCEEDED(hr));
 }
 
-void ShaderManager::Finalize() {
-	for (auto& i : instance->vertexShader) {
+ShaderManager::~ShaderManager() {
+	for (auto& i : vertexShader) {
 		i.second->Release();
 	}
-	for (auto& i : instance->hullShader) {
+	for (auto& i : hullShader) {
 		i.second->Release();
 	}
-	for (auto& i : instance->domainShader) {
+	for (auto& i : domainShader) {
 		i.second->Release();
 	}
-	for (auto& i : instance->geometoryShader) {
+	for (auto& i : geometoryShader) {
 		i.second->Release();
 	}
-	for (auto& i : instance->pixelShader) {
+	for (auto& i : pixelShader) {
 		i.second->Release();
 	}
-	instance->includeHandler->Release();
-	instance->dxcCompiler->Release();
-	instance->dxcUtils->Release();
-	delete instance;
-	instance = nullptr;
+	includeHandler->Release();
+	dxcCompiler->Release();
+	dxcUtils->Release();
 }
 
 IDxcBlob* ShaderManager::CompilerShader(

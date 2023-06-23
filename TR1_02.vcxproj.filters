@@ -56,6 +56,9 @@
     <ClCompile Include="Engine\ShaderManager\ShaderManager.cpp">
       <Filter>Engine\ShaderManager</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Mouse\Mouse.cpp">
+      <Filter>Engine\Mouse</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -87,6 +90,9 @@
     </Filter>
     <Filter Include="Engine\ShaderManager">
       <UniqueIdentifier>{e9f17783-c021-4323-ae3b-d9f04d63298d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Mouse">
+      <UniqueIdentifier>{840634f8-e2bb-40d7-a128-78abed2ce12a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -149,6 +155,9 @@
     </ClInclude>
     <ClInclude Include="Engine\ShaderManager\ShaderManager.h">
       <Filter>Engine\ShaderManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Mouse\Mouse.h">
+      <Filter>Engine\Mouse</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

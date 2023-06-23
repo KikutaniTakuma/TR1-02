@@ -283,7 +283,7 @@ void Model::CreateGraphicsPipeline() {
 		graphicsPipelineStateDesc.RasterizerState = rasterizerDesc;
 		// 書き込むRTVの情報
 		graphicsPipelineStateDesc.NumRenderTargets = 1;
-		graphicsPipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+		graphicsPipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 		// 利用するトポロジ(形状)のタイプ
 		//graphicsPipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_PATCH;
 		graphicsPipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
@@ -348,15 +348,6 @@ Model::~Model() {
 	}
 	if (graphicsPipelineState) {
 		graphicsPipelineState->Release();
-	}
-	if (vertexShaderBlob) {
-		vertexShaderBlob->Release();
-	}
-	if (pixelShaderBlob) {
-		pixelShaderBlob->Release();
-	}
-	if (geometoryShaderBlob) {
-		geometoryShaderBlob->Release();
 	}
 	if (meshData.indexBuffer) {
 		meshData.indexBuffer->Release();

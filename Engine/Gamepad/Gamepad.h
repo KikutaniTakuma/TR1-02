@@ -50,14 +50,8 @@ private:
 	short preButton;
 	XINPUT_STATE state;
 	XINPUT_VIBRATION vibration;
-	
-	static Gamepad* pInstans;
 
 public:
-	static void Initilize();
-
-	static void Finalize();
-
 	static Gamepad* GetInstans();
 
 
