@@ -8,12 +8,15 @@
 #include "Math/Vector3D/Vector3D.h"
 #include "Math/Vector4/Vector4.h"
 #include <string>
+#include "Engine/ConstBuffer/ConstBuffer.h"
 
 class Model {
 	struct VertData {
 		Vector4 position;
 		Vector4 color;
 		Vector4 normal;
+		Vector4 worldPosition;
+		Vector2D uv;
 	};
 
 	struct Mesh {
@@ -32,7 +35,7 @@ class Model {
 		uint32_t indexNum = 0;
 	};
 
-	struct ConstBuffer {
+	struct MatrixData {
 		Mat4x4 worldMat;
 		Mat4x4 viewProjectoionMat;
 		float waveCount;
@@ -63,7 +66,7 @@ public:
 
 	void Update();
 
-	void Draw(const Mat4x4& worldMat, const Mat4x4& viewProjectionMat, const Vector3D& cameraPos);
+	void Draw(const Mat4x4& worldMat, const Mat4x4& viewMat, const Mat4x4& projectionMat, const Vector3D& cameraPos);
 private:
 	void CreateGraphicsPipeline();
 
@@ -80,15 +83,13 @@ private:
 	ID3D12RootSignature* rootSignature = nullptr;
 	ID3D12PipelineState* graphicsPipelineState = nullptr;
 	
-	ID3D12Resource* bufferResource = nullptr;
-	ConstBuffer* wvpData;
+	ConstBuffer<MatrixData> wvpData;
 
 	bool loadObjFlg;
 	bool loadShaderFlg;
 	bool createGPFlg;
 
-	DirectionLight* dirLig = nullptr;
-	ID3D12Resource* dirLigResource = nullptr;
+	ConstBuffer<DirectionLight> dirLig;
 
 
 	float waveCountSpd;

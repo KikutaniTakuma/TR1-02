@@ -35,6 +35,7 @@ VertexShaderOutput main(VertexShaderInput input )
 	tmp.y += y - 1.0f;
 
 	input.position = mul(tmp, worldMat);
+	output.worldPosition = input.position;
 	output.position = mul(input.position, viewProkectionMat);
 	output.color = input.color;
 	output.normal = mul(input.normal, worldMat);

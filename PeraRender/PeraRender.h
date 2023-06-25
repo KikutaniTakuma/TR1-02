@@ -23,12 +23,16 @@ public:
 	PeraRender& operator=(const PeraRender&) = default;
 
 public:
+	void Initialize(const std::string& vsFileName, const std::string& psFileName);
+
+private:
 	void CreateDescriptor();
 
 	void CreateShader(const std::string& vsFileName, const std::string& psFileName);
 
 	void CreateGraphicsPipeline();
 
+public:
 	void PreDraw();
 
 	void Draw();

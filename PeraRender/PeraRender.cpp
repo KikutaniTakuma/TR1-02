@@ -1,4 +1,4 @@
-#include "RenderTarget.h"
+#include "PeraRender.h"
 #include "Engine/Engine.h"
 #include <cassert>
 #include "Engine/ConvertString/ConvertString.h"
@@ -25,17 +25,25 @@ PeraRender::~PeraRender() {
 	peraResource->Release();
 }
 
+void PeraRender::Initialize(const std::string& vsFileName, const std::string& psFileName) {
+	CreateDescriptor();
+
+	CreateShader(vsFileName, psFileName);
+
+	CreateGraphicsPipeline();
+}
+
 
 void PeraRender::CreateDescriptor() {
 	// ポストエフェクトに利用するものを初期化
-	auto heapDes = Engine::GetMainRTVDesc();
+	auto heapDesc = Engine::GetMainRTVDesc();
 
 	auto resDesc = Engine::GetSwapchainBufferDesc();
 
 	// Resourceを生成する
 	// リソース用のヒープの設定
-	D3D12_HEAP_PROPERTIES uploadHeapPropaerties{};
-	uploadHeapPropaerties.Type = D3D12_HEAP_TYPE_DEFAULT;
+	D3D12_HEAP_PROPERTIES heapPropaerties{};
+	heapPropaerties.Type = D3D12_HEAP_TYPE_DEFAULT;
 	float clsValue[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 	D3D12_CLEAR_VALUE clearValue{};
 	clearValue.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
@@ -44,7 +52,7 @@ void PeraRender::CreateDescriptor() {
 	}
 
 	// 実際にリソースを作る
-	HRESULT hr = Engine::GetDevice()->CreateCommittedResource(&uploadHeapPropaerties, D3D12_HEAP_FLAG_NONE, &resDesc, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, &clearValue, IID_PPV_ARGS(&peraResource));
+	HRESULT hr = Engine::GetDevice()->CreateCommittedResource(&heapPropaerties, D3D12_HEAP_FLAG_NONE, &resDesc, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, &clearValue, IID_PPV_ARGS(&peraResource));
 	if (!SUCCEEDED(hr)) {
 		OutputDebugStringA("CreateCommittedResource Function Failed!!");
 		return;
@@ -59,12 +67,7 @@ void PeraRender::CreateDescriptor() {
 	Engine::GetDevice()->CreateRenderTargetView(peraResource, &rtvDesc, peraRTVHeap->GetCPUDescriptorHandleForHeapStart());
 
 
-	heapDes.NumDescriptors = 1;
-	heapDes.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-	heapDes.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-
-	hr = Engine::GetDevice()->CreateDescriptorHeap(&heapDes, IID_PPV_ARGS(&peraSRVHeap));
-	assert(SUCCEEDED(hr));
+	peraSRVHeap = Engine::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1, true);
 
 
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
@@ -244,6 +247,12 @@ void PeraRender::Draw() {
 		D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE
 	);
 
+	// 描画先をメインレンダーターゲットに変更
+	auto rtvHeapHandle = Engine::GetMainRendertTargetHandle();
+	auto dsvH = Engine::GetDsvHandle();
+	Engine::GetCommandList()->OMSetRenderTargets(1, &rtvHeapHandle, false, &dsvH);
+
+	// 各種描画コマンドを積む
 	Engine::GetCommandList()->SetGraphicsRootSignature(rootSignature);
 	Engine::GetCommandList()->SetPipelineState(graphicsPipelineState);
 	Engine::GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);

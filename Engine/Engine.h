@@ -11,14 +11,13 @@
 
 #include <string>
 #include <vector>
-#include <memory>
 #include <chrono>
 
 #include "Math/Vector3D/Vector3D.h"
 #include "Math/Mat4x4/Mat4x4.h"
 #include "Math/Vector2D/Vector2D.h"
 #include "Math/Vector4/Vector4.h" 
-#include "RenderTarget/RenderTarget.h"
+#include "PeraRender/PeraRender.h"
 
 class Engine {
 public:
@@ -48,7 +47,7 @@ public:
 	/// <param name="windowWidth">Windowの横幅</param>
 	/// <param name="windowHeight">Windowの縦幅</param>
 	/// <param name="windowName">Windowの名前</param>
-	static void Initalize(int windowWidth, int windowHeight, const std::string& windowName);
+	static void Initialize(int windowWidth, int windowHeight, const std::string& windowName);
 
 	static void Finalize();
 
@@ -67,24 +66,29 @@ public:
 		return engine->commandList;
 	}
 
-	static ID3D12Device* GetDevice() {
+	static inline ID3D12Device* GetDevice() {
 		return engine->device;
 	}
 
-	static ID3D12DescriptorHeap* GetDSVHeap() {
+	static inline ID3D12DescriptorHeap* GetDSVHeap() {
 		return engine->dsvHeap;
 	}
 
-	static D3D12_DESCRIPTOR_HEAP_DESC GetMainRTVDesc() {
+	static inline D3D12_DESCRIPTOR_HEAP_DESC GetMainRTVDesc() {
 		return engine->rtvDescriptorHeap->GetDesc();
 	}
 
-	static D3D12_RESOURCE_DESC GetSwapchainBufferDesc() {
+	static inline D3D12_RESOURCE_DESC GetSwapchainBufferDesc() {
 		return engine->swapChianResource[0]->GetDesc();
 	}
 
-	static D3D12_CPU_DESCRIPTOR_HANDLE GetDsvHandle() {
+	static inline D3D12_CPU_DESCRIPTOR_HANDLE GetDsvHandle() {
 		return engine->dsvHeap->GetCPUDescriptorHandleForHeapStart();
+	}
+
+	static inline D3D12_CPU_DESCRIPTOR_HANDLE GetMainRendertTargetHandle() {
+		UINT backBufferIndex = engine->swapChain->GetCurrentBackBufferIndex();
+		return engine->rtvHandles[backBufferIndex];
 	}
 
 
@@ -102,7 +106,7 @@ public:
 	/// Debug用
 	/// 
 private:
-	void InitalizeDebugLayer();
+	void InitializeDebugLayer();
 
 private:
 	ID3D12Debug1* debugController = nullptr;
@@ -115,7 +119,7 @@ private:
 	/// Dirct3D
 	/// 
 private:
-	bool InitalizeDirect3D();
+	bool InitializeDirect3D();
 
 private:
 	ID3D12Device* device = nullptr;
@@ -129,7 +133,7 @@ private:
 	/// DirectX12
 	/// 
 private:
-	bool InitalizeDirect12();
+	bool InitializeDirect12();
 
 private:
 	ID3D12CommandQueue* commandQueue = nullptr;
@@ -159,13 +163,6 @@ public:
 private:
 	ID3D12Resource* depthStencilResource = nullptr;
 	ID3D12DescriptorHeap* dsvHeap = nullptr;
-	
-
-
-	// ポストエフェクト用
-	void CreatePera();
-
-	std::unique_ptr<PeraRender> pera;
 
 
 

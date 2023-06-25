@@ -21,14 +21,8 @@ Model::Model() :
 	createGPFlg(false),
 	waveCountSpd(0.01f)
 {
-	bufferResource = Engine::CreateBufferResuorce(sizeof(ConstBuffer));
-	bufferResource->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
-
 	// ’PˆÊs—ñ‚ð‘‚«ž‚ñ‚Å‚¨‚­
 	wvpData->worldMat = MakeMatrixIndentity();
-
-	dirLigResource = Engine::CreateBufferResuorce(sizeof(DirectionLight));
-	dirLigResource->Map(0, nullptr, reinterpret_cast<void**>(&dirLig));
 
 	dirLig->ligDirection = { 1.0f,-1.0f,-1.0f,0.0f };
 	Vector3D nor{ dirLig->ligDirection.x, dirLig->ligDirection.y, dirLig->ligDirection.z };
@@ -37,11 +31,9 @@ Model::Model() :
 	Vector4 colorTmp = Engine::UintToVector4(0xffffadff);
 	dirLig->ligColor = { colorTmp.x,colorTmp.y, colorTmp.z };
 
-	dirLig->ptPos = { 0.0f,10.0f,10.0f };
+	dirLig->ptPos = { 5.0f,5.0f,5.0f };
 	dirLig->ptColor = { 15.0f,15.0f,15.0f };
-	dirLig->ptRange = 300.0f;
-
-	dirLigResource->Unmap(0, nullptr);
+	dirLig->ptRange = 10.0f;
 }
 
 void Model::LoadObj(const std::string& fileName) {
@@ -132,6 +124,7 @@ void Model::LoadObj(const std::string& fileName) {
 					}
 					if (posBuf.size() == 3) {
 						meshData.vertMap[i].position = Vector4(posBuf[0], posBuf[1], posBuf[2], 1.0f);
+						meshData.vertMap[i].worldPosition = Vector4(posBuf[0], posBuf[1], posBuf[2], 1.0f);
 						meshData.vertMap[i].color = Engine::UintToVector4(0x36f3f7aa); // Color
 					}
 					i++;
@@ -223,7 +216,7 @@ void Model::CreateGraphicsPipeline() {
 		signatureBlob->Release();
 
 
-		D3D12_INPUT_ELEMENT_DESC inputElementDescs[3] = {};
+		D3D12_INPUT_ELEMENT_DESC inputElementDescs[4] = {};
 		inputElementDescs[0].SemanticName = "POSITION";
 		inputElementDescs[0].SemanticIndex = 0;
 		inputElementDescs[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
@@ -236,6 +229,10 @@ void Model::CreateGraphicsPipeline() {
 		inputElementDescs[2].SemanticIndex = 0;
 		inputElementDescs[2].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
 		inputElementDescs[2].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+		inputElementDescs[3].SemanticName = "POSITION";
+		inputElementDescs[3].SemanticIndex = 1;
+		inputElementDescs[3].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+		inputElementDescs[3].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
 		D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
 		inputLayoutDesc.pInputElementDescs = inputElementDescs;
 		inputLayoutDesc.NumElements = _countof(inputElementDescs);
@@ -318,31 +315,32 @@ void Model::Update() {
 	wvpData->waveCount += waveCountSpd;
 }
 
-void Model::Draw(const Mat4x4& worldMat, const Mat4x4& viewProjectionMat, const Vector3D& cameraPos) {
+void Model::Draw(const Mat4x4& worldMat, const Mat4x4& viewMat, const Mat4x4& projectionMat, const Vector3D& cameraPos) {
 	if (!createGPFlg) {
 		this->CreateGraphicsPipeline();
 	}
 	assert(createGPFlg);
 
 	wvpData->worldMat = worldMat;
-	wvpData->viewProjectoionMat = viewProjectionMat;
+	wvpData->viewProjectoionMat = viewMat * projectionMat;
 
 	dirLig->eyePos = cameraPos;
 
-	Engine::GetCommandList()->SetPipelineState(this->graphicsPipelineState);
 	Engine::GetCommandList()->SetGraphicsRootSignature(rootSignature);
+	Engine::GetCommandList()->SetGraphicsRootConstantBufferView(0, wvpData.GetGPUVtlAdrs());
+	Engine::GetCommandList()->SetGraphicsRootConstantBufferView(1, dirLig.GetGPUVtlAdrs());
+
+	Engine::GetCommandList()->SetPipelineState(this->graphicsPipelineState);
+	
 	//Engine::GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
 	Engine::GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	Engine::GetCommandList()->IASetVertexBuffers(0,1,&meshData.vertexView);
 	Engine::GetCommandList()->IASetIndexBuffer(&meshData.indexView);
-	Engine::GetCommandList()->SetGraphicsRootConstantBufferView(0, bufferResource->GetGPUVirtualAddress());
-	Engine::GetCommandList()->SetGraphicsRootConstantBufferView(1, dirLigResource->GetGPUVirtualAddress());
+	
 	Engine::GetCommandList()->DrawIndexedInstanced(meshData.indexNum, 1, 0, 0, 0);
 }
 
 Model::~Model() {
-	bufferResource->Release();
-	dirLigResource->Release();
 	if (rootSignature) {
 		rootSignature->Release();
 	}

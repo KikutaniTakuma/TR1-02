@@ -18,7 +18,7 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg
 
 Engine* Engine::engine = nullptr;
 
-void Engine::Initalize(int windowWidth, int windowHeight, const std::string& windowName) {
+void Engine::Initialize(int windowWidth, int windowHeight, const std::string& windowName) {
 	CoInitializeEx(0, COINIT_MULTITHREADED);
 
 	engine = new Engine();
@@ -32,16 +32,14 @@ void Engine::Initalize(int windowWidth, int windowHeight, const std::string& win
 
 #ifdef _DEBUG
 	// DebugLayer有効化
-	engine->InitalizeDebugLayer();
+	engine->InitializeDebugLayer();
 #endif
 
-	engine->pera = std::make_unique<PeraRender>();
-
 	// Direct3D生成
-	assert(engine->InitalizeDirect3D());
+	assert(engine->InitializeDirect3D());
 
 	// DirectX12生成
-	engine->InitalizeDirect12();
+	engine->InitializeDirect12();
 
 	engine->InitalizeDraw();
 }
@@ -84,7 +82,7 @@ LRESULT WindowProcedure(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
 /// デバッグレイヤー初期化
 /// 
 #ifdef _DEBUG
-void Engine::InitalizeDebugLayer() {
+void Engine::InitializeDebugLayer() {
 	debugController = nullptr;
 	if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)))) {
 		// デバッグレイヤーを有効化する
@@ -103,7 +101,7 @@ void Engine::InitalizeDebugLayer() {
 /// Direct3D初期化
 /// 
 
-bool Engine::InitalizeDirect3D() {
+bool Engine::InitializeDirect3D() {
 	// IDXGIFactory生成
 	auto hr = CreateDXGIFactory(IID_PPV_ARGS(&dxgiFactory));
 	assert(SUCCEEDED(hr));
@@ -210,7 +208,7 @@ ID3D12DescriptorHeap* Engine::CreateDescriptorHeap(
 	return descriptorHeap;
 }
 
-bool Engine::InitalizeDirect12() {
+bool Engine::InitializeDirect12() {
 	// コマンドキューを作成
 	commandQueue = nullptr;
 	D3D12_COMMAND_QUEUE_DESC commandQueueDesc{};
@@ -250,7 +248,7 @@ bool Engine::InitalizeDirect12() {
 	rtvDescriptorHeap = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
 
 	// SRV用のヒープ
-	srvDescriptorHeap = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
+	srvDescriptorHeap = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1, true);
 
 	// SwepChainのメモリとディスクリプタと関連付け
 	// バックバッファの数を取得
@@ -314,11 +312,6 @@ bool Engine::InitalizeDirect12() {
 ///
 /// 描画用
 /// 
-
-struct PeraVertexData {
-	Vector3D position;
-	Vector2D uv;
-};
 
 ID3D12Resource* Engine::CreateBufferResuorce(size_t sizeInBytes) {
 	if (!engine->device) {
@@ -404,17 +397,6 @@ void Engine::InitalizeDraw() {
 	dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
 
 	device->CreateDepthStencilView(depthStencilResource, &dsvDesc, dsvHeap->GetCPUDescriptorHandleForHeapStart());
-
-
-	CreatePera();
-
-	pera->CreateShader("PostShader/Post.VS.hlsl", "PostShader/PostNone.PS.hlsl");
-	
-	pera->CreateGraphicsPipeline();
-}
-
-void  Engine::CreatePera() {
-	pera->CreateDescriptor();
 }
 
 Vector4 Engine::UintToVector4(uint32_t color) {
@@ -502,18 +484,13 @@ void Engine::FrameStart() {
 	scissorRect.top = 0;
 	scissorRect.bottom = engine->clientHeight;
 	engine->commandList->RSSetScissorRects(1, &scissorRect);
-
-	engine->pera->PreDraw();
 }
 
 void Engine::FrameEnd() {
-	// これから書き込むバックバッファのインデックスを取得
-	UINT backBufferIndex = engine->swapChain->GetCurrentBackBufferIndex();
 	// 描画先をRTVを設定する
+	UINT backBufferIndex = engine->swapChain->GetCurrentBackBufferIndex();
 	auto dsvH = engine->dsvHeap->GetCPUDescriptorHandleForHeapStart();
 	engine->commandList->OMSetRenderTargets(1, &engine->rtvHandles[backBufferIndex], false, &dsvH);
-
-	engine->pera->Draw();
 
 	ID3D12DescriptorHeap* descriptorHeaps[] = {
 		engine->srvDescriptorHeap
@@ -522,7 +499,6 @@ void Engine::FrameEnd() {
 
 	ImGui::Render();
 	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), engine->commandList);
-
 
 	Barrier(
 		engine->swapChianResource[backBufferIndex],
@@ -574,8 +550,6 @@ Engine::~Engine() {
 	ImGui_ImplDX12_Shutdown();
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
-
-	pera.reset();
 
 	dsvHeap->Release();
 	depthStencilResource->Release();

@@ -2,20 +2,22 @@
 #include "externals/imgui/imgui.h"
 #include <chrono>
 #include <thread>
+#include <numbers>
 #include "Model/Model.h"
 #include <memory>
 #include "Engine/WinApp/WinApp.h"
 #include "Engine/Gamepad/Gamepad.h"
 #include "Engine/KeyInput/KeyInput.h"
+#include "PeraRender/PeraRender.h"
 
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
-	Engine::Initalize(1280, 720, "DirectXGame");
+	Engine::Initialize(1280, 720, "DirectXGame");
 
 	auto model = std::make_unique<Model>();
 
-	model->LoadObj("Obj/Cube.obj");
+	model->LoadObj("cube.obj");
 
-	model->LoadShader("Shaders/Object3D.VS.hlsl", "WaveShader/Wave.PS.hlsl", "WaveShader/Wave.GS.hlsl");
+	model->LoadShader("WaveShader/WaveNone.VS.hlsl", "WaveShader/Wave.PS.hlsl", "WaveShader/Wave.GS.hlsl");
 
 
 	Mat4x4 worldMat = MakeMatrixAffin(Vector3D(1.0f,1.0f,1.0f), Vector3D(), Vector3D());
@@ -29,14 +31,24 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	Vector3D cameraMoveRotate{};
 
+	auto pera = std::make_unique<PeraRender>();
+
+	pera->Initialize("PostShader/Post.VS.hlsl", "PostShader/PostNone.PS.hlsl");
+
 	/// 
 	/// メインループ
 	/// 
 	while (Engine::WindowMassage()) {
+		// 描画開始処理
 		Engine::FrameStart();
+
+		// 入力処理
 		Gamepad::GetInstans()->Input();
 		KeyInput::Input();
 
+		/// 
+		/// 更新処理
+		/// 
 		if ((Gamepad::GetInstans()->getStick(Gamepad::Stick::RIGHT_X) > 10000)) {
 			cameraMoveRotate.y += 0.01f;
 		}
@@ -83,18 +95,35 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		ImGui::DragFloat3("cameraPos", &cameraPos.x, 0.01f);
 		ImGui::DragFloat3("cameraRotate", &cameraRotate.x, 0.01f);
 		ImGui::DragFloat3("cameraScale", &cameraScale.x, 0.01f);
-		ImGui::DragFloat3("cameraMoveRotate", &cameraMoveRotate.x, 0.01f);
 		ImGui::End();
 
 		model->Update();
 
-		viewMatrix = MakeMatrixAffin(Vector3D(1.0f, 1.0f, 1.0f), cameraMoveRotate, Vector3D()) * MakeMatrixInverse(MakeMatrixAffin(cameraScale, cameraRotate, cameraPos));
+		///
+		/// 更新処理ここまで
+		/// 
+
+		///
+		/// 描画処理
+		/// 
+		pera->PreDraw();
+
+		viewMatrix = MakeMatrixInverse(MakeMatrixAffin(cameraScale, cameraRotate, cameraPos) * MakeMatrixAffin(Vector3D(1.0f,1.0f,1.0f), cameraMoveRotate, Vector3D()));
 		projectionMatrix = MakeMatrixPerspectiveFov(0.45f, static_cast<float>(Engine::GetInstance()->clientWidth) / static_cast<float>(Engine::GetInstance()->clientHeight), 0.1f, 100.0f);
 
-		model->Draw(worldMat, viewMatrix * projectionMatrix, cameraPos);
 
+		model->Draw(worldMat, viewMatrix,  projectionMatrix, cameraPos);
+
+		pera->Draw();
+		///
+		/// 描画処理ここまで
+		/// 
+
+
+		// フレーム終了処理
 		Engine::FrameEnd();
 
+		// Escapeが押されたら終了
 		if (KeyInput::Releaed(VK_ESCAPE)) {
 			break;
 		}
@@ -102,6 +131,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 
 	model.reset();
+	pera.reset();
 
 	Engine::Finalize();
 

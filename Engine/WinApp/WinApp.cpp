@@ -38,6 +38,7 @@ void WinApp::Create(const std::wstring& windowTitle, int32_t width, int32_t heig
 	w.lpfnWndProc = WindowProcedure;
 	w.lpszClassName = windowTitle.c_str();
 	w.hInstance = GetModuleHandle(nullptr);
+	w.hCursor = LoadCursor(NULL, IDC_ARROW);
 
 	RegisterClassEx(&w);
 

@@ -104,7 +104,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\taku1\source\School\TR1\TR1_02;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\takku\source\School\TR1\TR1_02;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <TreatWarningAsError>false</TreatWarningAsError>
     </ClCompile>
@@ -125,7 +125,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\taku1\source\School\TR1\TR1_02;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\takku\source\School\TR1\TR1_02;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <TreatWarningAsError>false</TreatWarningAsError>
     </ClCompile>
@@ -162,9 +162,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Math\Vector2D\Vector2D.cpp" />
     <ClCompile Include="Math\Vector3D\Vector3D.cpp" />
     <ClCompile Include="Model\Model.cpp" />
-    <ClCompile Include="RenderTarget\RenderTarget.cpp" />
+    <ClCompile Include="PeraRender\PeraRender.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Engine\ConstBuffer\ConstBuffer.h" />
     <ClInclude Include="Engine\ConvertString\ConvertString.h" />
     <ClInclude Include="Engine\Engine.h" />
     <ClInclude Include="Engine\Gamepad\Gamepad.h" />
@@ -185,7 +186,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Math\Vector3D\Vector3D.h" />
     <ClInclude Include="Math\Vector4\Vector4.h" />
     <ClInclude Include="Model\Model.h" />
-    <ClInclude Include="RenderTarget\RenderTarget.h" />
+    <ClInclude Include="PeraRender\PeraRender.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

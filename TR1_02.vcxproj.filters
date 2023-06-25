@@ -38,9 +38,6 @@
     <ClCompile Include="Model\Model.cpp">
       <Filter>Model</Filter>
     </ClCompile>
-    <ClCompile Include="RenderTarget\RenderTarget.cpp">
-      <Filter>RenderTareget</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\WinApp\WinApp.cpp">
       <Filter>Engine\WinApp</Filter>
     </ClCompile>
@@ -59,6 +56,9 @@
     <ClCompile Include="Engine\Mouse\Mouse.cpp">
       <Filter>Engine\Mouse</Filter>
     </ClCompile>
+    <ClCompile Include="PeraRender\PeraRender.cpp">
+      <Filter>PeraRender</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -72,9 +72,6 @@
     </Filter>
     <Filter Include="Model">
       <UniqueIdentifier>{75878dc3-228d-4f78-a159-c89a43ffafe2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="RenderTareget">
-      <UniqueIdentifier>{b462a3d3-8e40-4103-8650-7a43265afb6a}</UniqueIdentifier>
     </Filter>
     <Filter Include="Engine\WinApp">
       <UniqueIdentifier>{b53c25de-314b-4648-8852-e97c158f0275}</UniqueIdentifier>
@@ -93,6 +90,12 @@
     </Filter>
     <Filter Include="Engine\Mouse">
       <UniqueIdentifier>{840634f8-e2bb-40d7-a128-78abed2ce12a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PeraRender">
+      <UniqueIdentifier>{9f8d179a-c3cd-4256-8e00-4a3389c927d7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\ConstBuffer">
+      <UniqueIdentifier>{e59427f8-55ba-46bf-b8a3-e4974976afc4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -138,9 +141,6 @@
     <ClInclude Include="Model\Model.h">
       <Filter>Model</Filter>
     </ClInclude>
-    <ClInclude Include="RenderTarget\RenderTarget.h">
-      <Filter>RenderTareget</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\WinApp\WinApp.h">
       <Filter>Engine\WinApp</Filter>
     </ClInclude>
@@ -158,6 +158,12 @@
     </ClInclude>
     <ClInclude Include="Engine\Mouse\Mouse.h">
       <Filter>Engine\Mouse</Filter>
+    </ClInclude>
+    <ClInclude Include="PeraRender\PeraRender.h">
+      <Filter>PeraRender</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\ConstBuffer\ConstBuffer.h">
+      <Filter>Engine\ConstBuffer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

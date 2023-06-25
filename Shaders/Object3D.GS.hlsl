@@ -17,15 +17,13 @@ void main(triangle VertexShaderOutput input[3], inout TriangleStream<GeometoryOu
     normal = normalize(normal);
 
     GeometoryOutPut output[3];
-    output[0].position = input[0].position;
-    output[0].color = input[0].color;
-    output[0].normal = normal;
-    output[1].position = input[1].position;
-    output[1].color = input[1].color;
-    output[1].normal = normal;
-    output[2].position = input[2].position;
-    output[2].color = input[2].color;
-    output[2].normal = normal;
+
+    for(int i=0;i<3;i++){
+        output[i].position = input[i].position;
+        output[i].worldPosition = input[i].worldPosition;
+        output[i].color = input[i].color;
+        output[i].normal = normal;
+    }
 
     outStream.Append(output[0]);
     outStream.Append(output[1]);

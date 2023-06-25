@@ -8,6 +8,8 @@ class WinApp {
 private:
 	WinApp();
 	~WinApp();
+	WinApp(const WinApp&) = delete;
+	const WinApp& operator=(const WinApp&) = delete;
 
 public:
 	static inline WinApp* GetInstance() {
@@ -26,6 +28,6 @@ public:
 
 
 private:
-	WNDCLASSEX w{};
 	HWND hwnd{};
+	WNDCLASSEX w{};
 };

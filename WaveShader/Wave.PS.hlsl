@@ -29,20 +29,21 @@ PixelShaderOutPut main(GeometoryOutPut input)
 
 	float3 diffDirection = ligColor * t;
 
+	// メタリックすぎるので削除
 	// ディレクションライト鏡面反射光
-	float3 refVec = reflect(ligDirection.xyz, input.normal.xyz);
+	/*float3 refVec = reflect(ligDirection.xyz, input.normal.xyz);
 
-	float3 toEye = eyePos - input.position.xyz;
+	float3 toEye = eyePos - input.worldPosition.xyz;
 	toEye = normalize(toEye);
 
 	t  = dot(refVec,  toEye);
 	t = (t + abs(t)) * 0.5f;
 
-	t = pow(t, 3.0f);
-	float3 specDirection =  ligColor * t;
+	t = pow(t, 5.0f);
+	float3 specDirection =  ligColor * t;*/
 
 
-	float3 ligDir = input.position.xyz - ptPos;
+	float3 ligDir = input.worldPosition.xyz - ptPos;
 	ligDir = normalize(ligDir);
 
 	// ポイントライト拡散反射光
@@ -54,19 +55,19 @@ PixelShaderOutPut main(GeometoryOutPut input)
 	float3 diffPoint = ptColor * t;
 
 	// ポイントライト鏡面反射光
-	refVec = reflect(ligDir, input.normal.xyz);
+	float3 refVec = reflect(ligDir, input.normal.xyz);
 
-	toEye = eyePos - input.position.xyz;
+	float3 toEye = eyePos - input.worldPosition.xyz;
 	toEye = normalize(toEye);
 
 	t  = dot(refVec,  toEye);
 	t = (t + abs(t)) * 0.5f;
 
-	t = pow(t, 3.0f);
+	t = pow(t, 5.0f);
 	float3 specpoint = ptColor * t;
 
 	// 影響率計算
-	float distance = length(input.position.xyz - ptPos);
+	float distance = length(input.worldPosition.xyz - ptPos);
 
 	float affect = 1.0f - 1.0f / ptRange * distance;
 	affect = (affect + abs(affect)) * 0.5f;
@@ -76,7 +77,7 @@ PixelShaderOutPut main(GeometoryOutPut input)
 	specpoint *= affect;
 
 	float3 diffuseLig = diffPoint + diffDirection;
-	float3 specularLig = specpoint + specDirection;
+	float3 specularLig = specpoint;// + specDirection;
 
 	float3 lig = diffuseLig + specularLig;
 

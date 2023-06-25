@@ -1,5 +1,11 @@
 #include "Wave.hlsli"
 
+cbuffer WorldViewProjection : register(b0){
+	float32_t4x4 worldMat;
+	float32_t4x4 viewProkectionMat;
+	float waveCount;
+}
+
 struct VertexShaderInput {
 	float32_t4 position : POSITION0;
 	float32_t4 color : COLOR0;
@@ -11,9 +17,11 @@ VertexShaderOutput main(VertexShaderInput input )
 {
 	VertexShaderOutput output;
 
-	output.position = input.position;
+	input.position = mul(input.position, worldMat);
+	output.worldPosition = input.position;
+	output.position = mul(input.position, viewProkectionMat);
 	output.color = input.color;
-	output.normal = input.normal;
+	output.normal = mul(input.normal, worldMat);
 
 	return output;
 }
