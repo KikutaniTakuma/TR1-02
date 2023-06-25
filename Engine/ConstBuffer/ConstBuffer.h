@@ -1,6 +1,7 @@
 #pragma once
 #include "Engine/Engine.h"
 
+// ポインタをテンプレートパラメータに設定してはいけない
 template<class T>
 class ConstBuffer {
 public:
