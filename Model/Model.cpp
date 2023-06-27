@@ -22,8 +22,13 @@ Model::Model() :
 	waveCountSpd(0.01f)
 {
 	// 単位行列を書き込んでおく
+	wvpData.shaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+	wvpData.shaderRegister = 0;
 	wvpData->worldMat = MakeMatrixIndentity();
 
+
+	dirLig.shaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	dirLig.shaderRegister = 1;
 	dirLig->ligDirection = { 1.0f,-1.0f,-1.0f,0.0f };
 	Vector3D nor{ dirLig->ligDirection.x, dirLig->ligDirection.y, dirLig->ligDirection.z };
 	nor = nor.Normalize();
@@ -34,6 +39,11 @@ Model::Model() :
 	dirLig->ptPos = { 5.0f,5.0f,5.0f };
 	dirLig->ptColor = { 15.0f,15.0f,15.0f };
 	dirLig->ptRange = 10.0f;
+
+	color.shaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	color.shaderRegister = 2;
+	*color = Engine::UintToVector4(0xff0000ff);
+	color.OffWright();
 }
 
 void Model::LoadObj(const std::string& fileName) {
@@ -90,9 +100,9 @@ void Model::LoadObj(const std::string& fileName) {
 		meshData.vertexView.StrideInBytes = sizeof(VertData);
 
 		// 頂点リソースにデータを書き込む
-		meshData.vertMap = nullptr;
+		meshData.vertexMap = nullptr;
 		// 書き込むためのアドレスを取得
-		meshData.vertexBuffer->Map(0, nullptr, reinterpret_cast<void**>(&meshData.vertMap));
+		meshData.vertexBuffer->Map(0, nullptr, reinterpret_cast<void**>(&meshData.vertexMap));
 
 
 		// indexBUffer生成
@@ -123,9 +133,8 @@ void Model::LoadObj(const std::string& fileName) {
 						}
 					}
 					if (posBuf.size() == 3) {
-						meshData.vertMap[i].position = Vector4(posBuf[0], posBuf[1], posBuf[2], 1.0f);
-						meshData.vertMap[i].worldPosition = Vector4(posBuf[0], posBuf[1], posBuf[2], 1.0f);
-						meshData.vertMap[i].color = Engine::UintToVector4(0x36f3f7aa); // Color
+						meshData.vertexMap[i].position = Vector4(posBuf[0], posBuf[1], posBuf[2], 1.0f);
+						meshData.vertexMap[i].normal = Vector3D(posBuf[0], posBuf[1], posBuf[2]).Normalize();
 					}
 					i++;
 					if (i >= vertPositionNum) {
@@ -150,8 +159,7 @@ void Model::LoadObj(const std::string& fileName) {
 						}
 						if (!num[0].empty()) {
 							meshData.indexMap[meshData.indexNum] = static_cast<int16_t>(std::stoi(num[0]) - 1);
-							Vector3D normal = normalPos[std::stoi(num[2]) - 1];
-							meshData.vertMap[std::stoi(num[0]) - 1].normal = { normal.x, normal.y, normal.z,0.0f };
+							meshData.vertexMap[std::stoi(num[0]) - 1].normal = normalPos[std::stoi(num[2]) - 1];
 							meshData.indexNum++;
 						}
 					}
@@ -190,13 +198,10 @@ void Model::CreateGraphicsPipeline() {
 		descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
 		// RootParamater作成。複数設定出来るので配列
-		D3D12_ROOT_PARAMETER roootParamaters[2] = {};
-		roootParamaters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-		roootParamaters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
-		roootParamaters[0].Descriptor.ShaderRegister = 0;
-		roootParamaters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-		roootParamaters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-		roootParamaters[1].Descriptor.ShaderRegister = 1;
+		D3D12_ROOT_PARAMETER roootParamaters[3] = {};
+		roootParamaters[0] = wvpData.getRoootParamater();
+		roootParamaters[1] = dirLig.getRoootParamater();
+		roootParamaters[2] = color.getRoootParamater();
 		descriptionRootSignature.pParameters = roootParamaters;
 		descriptionRootSignature.NumParameters = _countof(roootParamaters);
 
@@ -216,23 +221,19 @@ void Model::CreateGraphicsPipeline() {
 		signatureBlob->Release();
 
 
-		D3D12_INPUT_ELEMENT_DESC inputElementDescs[4] = {};
+		D3D12_INPUT_ELEMENT_DESC inputElementDescs[3] = {};
 		inputElementDescs[0].SemanticName = "POSITION";
 		inputElementDescs[0].SemanticIndex = 0;
 		inputElementDescs[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
 		inputElementDescs[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-		inputElementDescs[1].SemanticName = "COLOR";
+		inputElementDescs[1].SemanticName = "NORMAL";
 		inputElementDescs[1].SemanticIndex = 0;
-		inputElementDescs[1].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+		inputElementDescs[1].Format = DXGI_FORMAT_R32G32B32_FLOAT;
 		inputElementDescs[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-		inputElementDescs[2].SemanticName = "NORMAL";
-		inputElementDescs[2].SemanticIndex = 0;
+		inputElementDescs[2].SemanticName = "POSITION";
+		inputElementDescs[2].SemanticIndex = 1;
 		inputElementDescs[2].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
 		inputElementDescs[2].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-		inputElementDescs[3].SemanticName = "POSITION";
-		inputElementDescs[3].SemanticIndex = 1;
-		inputElementDescs[3].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-		inputElementDescs[3].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
 		D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
 		inputLayoutDesc.pInputElementDescs = inputElementDescs;
 		inputLayoutDesc.NumElements = _countof(inputElementDescs);
@@ -312,7 +313,7 @@ void Model::CreateGraphicsPipeline() {
 }
 
 void Model::Update() {
-	wvpData->waveCount += waveCountSpd;
+	
 }
 
 void Model::Draw(const Mat4x4& worldMat, const Mat4x4& viewMat, const Mat4x4& projectionMat, const Vector3D& cameraPos) {
@@ -329,6 +330,7 @@ void Model::Draw(const Mat4x4& worldMat, const Mat4x4& viewMat, const Mat4x4& pr
 	Engine::GetCommandList()->SetGraphicsRootSignature(rootSignature);
 	Engine::GetCommandList()->SetGraphicsRootConstantBufferView(0, wvpData.GetGPUVtlAdrs());
 	Engine::GetCommandList()->SetGraphicsRootConstantBufferView(1, dirLig.GetGPUVtlAdrs());
+	Engine::GetCommandList()->SetGraphicsRootConstantBufferView(2, color.GetGPUVtlAdrs());
 
 	Engine::GetCommandList()->SetPipelineState(this->graphicsPipelineState);
 	

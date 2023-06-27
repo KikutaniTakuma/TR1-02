@@ -38,7 +38,7 @@ VertexShaderOutput main(VertexShaderInput input )
 	output.worldPosition = input.position;
 	output.position = mul(input.position, viewProkectionMat);
 	output.color = input.color;
-	output.normal = mul(input.normal, worldMat);
+	output.normal = mul(input.normal, (float32_t3x3)worldMat);
 
 	return output;
 }

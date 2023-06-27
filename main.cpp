@@ -10,14 +10,13 @@
 #include "Engine/KeyInput/KeyInput.h"
 #include "PeraRender/PeraRender.h"
 
-int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
+int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	Engine::Initialize(1280, 720, "DirectXGame");
 
+
 	auto model = std::make_unique<Model>();
-
-	model->LoadObj("cube.obj");
-
-	model->LoadShader("WaveShader/WaveNone.VS.hlsl", "WaveShader/Wave.PS.hlsl", "WaveShader/Wave.GS.hlsl");
+	model->LoadObj("Obj/Ball.obj");
+	model->LoadShader("WaveShader/WaveNone.VS.hlsl", "WaveShader/Wave.PS.hlsl", "WaveShader/WaveNone.GS.hlsl");
 
 
 	Mat4x4 worldMat = MakeMatrixAffin(Vector3D(1.0f,1.0f,1.0f), Vector3D(), Vector3D());
@@ -95,6 +94,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		ImGui::DragFloat3("cameraPos", &cameraPos.x, 0.01f);
 		ImGui::DragFloat3("cameraRotate", &cameraRotate.x, 0.01f);
 		ImGui::DragFloat3("cameraScale", &cameraScale.x, 0.01f);
+		ImGui::DragFloat3("cameraMoveRotate", &cameraMoveRotate.x, 0.01f);
 		ImGui::End();
 
 		model->Update();
@@ -106,7 +106,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		///
 		/// ï`âÊèàóù
 		/// 
-		pera->PreDraw();
+		//pera->PreDraw();
 
 		viewMatrix = MakeMatrixInverse(MakeMatrixAffin(cameraScale, cameraRotate, cameraPos) * MakeMatrixAffin(Vector3D(1.0f,1.0f,1.0f), cameraMoveRotate, Vector3D()));
 		projectionMatrix = MakeMatrixPerspectiveFov(0.45f, static_cast<float>(Engine::GetInstance()->clientWidth) / static_cast<float>(Engine::GetInstance()->clientHeight), 0.1f, 100.0f);
@@ -114,7 +114,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		model->Draw(worldMat, viewMatrix,  projectionMatrix, cameraPos);
 
-		pera->Draw();
+		//pera->Draw();
 		///
 		/// ï`âÊèàóùÇ±Ç±Ç‹Ç≈
 		/// 

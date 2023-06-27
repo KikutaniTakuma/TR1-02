@@ -8,12 +8,17 @@ public:
 	inline ConstBuffer():
 		bufferResource(nullptr),
 		data(nullptr),
-		isWright(true)
+		isWright(true),
+		roootParamater(),
+		shaderVisibility(D3D12_SHADER_VISIBILITY_ALL),
+		shaderRegister(0)
 	{
 		bufferResource = Engine::CreateBufferResuorce(sizeof(T));
 		if (isWright) {
 			bufferResource->Map(0, nullptr, reinterpret_cast<void**>(&data));
 		}
+		roootParamater.ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+
 	}
 
 	inline ~ConstBuffer() {
@@ -47,6 +52,11 @@ public:
 		return bufferResource->GetGPUVirtualAddress();
 	}
 
+	const D3D12_ROOT_PARAMETER& getRoootParamater() {
+		roootParamater.ShaderVisibility = shaderVisibility;
+		roootParamater.Descriptor.ShaderRegister = shaderRegister;
+		return roootParamater;
+	}
 
 private:
 	ID3D12Resource* bufferResource = nullptr;
@@ -54,4 +64,9 @@ private:
 	T* data;
 
 	bool isWright;
+
+	D3D12_ROOT_PARAMETER roootParamater;
+public:
+	D3D12_SHADER_VISIBILITY shaderVisibility;
+	UINT shaderRegister;
 };

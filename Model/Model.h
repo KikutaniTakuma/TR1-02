@@ -13,10 +13,7 @@
 class Model {
 	struct VertData {
 		Vector4 position;
-		Vector4 color;
-		Vector4 normal;
-		Vector4 worldPosition;
-		Vector2D uv;
+		Vector3D normal;
 	};
 
 	struct Mesh {
@@ -27,7 +24,7 @@ class Model {
 		// インデックスバッファビュー
 		D3D12_INDEX_BUFFER_VIEW indexView{};
 		// 頂点バッファマップ
-		VertData* vertMap = nullptr;
+		VertData* vertexMap = nullptr;
 		// インデックスバッファマップ
 		uint16_t* indexMap = nullptr;
 
@@ -38,7 +35,6 @@ class Model {
 	struct MatrixData {
 		Mat4x4 worldMat;
 		Mat4x4 viewProjectoionMat;
-		float waveCount;
 	};
 
 	struct DirectionLight {
@@ -91,6 +87,7 @@ private:
 
 	ConstBuffer<DirectionLight> dirLig;
 
+	ConstBuffer<Vector4> color;
 
 	float waveCountSpd;
 };

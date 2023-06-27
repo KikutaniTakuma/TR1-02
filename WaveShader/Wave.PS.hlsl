@@ -17,12 +17,17 @@ cbuffer DirectionLight : register(b1) {
 	float ptRange;
 }
 
+cbuffer Color : register(b2){
+	float4 color;
+}
+
 PixelShaderOutPut main(GeometoryOutPut input)
 {
 	PixelShaderOutPut output;
+	input.normal = normalize(input.normal);
 
 	// ディレクションライト拡散反射光
-	float t = dot(input.normal, ligDirection);
+	float t = dot(input.normal, ligDirection.xyz);
 
 	t *= -1.0f;
 	t = (t + abs(t)) * 0.5f;
@@ -47,7 +52,7 @@ PixelShaderOutPut main(GeometoryOutPut input)
 	ligDir = normalize(ligDir);
 
 	// ポイントライト拡散反射光
-	t = dot(input.normal.xyz, ligDir);
+	t = dot(input.normal, ligDir);
 
 	t *= -1.0f;
 	t = (t + abs(t)) * 0.5f;
@@ -55,7 +60,7 @@ PixelShaderOutPut main(GeometoryOutPut input)
 	float3 diffPoint = ptColor * t;
 
 	// ポイントライト鏡面反射光
-	float3 refVec = reflect(ligDir, input.normal.xyz);
+	float3 refVec = reflect(ligDir, input.normal);
 
 	float3 toEye = eyePos - input.worldPosition.xyz;
 	toEye = normalize(toEye);
@@ -81,7 +86,7 @@ PixelShaderOutPut main(GeometoryOutPut input)
 
 	float3 lig = diffuseLig + specularLig;
 
-	output.color = input.color;
+	output.color = color;
 	lig.x += 0.2f;
 	lig.y += 0.2f;
 	lig.z += 0.2f;

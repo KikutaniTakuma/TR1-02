@@ -36,7 +36,7 @@ void Engine::Initialize(int windowWidth, int windowHeight, const std::string& wi
 #endif
 
 	// Direct3D¶¬
-	assert(engine->InitializeDirect3D());
+	engine->InitializeDirect3D();
 
 	// DirectX12¶¬
 	engine->InitializeDirect12();
@@ -204,8 +204,12 @@ ID3D12DescriptorHeap* Engine::CreateDescriptorHeap(
 	descriptorHeapDesc.Type = heapType;
 	descriptorHeapDesc.NumDescriptors = numDescriptors;
 	descriptorHeapDesc.Flags = shaderrVisible ? D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE : D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-	assert(SUCCEEDED(engine->device->CreateDescriptorHeap(&descriptorHeapDesc, IID_PPV_ARGS(&descriptorHeap))));
-	return descriptorHeap;
+	if (SUCCEEDED(engine->device->CreateDescriptorHeap(&descriptorHeapDesc, IID_PPV_ARGS(&descriptorHeap)))) {
+		return descriptorHeap;
+	}
+	assert(!"Failed");
+
+	return nullptr;
 }
 
 bool Engine::InitializeDirect12() {
@@ -364,16 +368,17 @@ ID3D12Resource* Engine::CreateDepthStencilTextureResource(int32_t width, int32_t
 	depthClearValue.Format = DXGI_FORMAT_D32_FLOAT;
 
 	ID3D12Resource* resource = nullptr;
-	assert(SUCCEEDED(
+	if (SUCCEEDED(
 		engine->device->CreateCommittedResource(
-		&heapProperties,
-		D3D12_HEAP_FLAG_NONE,
-		&resourceDesc,
-		D3D12_RESOURCE_STATE_DEPTH_WRITE,
-		&depthClearValue,
-		IID_PPV_ARGS(&resource))
-		)
-	);
+			&heapProperties,
+			D3D12_HEAP_FLAG_NONE,
+			&resourceDesc,
+			D3D12_RESOURCE_STATE_DEPTH_WRITE,
+			&depthClearValue,
+			IID_PPV_ARGS(&resource))
+	)) {
+		assert(!"CreateDepthStencilTextureResource Failed");
+	}
 
 	return resource;
 }
@@ -388,7 +393,9 @@ void Engine::InitalizeDraw() {
 	dsvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
 
 	dsvHeap = nullptr;
-	assert(SUCCEEDED(device->CreateDescriptorHeap(&dsvHeapDesc, IID_PPV_ARGS(&dsvHeap))));
+	if(!SUCCEEDED(device->CreateDescriptorHeap(&dsvHeapDesc, IID_PPV_ARGS(&dsvHeap)))) {
+		assert(!"CreateDescriptorHeap failed");
+	}
 
 
 	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
