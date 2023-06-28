@@ -94,7 +94,7 @@
     <Filter Include="PeraRender">
       <UniqueIdentifier>{9f8d179a-c3cd-4256-8e00-4a3389c927d7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\ConvertString\ConstBuffer">
+    <Filter Include="Engine\ConstBuffer">
       <UniqueIdentifier>{e59427f8-55ba-46bf-b8a3-e4974976afc4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -163,7 +163,7 @@
       <Filter>PeraRender</Filter>
     </ClInclude>
     <ClInclude Include="Engine\ConstBuffer\ConstBuffer.h">
-      <Filter>Engine\ConvertString\ConstBuffer</Filter>
+      <Filter>Engine\ConstBuffer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

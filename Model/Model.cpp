@@ -19,8 +19,12 @@ Model::Model() :
 	loadObjFlg(false),
 	loadShaderFlg(false),
 	createGPFlg(false),
-	waveCountSpd(0.01f)
+	waveCountSpd(0.01f),
+	color(),
+	dirLig()
 {
+	descHeap = Engine::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 4, true);
+
 	// 単位行列を書き込んでおく
 	wvpData.shaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
 	wvpData.shaderRegister = 0;
@@ -44,6 +48,13 @@ Model::Model() :
 	color.shaderRegister = 2;
 	*color = Engine::UintToVector4(0xff0000ff);
 	color.OffWright();
+
+	auto descHeaphandle = descHeap->GetCPUDescriptorHandleForHeapStart();
+	wvpData.SetDescriptor(descHeaphandle);
+	descHeaphandle.ptr += Engine::GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	dirLig.SetDescriptor(descHeaphandle);
+	descHeaphandle.ptr += Engine::GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	color.SetDescriptor(descHeaphandle);
 }
 
 void Model::LoadObj(const std::string& fileName) {
@@ -197,13 +208,22 @@ void Model::CreateGraphicsPipeline() {
 		D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
 		descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
+		D3D12_DESCRIPTOR_RANGE ranges[1];
+		ranges[0].BaseShaderRegister = 0;
+		ranges[0].NumDescriptors = 3;
+		ranges[0].RegisterSpace = 0;
+		ranges[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
+		ranges[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
 		// RootParamater作成。複数設定出来るので配列
-		D3D12_ROOT_PARAMETER roootParamaters[3] = {};
-		roootParamaters[0] = wvpData.getRoootParamater();
-		roootParamaters[1] = dirLig.getRoootParamater();
-		roootParamaters[2] = color.getRoootParamater();
-		descriptionRootSignature.pParameters = roootParamaters;
-		descriptionRootSignature.NumParameters = _countof(roootParamaters);
+		D3D12_ROOT_PARAMETER roootParamaters{};
+		roootParamaters.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+		roootParamaters.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+		roootParamaters.DescriptorTable.pDescriptorRanges = ranges;
+		roootParamaters.DescriptorTable.NumDescriptorRanges = _countof(ranges);
+
+		descriptionRootSignature.pParameters = &roootParamaters;
+		descriptionRootSignature.NumParameters = 1;
 
 		// シリアライズしてバイナリにする
 		ID3DBlob* signatureBlob = nullptr;
@@ -328,9 +348,8 @@ void Model::Draw(const Mat4x4& worldMat, const Mat4x4& viewMat, const Mat4x4& pr
 	dirLig->eyePos = cameraPos;
 
 	Engine::GetCommandList()->SetGraphicsRootSignature(rootSignature);
-	Engine::GetCommandList()->SetGraphicsRootConstantBufferView(0, wvpData.GetGPUVtlAdrs());
-	Engine::GetCommandList()->SetGraphicsRootConstantBufferView(1, dirLig.GetGPUVtlAdrs());
-	Engine::GetCommandList()->SetGraphicsRootConstantBufferView(2, color.GetGPUVtlAdrs());
+	Engine::GetCommandList()->SetDescriptorHeaps(1, &descHeap);
+	Engine::GetCommandList()->SetGraphicsRootDescriptorTable(0, descHeap->GetGPUDescriptorHandleForHeapStart());
 
 	Engine::GetCommandList()->SetPipelineState(this->graphicsPipelineState);
 	
@@ -355,4 +374,5 @@ Model::~Model() {
 	if (meshData.vertexBuffer) {
 		meshData.vertexBuffer->Release();
 	}
+	descHeap->Release();
 }

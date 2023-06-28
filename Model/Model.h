@@ -68,6 +68,7 @@ private:
 
 
 private:
+	ID3D12DescriptorHeap* descHeap = nullptr;
 
 	Mesh meshData;
 	IDxcBlob* vertexShaderBlob = nullptr;

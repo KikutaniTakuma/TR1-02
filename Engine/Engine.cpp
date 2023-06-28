@@ -252,7 +252,7 @@ bool Engine::InitializeDirect12() {
 	rtvDescriptorHeap = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
 
 	// SRV用のヒープ
-	srvDescriptorHeap = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1, true);
+	srvDescriptorHeap = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
 
 	// SwepChainのメモリとディスクリプタと関連付け
 	// バックバッファの数を取得
@@ -368,7 +368,7 @@ ID3D12Resource* Engine::CreateDepthStencilTextureResource(int32_t width, int32_t
 	depthClearValue.Format = DXGI_FORMAT_D32_FLOAT;
 
 	ID3D12Resource* resource = nullptr;
-	if (SUCCEEDED(
+	if (!SUCCEEDED(
 		engine->device->CreateCommittedResource(
 			&heapProperties,
 			D3D12_HEAP_FLAG_NONE,

@@ -7,18 +7,21 @@ class ConstBuffer {
 public:
 	inline ConstBuffer():
 		bufferResource(nullptr),
+		cbvDesc(),
 		data(nullptr),
 		isWright(true),
 		roootParamater(),
 		shaderVisibility(D3D12_SHADER_VISIBILITY_ALL),
 		shaderRegister(0)
 	{
-		bufferResource = Engine::CreateBufferResuorce(sizeof(T));
+		bufferResource = Engine::CreateBufferResuorce((sizeof(T) + 0xff) & ~0xff);
+		cbvDesc.BufferLocation = bufferResource->GetGPUVirtualAddress();
+		cbvDesc.SizeInBytes = UINT(bufferResource->GetDesc().Width);
+
 		if (isWright) {
 			bufferResource->Map(0, nullptr, reinterpret_cast<void**>(&data));
 		}
 		roootParamater.ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-
 	}
 
 	inline ~ConstBuffer() {
@@ -58,8 +61,13 @@ public:
 		return roootParamater;
 	}
 
+	void SetDescriptor(D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle) {
+		Engine::GetDevice()->CreateConstantBufferView(&cbvDesc, descriptorHandle);
+	}
+
 private:
 	ID3D12Resource* bufferResource = nullptr;
+	D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc;
 
 	T* data;
 
