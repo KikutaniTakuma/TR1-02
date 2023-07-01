@@ -59,6 +59,15 @@
     <ClCompile Include="PeraRender\PeraRender.cpp">
       <Filter>PeraRender</Filter>
     </ClCompile>
+    <ClCompile Include="TextureManager\TextureManager.cpp">
+      <Filter>TextureManager</Filter>
+    </ClCompile>
+    <ClCompile Include="TextureManager\Texture\Texture.cpp">
+      <Filter>TextureManager\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture2D\Texture2D.cpp">
+      <Filter>Texture2D</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -96,6 +105,15 @@
     </Filter>
     <Filter Include="Engine\ConstBuffer">
       <UniqueIdentifier>{e59427f8-55ba-46bf-b8a3-e4974976afc4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TextureManager">
+      <UniqueIdentifier>{1336c590-e855-4d4f-92b9-fa2698582835}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TextureManager\Texture">
+      <UniqueIdentifier>{5c638997-6f2b-4dd7-9e5b-0d6092ae02f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Texture2D">
+      <UniqueIdentifier>{192c5cda-f43f-40d2-9f13-b9f849327730}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -164,6 +182,15 @@
     </ClInclude>
     <ClInclude Include="Engine\ConstBuffer\ConstBuffer.h">
       <Filter>Engine\ConstBuffer</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureManager\TextureManager.h">
+      <Filter>TextureManager</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureManager\Texture\Texture.h">
+      <Filter>TextureManager\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture2D\Texture2D.h">
+      <Filter>Texture2D</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

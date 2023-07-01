@@ -5,6 +5,7 @@
 #include "WinApp/WinApp.h"
 #include "ShaderManager/ShaderManager.h"
 #include "ConvertString/ConvertString.h"
+#include "TextureManager/TextureManager.h"
 
 #include "externals/imgui/imgui.h"
 #include "externals/imgui/imgui_impl_dx12.h"
@@ -19,10 +20,16 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg
 Engine* Engine::engine = nullptr;
 
 void Engine::Initialize(int windowWidth, int windowHeight, const std::string& windowName) {
-	CoInitializeEx(0, COINIT_MULTITHREADED);
+	HRESULT hr =  CoInitializeEx(0, COINIT_MULTITHREADED);
+	if (hr != S_OK) {
+		return;
+	}
 
 	engine = new Engine();
 	assert(engine);
+
+	ShaderManager::Initialize();
+	TextureManager::Initialize();
 
 	engine->clientWidth = windowWidth;
 	engine->clientHeight = windowHeight;
@@ -45,6 +52,9 @@ void Engine::Initialize(int windowWidth, int windowHeight, const std::string& wi
 }
 
 void Engine::Finalize() {
+	TextureManager::Finalize();
+	ShaderManager::Finalize();
+
 	delete engine;
 	engine = nullptr;
 
@@ -101,12 +111,12 @@ void Engine::InitializeDebugLayer() {
 /// Direct3D初期化
 /// 
 
-bool Engine::InitializeDirect3D() {
+void Engine::InitializeDirect3D() {
 	// IDXGIFactory生成
 	auto hr = CreateDXGIFactory(IID_PPV_ARGS(&dxgiFactory));
 	assert(SUCCEEDED(hr));
 	if (hr != S_OK) {
-		return false;
+		return;
 	}
 
 	// 使用するグラボの設定
@@ -118,7 +128,7 @@ bool Engine::InitializeDirect3D() {
 		DXGI_ADAPTER_DESC3 adapterDesc{};
 		hr = useAdapter->GetDesc3(&adapterDesc);
 		if (hr != S_OK) {
-			return false;
+			return;
 		}
 
 		if (!(adapterDesc.Flags & DXGI_ADAPTER_FLAG3_SOFTWARE)) {
@@ -128,7 +138,7 @@ bool Engine::InitializeDirect3D() {
 		useAdapter = nullptr;
 	}
 	if (useAdapter == nullptr) {
-		return false;
+		return;
 	}
 
 
@@ -153,7 +163,7 @@ bool Engine::InitializeDirect3D() {
 	}
 
 	if (device == nullptr) {
-		return false;
+		return;
 	}
 	Log("Complete create D3D12Device!!!\n");
 
@@ -185,8 +195,6 @@ bool Engine::InitializeDirect3D() {
 		infoQueue->Release();
 	}
 #endif
-
-	return true;
 }
 
 
@@ -212,7 +220,7 @@ ID3D12DescriptorHeap* Engine::CreateDescriptorHeap(
 	return nullptr;
 }
 
-bool Engine::InitializeDirect12() {
+void Engine::InitializeDirect12() {
 	// コマンドキューを作成
 	commandQueue = nullptr;
 	D3D12_COMMAND_QUEUE_DESC commandQueueDesc{};
@@ -252,7 +260,7 @@ bool Engine::InitializeDirect12() {
 	rtvDescriptorHeap = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
 
 	// SRV用のヒープ
-	srvDescriptorHeap = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
+	srvDescriptorHeap = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1, true);
 
 	// SwepChainのメモリとディスクリプタと関連付け
 	// バックバッファの数を取得
@@ -303,9 +311,6 @@ bool Engine::InitializeDirect12() {
 	fenceEvent = nullptr;
 	fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 	assert(fenceEvent != nullptr);
-
-
-	return true;
 }
 
 
@@ -407,7 +412,7 @@ void Engine::InitalizeDraw() {
 }
 
 Vector4 Engine::UintToVector4(uint32_t color) {
-	float normal = 1.0f / 255.0f;
+	static const float normal = 1.0f / 255.0f;
 	return Vector4(static_cast<float>((color & 0xff000000) >> 24) * normal, static_cast<float>((color & 0xff0000) >> 16) * normal, static_cast<float>((color & 0xff00) >> 8) * normal, static_cast<float>(color & 0xff) * normal);
 }
 
@@ -499,11 +504,9 @@ void Engine::FrameEnd() {
 	auto dsvH = engine->dsvHeap->GetCPUDescriptorHandleForHeapStart();
 	engine->commandList->OMSetRenderTargets(1, &engine->rtvHandles[backBufferIndex], false, &dsvH);
 
-	ID3D12DescriptorHeap* descriptorHeaps[] = {
-		engine->srvDescriptorHeap
-	};
-	engine->commandList->SetDescriptorHeaps(1, descriptorHeaps);
+	engine->commandList->SetDescriptorHeaps(1, &engine->srvDescriptorHeap);
 
+	// ImGui描画
 	ImGui::Render();
 	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), engine->commandList);
 
@@ -519,7 +522,7 @@ void Engine::FrameEnd() {
 
 	// GPUにコマンドリストの実行を行わせる
 	ID3D12CommandList* commandLists[] = { engine->commandList };
-	engine->commandQueue->ExecuteCommandLists(1, commandLists);
+	engine->commandQueue->ExecuteCommandLists(_countof(commandLists), commandLists);
 
 
 	// GPUとOSに画面の交換を行うように通知する
@@ -544,6 +547,10 @@ void Engine::FrameEnd() {
 	assert(SUCCEEDED(hr));
 	hr = engine->commandList->Reset(engine->commandAllocator, nullptr);
 	assert(SUCCEEDED(hr));
+
+	// このフレームで画像読み込みが発生していたら開放する
+	// またUnloadされていたらそれをコンテナから削除する
+	TextureManager::GetInstance()->ReleaseIntermediateResource();
 }
 
 

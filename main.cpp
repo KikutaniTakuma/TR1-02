@@ -9,14 +9,15 @@
 #include "Engine/Gamepad/Gamepad.h"
 #include "Engine/KeyInput/KeyInput.h"
 #include "PeraRender/PeraRender.h"
+#include "Texture2D/Texture2D.h"
 
-int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
+int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	Engine::Initialize(1280, 720, "DirectXGame");
 
 
-	auto model = std::make_unique<Model>();
-	model->LoadObj("Obj/Ball.obj");
-	model->LoadShader("WaveShader/WaveNone.VS.hlsl", "WaveShader/Wave.PS.hlsl", "WaveShader/WaveNone.GS.hlsl");
+	/*auto model = std::make_unique<Model>();
+	model->LoadObj("Cube.obj");
+	model->LoadShader("WaveShader/WaveNone.VS.hlsl", "WaveShader/Wave.PS.hlsl", "WaveShader/Wave.GS.hlsl");*/
 
 
 	Mat4x4 worldMat = MakeMatrixAffin(Vector3D(1.0f,1.0f,1.0f), Vector3D(), Vector3D());
@@ -30,9 +31,17 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPSTR, _In
 
 	Vector3D cameraMoveRotate{};
 
-	auto pera = std::make_unique<PeraRender>();
+	auto tex = std::make_unique<Texture2D>();
+	tex->Initialize("PostShader/Post.VS.hlsl", "PostShader/PostNone.PS.hlsl");
+	tex->LoadTexture("./Resources/uvChecker.png");
 
-	pera->Initialize("PostShader/Post.VS.hlsl", "PostShader/PostNone.PS.hlsl");
+	auto tex1 = std::make_unique<Texture2D>();
+	tex1->Initialize("PostShader/Post.VS.hlsl", "PostShader/PostNone.PS.hlsl");
+	tex1->LoadTexture("./Resources/uvChecker.png");
+
+
+	auto pera = std::make_unique<PeraRender>();
+	pera->Initialize("PostShader/Post.VS.hlsl", "PostShader/Wipe.PS.hlsl");
 
 	/// 
 	/// メインループ
@@ -62,7 +71,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPSTR, _In
 			cameraMoveRotate.x -= 0.01f;
 		}
 
-		if (KeyInput::LongPush(VK_W)) {
+		/*if (KeyInput::LongPush(VK_W)) {
 			cameraPos.z += 0.1f;
 		}
 		if (KeyInput::LongPush(VK_S)) {
@@ -86,6 +95,10 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPSTR, _In
 		}
 		if (KeyInput::LongPush(VK_RIGHT)) {
 			cameraRotate.y += 0.01f;
+		}*/
+
+		if (Gamepad::GetInstans()->Released(Gamepad::Button::A)) {
+			tex->LoadTexture("./Resources/sakabannbasupisu.png");
 		}
 
 
@@ -97,7 +110,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPSTR, _In
 		ImGui::DragFloat3("cameraMoveRotate", &cameraMoveRotate.x, 0.01f);
 		ImGui::End();
 
-		model->Update();
+		//model->Update();
 
 		///
 		/// 更新処理ここまで
@@ -112,7 +125,10 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPSTR, _In
 		projectionMatrix = MakeMatrixPerspectiveFov(0.45f, static_cast<float>(Engine::GetInstance()->clientWidth) / static_cast<float>(Engine::GetInstance()->clientHeight), 0.1f, 100.0f);
 
 
-		model->Draw(worldMat, viewMatrix,  projectionMatrix, cameraPos);
+		//model->Draw(worldMat, viewMatrix,  projectionMatrix, cameraPos);
+
+		tex1->Draw();
+		tex->Draw();
 
 		//pera->Draw();
 		///
@@ -130,7 +146,9 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPSTR, _In
 	}
 
 
-	model.reset();
+	//model.reset();
+	tex1.reset();
+	tex.reset();
 	pera.reset();
 
 	Engine::Finalize();

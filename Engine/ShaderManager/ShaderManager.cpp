@@ -4,6 +4,8 @@
 #include <cassert>
 #include <format>
 
+ShaderManager* ShaderManager::instance = nullptr;
+
 ShaderManager::ShaderManager() {
 	vertexShader.reserve(0);
 	hullShader.reserve(0);
@@ -43,6 +45,16 @@ ShaderManager::~ShaderManager() {
 	includeHandler->Release();
 	dxcCompiler->Release();
 	dxcUtils->Release();
+}
+
+void ShaderManager::Initialize() {
+	instance = new ShaderManager();
+	assert(instance);
+}
+
+void ShaderManager::Finalize() {
+	delete instance;
+	instance = nullptr;
 }
 
 IDxcBlob* ShaderManager::CompilerShader(
@@ -111,7 +123,12 @@ IDxcBlob* ShaderManager::CompilerShader(
 }
 
 IDxcBlob* ShaderManager::LoadVertexShader(const std::string& fileName) {
-	if (!vertexShader.empty()) {
+	if (vertexShader.empty()) {
+		IDxcBlob* shader = CompilerShader(ConvertString(fileName), L"vs_6_0");
+		assert(shader);
+		vertexShader.insert(std::make_pair(fileName, shader));
+	}
+	else {
 		auto itr = vertexShader.find(fileName);
 		if (itr == vertexShader.end()) {
 			IDxcBlob* shader = CompilerShader(ConvertString(fileName), L"vs_6_0");
@@ -119,15 +136,15 @@ IDxcBlob* ShaderManager::LoadVertexShader(const std::string& fileName) {
 			vertexShader.insert(std::make_pair(fileName, shader));
 		}
 	}
-	else {
-		IDxcBlob* shader = CompilerShader(ConvertString(fileName), L"vs_6_0");
-		assert(shader);
-		vertexShader.insert(std::make_pair(fileName, shader));
-	}
 	return vertexShader[fileName];
 }
 IDxcBlob* ShaderManager::LoadHullShader(const std::string& fileName) {
-	if (!hullShader.empty()) {
+	if (hullShader.empty()) {
+		IDxcBlob* shader = CompilerShader(ConvertString(fileName), L"hs_6_0");
+		assert(shader);
+		hullShader.insert(std::make_pair(fileName, shader));
+	}
+	else {
 		auto itr = hullShader.find(fileName);
 		if (itr == hullShader.end()) {
 			IDxcBlob* shader = CompilerShader(ConvertString(fileName), L"hs_6_0");
@@ -135,15 +152,16 @@ IDxcBlob* ShaderManager::LoadHullShader(const std::string& fileName) {
 			hullShader.insert(std::make_pair(fileName, shader));
 		}
 	}
-	else {
-		IDxcBlob* shader = CompilerShader(ConvertString(fileName), L"hs_6_0");
-		assert(shader);
-		hullShader.insert(std::make_pair(fileName, shader));
-	}
+
 	return hullShader[fileName];
 }
 IDxcBlob* ShaderManager::LoadDomainShader(const std::string& fileName) {
-	if (!domainShader.empty()) {
+	if (domainShader.empty()) {
+		IDxcBlob* shader = CompilerShader(ConvertString(fileName), L"ds_6_0");
+		assert(shader);
+		domainShader.insert(std::make_pair(fileName, shader));
+	}
+	else {
 		auto itr = domainShader.find(fileName);
 		if (itr == domainShader.end()) {
 			IDxcBlob* shader = CompilerShader(ConvertString(fileName), L"ds_6_0");
@@ -151,15 +169,15 @@ IDxcBlob* ShaderManager::LoadDomainShader(const std::string& fileName) {
 			domainShader.insert(std::make_pair(fileName, shader));
 		}
 	}
-	else {
-		IDxcBlob* shader = CompilerShader(ConvertString(fileName), L"ds_6_0");
-		assert(shader);
-		domainShader.insert(std::make_pair(fileName, shader));
-	}
 	return domainShader[fileName];
 }
 IDxcBlob* ShaderManager::LoadGeometoryShader(const std::string& fileName) {
 	if (geometoryShader.empty()) {
+		IDxcBlob* shader = CompilerShader(ConvertString(fileName), L"gs_6_0");
+		assert(shader);
+		geometoryShader.insert(std::make_pair(fileName, shader));
+	}
+	else {
 		auto itr = geometoryShader.find(fileName);
 		if (itr == geometoryShader.end()) {
 			IDxcBlob* shader = CompilerShader(ConvertString(fileName), L"gs_6_0");
@@ -167,26 +185,21 @@ IDxcBlob* ShaderManager::LoadGeometoryShader(const std::string& fileName) {
 			geometoryShader.insert(std::make_pair(fileName, shader));
 		}
 	}
-	else {
-		IDxcBlob* shader = CompilerShader(ConvertString(fileName), L"gs_6_0");
-		assert(shader);
-		geometoryShader.insert(std::make_pair(fileName, shader));
-	}
 	return geometoryShader[fileName];
 }
 IDxcBlob* ShaderManager::LoadPixelShader(const std::string& fileName) {
 	if (!pixelShader.empty()) {
+		IDxcBlob* shader = CompilerShader(ConvertString(fileName), L"ps_6_0");
+		assert(shader);
+		pixelShader.insert(std::make_pair(fileName, shader));
+	}
+	else {
 		auto itr = pixelShader.find(fileName);
 		if (itr == pixelShader.end()) {
 			IDxcBlob* shader = CompilerShader(ConvertString(fileName), L"ps_6_0");
 			assert(shader);
 			pixelShader.insert(std::make_pair(fileName, shader));
 		}
-	}
-	else {
-		IDxcBlob* shader = CompilerShader(ConvertString(fileName), L"ps_6_0");
-		assert(shader);
-		pixelShader.insert(std::make_pair(fileName, shader));
 	}
 	return pixelShader[fileName];
 }

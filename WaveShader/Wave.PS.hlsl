@@ -8,7 +8,7 @@ struct PixelShaderOutPut {
 };
 
 cbuffer DirectionLight : register(b1) {
-	float4 ligDirection;
+	float3 ligDirection;
 	float3 ligColor;
 	float3 eyePos;
 
@@ -27,7 +27,7 @@ PixelShaderOutPut main(GeometoryOutPut input)
 	input.normal = normalize(input.normal);
 
 	// ディレクションライト拡散反射光
-	float t = dot(input.normal, ligDirection.xyz);
+	float t = dot(input.normal, ligDirection);
 
 	t *= -1.0f;
 	t = (t + abs(t)) * 0.5f;
@@ -36,7 +36,7 @@ PixelShaderOutPut main(GeometoryOutPut input)
 
 	// メタリックすぎるので削除
 	// ディレクションライト鏡面反射光
-	/*float3 refVec = reflect(ligDirection.xyz, input.normal.xyz);
+	/*float3 refVec = reflect(ligDirection, input.normal.xyz);
 
 	float3 toEye = eyePos - input.worldPosition.xyz;
 	toEye = normalize(toEye);

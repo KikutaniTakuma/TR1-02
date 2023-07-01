@@ -163,6 +163,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Math\Vector3D\Vector3D.cpp" />
     <ClCompile Include="Model\Model.cpp" />
     <ClCompile Include="PeraRender\PeraRender.cpp" />
+    <ClCompile Include="Texture2D\Texture2D.cpp" />
+    <ClCompile Include="TextureManager\TextureManager.cpp" />
+    <ClCompile Include="TextureManager\Texture\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\ConstBuffer\ConstBuffer.h" />
@@ -187,6 +190,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Math\Vector4\Vector4.h" />
     <ClInclude Include="Model\Model.h" />
     <ClInclude Include="PeraRender\PeraRender.h" />
+    <ClInclude Include="Texture2D\Texture2D.h" />
+    <ClInclude Include="TextureManager\TextureManager.h" />
+    <ClInclude Include="TextureManager\Texture\Texture.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

@@ -3,6 +3,7 @@
 #include <cassert>
 #include "Engine/ConvertString/ConvertString.h"
 #include "Engine/ShaderManager/ShaderManager.h"
+#include "externals/imgui/imgui.h"
 
 PeraRender::PeraRender():
 	peraResource(nullptr),
@@ -13,7 +14,8 @@ PeraRender::PeraRender():
 	peraVertexShader(nullptr),
 	peraPixelShader(nullptr),
 	rootSignature(nullptr),
-	graphicsPipelineState(nullptr)
+	graphicsPipelineState(nullptr),
+	cbuffer()
 {}
 
 PeraRender::~PeraRender() {
@@ -67,7 +69,13 @@ void PeraRender::CreateDescriptor() {
 	Engine::GetDevice()->CreateRenderTargetView(peraResource, &rtvDesc, peraRTVHeap->GetCPUDescriptorHandleForHeapStart());
 
 
-	peraSRVHeap = Engine::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1, true);
+	peraSRVHeap = Engine::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 2, true);
+
+	auto descHeaphandle = peraSRVHeap->GetCPUDescriptorHandleForHeapStart();
+	descHeaphandle.ptr += Engine::GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	cbuffer.CrerateView(descHeaphandle);
+	cbuffer.shaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	cbuffer.shaderRegister = 0;
 
 
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
@@ -96,7 +104,6 @@ void PeraRender::CreateGraphicsPipeline() {
 
 	peraVertexResource = Engine::CreateBufferResuorce(sizeof(pv));
 
-	peraVertexView;
 	peraVertexView.BufferLocation = peraVertexResource->GetGPUVirtualAddress();
 	peraVertexView.SizeInBytes = sizeof(pv);
 	peraVertexView.StrideInBytes = sizeof(PeraVertexData);
@@ -108,22 +115,34 @@ void PeraRender::CreateGraphicsPipeline() {
 	}
 	peraVertexResource->Unmap(0, nullptr);
 
+	cbuffer.shaderRegister = 0;
+	cbuffer.shaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	cbuffer->center.x = 640.0f;
+	cbuffer->center.y = 360.0f;
+	cbuffer->wipeSize = 300.0f;
+
 	// RootSignatureの生成
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
 	descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
-	D3D12_DESCRIPTOR_RANGE descriptorRange[1] = {};
+	D3D12_DESCRIPTOR_RANGE descriptorRange[2] = {};
 	descriptorRange[0].BaseShaderRegister = 0;
 	descriptorRange[0].NumDescriptors = 1;
 	descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+	descriptorRange[1].BaseShaderRegister = 0;
+	descriptorRange[1].NumDescriptors = 1;
+	descriptorRange[1].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
+	descriptorRange[1].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
-	D3D12_ROOT_PARAMETER roootParamater{};
-	roootParamater.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-	roootParamater.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-	roootParamater.DescriptorTable.pDescriptorRanges = descriptorRange;
-	roootParamater.DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);
-	descriptionRootSignature.pParameters = &roootParamater;
-	descriptionRootSignature.NumParameters = 1;
+	D3D12_ROOT_PARAMETER roootParamater[1] = {};
+	roootParamater[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	roootParamater[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	roootParamater[0].DescriptorTable.pDescriptorRanges = descriptorRange;
+	roootParamater[0].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);
+	//roootParamater[1] = cbuffer.GetRoootParamater();
+	descriptionRootSignature.pParameters = roootParamater;
+	descriptionRootSignature.NumParameters = _countof(roootParamater);
 
 
 	// sampler
@@ -213,7 +232,7 @@ void PeraRender::CreateGraphicsPipeline() {
 
 	graphicsPipelineStateDesc.BlendState.RenderTarget[0].BlendEnable = true;
 	graphicsPipelineStateDesc.BlendState.RenderTarget[0].SrcBlend = D3D12_BLEND_ONE;  // D3D12_BLEND_ZERO;
-	graphicsPipelineStateDesc.BlendState.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;  // D3D12_BLEND_SRC_COLOR;
+	graphicsPipelineStateDesc.BlendState.RenderTarget[0].DestBlend = D3D12_BLEND_ZERO;  // D3D12_BLEND_SRC_COLOR;
 	graphicsPipelineStateDesc.BlendState.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
 	graphicsPipelineStateDesc.BlendState.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
 	graphicsPipelineStateDesc.BlendState.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
@@ -247,6 +266,11 @@ void PeraRender::Draw() {
 		D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE
 	);
 
+	//ImGui::Begin("Window");
+	ImGui::DragFloat("wipeSize", &cbuffer->wipeSize, 0.1f);
+	ImGui::DragFloat2("wipeCenter", &cbuffer->center.x);
+	//ImGui::End();
+
 	// 描画先をメインレンダーターゲットに変更
 	auto rtvHeapHandle = Engine::GetMainRendertTargetHandle();
 	auto dsvH = Engine::GetDsvHandle();
@@ -255,7 +279,7 @@ void PeraRender::Draw() {
 	// 各種描画コマンドを積む
 	Engine::GetCommandList()->SetGraphicsRootSignature(rootSignature);
 	Engine::GetCommandList()->SetPipelineState(graphicsPipelineState);
-	Engine::GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+	Engine::GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 	Engine::GetCommandList()->IASetVertexBuffers(0, 1, &peraVertexView);
 	Engine::GetCommandList()->SetDescriptorHeaps(1, &peraSRVHeap);
 	auto perasSrvHandle = peraSRVHeap->GetGPUDescriptorHandleForHeapStart();

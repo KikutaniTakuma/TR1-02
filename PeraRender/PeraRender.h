@@ -8,12 +8,19 @@
 #include "Math/Vector3D/Vector3D.h"
 #include "Math/Vector4/Vector4.h"
 #include <string>
+#include "Engine/ConstBuffer/ConstBuffer.h"
 
 class PeraRender {
 public:
 	struct PeraVertexData {
 		Vector3D position;
 		Vector2D uv;
+	};
+
+	struct Wipe {
+		Vector2D center;
+		//float pad[2];
+		float wipeSize;
 	};
 
 public:
@@ -49,4 +56,6 @@ private:
 
 	ID3D12RootSignature* rootSignature = nullptr;
 	ID3D12PipelineState* graphicsPipelineState = nullptr;
+
+	ConstBuffer<Wipe> cbuffer;
 };

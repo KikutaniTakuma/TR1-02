@@ -15,28 +15,20 @@ Model::Model() :
 	vertexShaderBlob(nullptr),
 	pixelShaderBlob(nullptr),
 	graphicsPipelineState(nullptr),
-	wvpData(),
 	loadObjFlg(false),
 	loadShaderFlg(false),
 	createGPFlg(false),
 	waveCountSpd(0.01f),
-	color(),
-	dirLig()
+	wvpData(),
+	dirLig(),
+	color()
 {
-	descHeap = Engine::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 4, true);
-
 	// ’PˆÊs—ñ‚ð‘‚«ž‚ñ‚Å‚¨‚­
-	wvpData.shaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
-	wvpData.shaderRegister = 0;
 	wvpData->worldMat = MakeMatrixIndentity();
+	wvpData->viewProjectoionMat = MakeMatrixIndentity();
 
-
-	dirLig.shaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-	dirLig.shaderRegister = 1;
-	dirLig->ligDirection = { 1.0f,-1.0f,-1.0f,0.0f };
-	Vector3D nor{ dirLig->ligDirection.x, dirLig->ligDirection.y, dirLig->ligDirection.z };
-	nor = nor.Normalize();
-	dirLig->ligDirection = {nor.x,nor.y,nor.z,0.0f};
+	dirLig->ligDirection = { 1.0f,-1.0f,-1.0f };
+	dirLig->ligDirection = dirLig->ligDirection.Normalize();
 	Vector4 colorTmp = Engine::UintToVector4(0xffffadff);
 	dirLig->ligColor = { colorTmp.x,colorTmp.y, colorTmp.z };
 
@@ -44,17 +36,17 @@ Model::Model() :
 	dirLig->ptColor = { 15.0f,15.0f,15.0f };
 	dirLig->ptRange = 10.0f;
 
-	color.shaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-	color.shaderRegister = 2;
 	*color = Engine::UintToVector4(0xff0000ff);
 	color.OffWright();
 
+	descHeap = Engine::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 3, true);
+
 	auto descHeaphandle = descHeap->GetCPUDescriptorHandleForHeapStart();
-	wvpData.SetDescriptor(descHeaphandle);
+	wvpData.CrerateView(descHeaphandle);
 	descHeaphandle.ptr += Engine::GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-	dirLig.SetDescriptor(descHeaphandle);
+	dirLig.CrerateView(descHeaphandle);
 	descHeaphandle.ptr += Engine::GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-	color.SetDescriptor(descHeaphandle);
+	color.CrerateView(descHeaphandle);
 }
 
 void Model::LoadObj(const std::string& fileName) {
@@ -187,7 +179,7 @@ void Model::LoadObj(const std::string& fileName) {
 
 void Model::LoadShader(const std::string& vertexFileName, const std::string& pixelFileName, const std::string& geometoryFileName) {
 	if (!loadShaderFlg) {
-		vertexShaderBlob = ShaderManager::GetInstance()->LoadVertexShader(vertexFileName);;
+		vertexShaderBlob = ShaderManager::GetInstance()->LoadVertexShader(vertexFileName);
 		assert(vertexShaderBlob != nullptr);
 		pixelShaderBlob = ShaderManager::GetInstance()->LoadPixelShader(pixelFileName);
 		assert(pixelShaderBlob != nullptr);

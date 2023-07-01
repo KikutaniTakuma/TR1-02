@@ -17,7 +17,6 @@
 #include "Math/Mat4x4/Mat4x4.h"
 #include "Math/Vector2D/Vector2D.h"
 #include "Math/Vector4/Vector4.h" 
-#include "PeraRender/PeraRender.h"
 
 class Engine {
 public:
@@ -119,7 +118,7 @@ private:
 	/// Dirct3D
 	/// 
 private:
-	bool InitializeDirect3D();
+	void InitializeDirect3D();
 
 private:
 	ID3D12Device* device = nullptr;
@@ -133,7 +132,7 @@ private:
 	/// DirectX12
 	/// 
 private:
-	bool InitializeDirect12();
+	void InitializeDirect12();
 
 private:
 	ID3D12CommandQueue* commandQueue = nullptr;

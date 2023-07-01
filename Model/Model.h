@@ -38,13 +38,14 @@ class Model {
 	};
 
 	struct DirectionLight {
-		Vector4 ligDirection;
-		Vector3D ligColor;
+		Vector3D ligDirection;
 		float pad0;
-		Vector3D eyePos;
+		Vector3D ligColor;
 		float pad1;
-		Vector3D ptPos;
+		Vector3D eyePos;
 		float pad2;
+		Vector3D ptPos;
+		float pad3;
 		Vector3D ptColor;
 		float ptRange;
 	};
@@ -79,12 +80,12 @@ private:
 
 	ID3D12RootSignature* rootSignature = nullptr;
 	ID3D12PipelineState* graphicsPipelineState = nullptr;
-	
-	ConstBuffer<MatrixData> wvpData;
 
 	bool loadObjFlg;
 	bool loadShaderFlg;
 	bool createGPFlg;
+
+	ConstBuffer<MatrixData> wvpData;
 
 	ConstBuffer<DirectionLight> dirLig;
 

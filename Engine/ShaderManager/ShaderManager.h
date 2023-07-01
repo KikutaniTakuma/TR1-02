@@ -16,10 +16,17 @@ private:
 	~ShaderManager();
 
 public:
+	static void Initialize();
+
+	static void Finalize();
+
 	static inline ShaderManager* GetInstance() {
-		static ShaderManager instance;
-		return &instance;
+		return instance;
 	}
+
+private:
+	static ShaderManager* instance;
+
 
 public:
 	IDxcBlob* LoadVertexShader(const std::string& fileName);

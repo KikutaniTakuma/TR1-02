@@ -14,6 +14,7 @@ public:
 		shaderVisibility(D3D12_SHADER_VISIBILITY_ALL),
 		shaderRegister(0)
 	{
+		// バイトサイズは256アライメントする(vramを効率的に使うための仕組み)
 		bufferResource = Engine::CreateBufferResuorce((sizeof(T) + 0xff) & ~0xff);
 		cbvDesc.BufferLocation = bufferResource->GetGPUVirtualAddress();
 		cbvDesc.SizeInBytes = UINT(bufferResource->GetDesc().Width);
@@ -55,13 +56,13 @@ public:
 		return bufferResource->GetGPUVirtualAddress();
 	}
 
-	const D3D12_ROOT_PARAMETER& getRoootParamater() {
+	const D3D12_ROOT_PARAMETER& GetRoootParamater() {
 		roootParamater.ShaderVisibility = shaderVisibility;
 		roootParamater.Descriptor.ShaderRegister = shaderRegister;
 		return roootParamater;
 	}
 
-	void SetDescriptor(D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle) {
+	void CrerateView(D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle) {
 		Engine::GetDevice()->CreateConstantBufferView(&cbvDesc, descriptorHandle);
 	}
 
