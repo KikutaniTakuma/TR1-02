@@ -24,7 +24,7 @@ private:
 public:
 	std::shared_ptr<Texture> LoadTexture(const std::string& fileName);
 
-	void UnloadTexture(const std::string& fileName);
+	void UnloadTexture(std::shared_ptr<Texture>& tex);
 
 	void ReleaseIntermediateResource();
 

@@ -25,9 +25,7 @@ TextureManager::TextureManager() :
 }
 
 TextureManager::~TextureManager() {
-	for (auto& i : textures) {
-		i.second.reset();
-	}
+	textures.clear();
 }
 
 
@@ -55,12 +53,15 @@ std::shared_ptr<Texture> TextureManager::LoadTexture(const std::string& fileName
 	return textures[fileName];
 }
 
-void TextureManager::UnloadTexture(const std::string& fileName) {
-	auto itr = textures.find(fileName);
+void TextureManager::UnloadTexture(std::shared_ptr<Texture>& tex) {
+	auto itr = textures.find(tex->fileName);
 	assert(!(itr == textures.end()));
 	if (itr->second.use_count() == 1) {
 		// 参照カウントが1の場合コンテナから削除
 		textures.erase(itr);
+	}
+	else {
+		tex.reset();
 	}
 }
 

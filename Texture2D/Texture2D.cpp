@@ -222,8 +222,7 @@ void Texture2D::CreateGraphicsPipeline(Blend blend) {
 void Texture2D::LoadTexture(const std::string& fileName) {
 	// LoadÏ‚Ý‚¾‚Á‚½‚çUnload;
 	if (tex) {
-		TextureManager::GetInstance()->UnloadTexture(tex->GetFileName());
-		tex.reset();
+		TextureManager::GetInstance()->UnloadTexture(tex);
 	}
 
 	if (!tex) {

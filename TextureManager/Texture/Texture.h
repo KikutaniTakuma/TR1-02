@@ -35,6 +35,7 @@ public:
 /// </summary>
 private:
 	void Load(const std::string& filePath);
+	void ThreadLoad(const std::string& filePath);
 	void Unload();
 
 	DirectX::ScratchImage LoadTexture(const std::string& filePath);
@@ -48,6 +49,9 @@ private:
 public:
 	void CreateSRVView(D3D12_CPU_DESCRIPTOR_HANDLE descHeapHandle);
 
+/// <summary>
+/// CPU‘¤‚ÌƒŠƒ\[ƒX‚ğ‰ğ•ú
+/// </summary>
 private:
 	void ReleaseIntermediateResource();
 
@@ -62,6 +66,7 @@ private:
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc;
 
 	bool loadFlg;
+	bool threadLoadFlg;
 
 private:
 	std::string fileName;

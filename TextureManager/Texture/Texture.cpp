@@ -8,6 +8,7 @@ Texture::Texture():
 	intermediateResource(nullptr),
 	srvDesc(),
 	loadFlg(false),
+	threadLoadFlg(false),
 	fileName()
 {}
 
@@ -37,7 +38,7 @@ Texture& Texture::operator=(Texture&& tex) noexcept {
 }
 
 void Texture::Load(const std::string& filePath) {
-	if (!loadFlg) {
+	if (!loadFlg && !threadLoadFlg) {
 		this->fileName = filePath;
 
 		DirectX::ScratchImage mipImages = LoadTexture(filePath);
@@ -52,6 +53,24 @@ void Texture::Load(const std::string& filePath) {
 
 		// loadÏ‚Ý
 		loadFlg = true;
+	}
+}
+
+void Texture::ThreadLoad(const std::string& filePath) {
+	if (!loadFlg && !threadLoadFlg) {
+		threadLoadFlg = true;
+
+		this->fileName = filePath;
+
+		DirectX::ScratchImage mipImages = LoadTexture(filePath);
+		const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
+		textureResouce = CreateTextureResource(metadata);
+		intermediateResource = UploadTextureData(textureResouce, mipImages);
+
+		srvDesc.Format = metadata.format;
+		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+		srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
 	}
 }
 
