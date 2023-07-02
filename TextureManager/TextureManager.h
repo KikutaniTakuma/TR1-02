@@ -22,7 +22,7 @@ private:
 
 
 public:
-	Texture* LoadTexture(const std::string& fileName);
+	std::shared_ptr<Texture> LoadTexture(const std::string& fileName);
 
 	void UnloadTexture(const std::string& fileName);
 
@@ -33,7 +33,7 @@ private:
 	/// <summary>
 	/// Textureのコンテナ(キー値: ファイルネーム  コンテナデータ型: 参照カウント Texture*)
 	/// </summary>
-	std::unordered_map<std::string, std::pair<uint32_t,std::unique_ptr<Texture>>> textures;
+	std::unordered_map<std::string, std::shared_ptr<Texture>> textures;
 
 	bool thisFrameLoadFlg;
 };

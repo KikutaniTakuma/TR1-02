@@ -32,12 +32,12 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	Vector3D cameraMoveRotate{};
 
 	auto tex = std::make_unique<Texture2D>();
-	tex->Initialize("PostShader/Post.VS.hlsl", "PostShader/PostNone.PS.hlsl");
+	tex->Initialize("Texture2DShader/Texture2D.VS.hlsl", "Texture2DShader/Texture2DNone.PS.hlsl");
 	tex->LoadTexture("./Resources/uvChecker.png");
 
-	auto tex1 = std::make_unique<Texture2D>();
-	tex1->Initialize("PostShader/Post.VS.hlsl", "PostShader/PostNone.PS.hlsl");
-	tex1->LoadTexture("./Resources/uvChecker.png");
+	/*auto tex1 = std::make_unique<Texture2D>();
+	tex1->Initialize("Texture2DShader/Texture2D.VS.hlsl", "Texture2DShader/Texture2DNone.PS.hlsl");
+	tex1->LoadTexture("./Resources/uvChecker.png");*/
 
 
 	auto pera = std::make_unique<PeraRender>();
@@ -127,8 +127,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		//model->Draw(worldMat, viewMatrix,  projectionMatrix, cameraPos);
 
-		tex1->Draw();
-		tex->Draw();
+		//tex1->Draw();
+		tex->Draw(Texture2D::Blend::None, MakeMatrixAffin(Vector3D(1280.0f,720.0f,1.0f), Vector3D(), Vector3D()));
 
 		//pera->Draw();
 		///
@@ -147,7 +147,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 
 	//model.reset();
-	tex1.reset();
+	//tex1.reset();
 	tex.reset();
 	pera.reset();
 

@@ -10,6 +10,13 @@
 
 class Texture2D {
 public:
+	enum class Blend : uint16_t{
+		None,
+		Add,
+		Multiply
+	};
+
+public:
 	struct MatrixData {
 		Mat4x4 wvpMat;
 	};
@@ -31,12 +38,20 @@ private:
 
 	void CreateShader(const std::string& vsFileName, const std::string& psFileName);
 
-	void CreateGraphicsPipeline();
+	void CreateGraphicsPipeline(Blend blend);
 
 public:
 	void LoadTexture(const std::string& fileName);
 
-	void Draw(Vector2D uv0 = { 0.0f, 1.0f }, Vector2D uv1 = { 1.0f, 1.0f }, Vector2D uv2 = { 1.0f, 0.0f }, Vector2D uv3 = { 0.0f, 0.0f });
+public:
+	void Draw(
+		Blend blend = Blend::None, 
+		const Mat4x4& worldMat = MakeMatrixAffin(Vector3D(1.0f,1.0f,1.0f),Vector3D(), Vector3D()),
+		const Mat4x4& viewProjection = MakeMatrixInverse(MakeMatrixAffin(Vector3D(1.0f, 1.0f, 1.0f), Vector3D(), Vector3D())) *
+		MakeMatrixOrthographic(-static_cast<float>(Engine::GetInstance()->clientWidth) * 0.5f, static_cast<float>(Engine::GetInstance()->clientHeight) * 0.5f, static_cast<float>(Engine::GetInstance()->clientWidth) * 0.5f, -static_cast<float>(Engine::GetInstance()->clientHeight) * 0.5f, 0.01f, 1000.0f),
+		const Vector2D& uv0 = {0.0f, 1.0f}, const Vector2D& uv1 = {1.0f, 1.0f}, 
+		const Vector2D& uv2 = {1.0f, 0.0f}, const Vector2D& uv3 = {0.0f, 0.0f}
+	);
 
 private:
 	ID3D12DescriptorHeap* SRVHeap = nullptr;
@@ -44,11 +59,16 @@ private:
 	D3D12_VERTEX_BUFFER_VIEW vertexView;
 	ID3D12Resource* vertexResource = nullptr;
 
+	D3D12_INDEX_BUFFER_VIEW indexView;
+	ID3D12Resource* indexResource = nullptr;
+
 	IDxcBlob* vertexShader = nullptr;
 	IDxcBlob* pixelShader = nullptr;
 
 	ID3D12RootSignature* rootSignature = nullptr;
 	ID3D12PipelineState* graphicsPipelineState = nullptr;
 
-	Texture* tex;
+	ConstBuffer<Mat4x4> wvpMat;
+
+	std::shared_ptr<Texture> tex;
 };
