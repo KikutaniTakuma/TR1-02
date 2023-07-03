@@ -590,14 +590,4 @@ Engine::~Engine() {
 	CloseHandle(fenceEvent);
 	srvDescriptorHeap->Release();
 	rtvDescriptorHeap->Release();
-	/*for (auto i = swapChianResource.rbegin(); i != swapChianResource.rend(); i++) {
-		(*i)->Release();
-	}
-	swapChain->Release();*/
-	/*commandList->Release();
-	commandAllocator->Release();
-	commandQueue->Release();*/
-	/*device->Release();
-	useAdapter->Release();
-	dxgiFactory->Release();*/
 }
