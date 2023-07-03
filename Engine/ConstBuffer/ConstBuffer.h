@@ -1,5 +1,6 @@
 #pragma once
 #include "Engine/Engine.h"
+#include <wrl.h>
 
 // ポインタをテンプレートパラメータに設定してはいけない
 template<class T>
@@ -67,7 +68,7 @@ public:
 	}
 
 private:
-	ID3D12Resource* bufferResource = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> bufferResource = nullptr;
 	D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc;
 
 	T* data;

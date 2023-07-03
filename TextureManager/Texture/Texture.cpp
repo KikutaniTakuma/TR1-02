@@ -15,10 +15,12 @@ Texture::Texture():
 Texture::~Texture() {
 	if (intermediateResource) {
 		intermediateResource->Release();
+		intermediateResource.Reset();
 		intermediateResource = nullptr;
 	}
 	if (textureResouce) {
 		textureResouce->Release();
+		textureResouce.Reset();
 		textureResouce = nullptr;
 	}
 }
@@ -44,7 +46,7 @@ void Texture::Load(const std::string& filePath) {
 		DirectX::ScratchImage mipImages = LoadTexture(filePath);
 		const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
 		textureResouce = CreateTextureResource(metadata);
-		intermediateResource = UploadTextureData(textureResouce, mipImages);
+		intermediateResource = UploadTextureData(textureResouce.Get(), mipImages);
 
 		srvDesc.Format = metadata.format;
 		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -65,7 +67,7 @@ void Texture::ThreadLoad(const std::string& filePath) {
 		DirectX::ScratchImage mipImages = LoadTexture(filePath);
 		const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
 		textureResouce = CreateTextureResource(metadata);
-		intermediateResource = UploadTextureData(textureResouce, mipImages);
+		intermediateResource = UploadTextureData(textureResouce.Get(), mipImages);
 
 		srvDesc.Format = metadata.format;
 		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -79,11 +81,11 @@ void Texture::Unload() {
 		srvDesc = {};
 
 		if (intermediateResource) {
-			intermediateResource->Release();
+			intermediateResource.Reset();
 			intermediateResource = nullptr;
 		}
 		if (textureResouce) {
-			textureResouce->Release();
+			textureResouce.Reset();
 			textureResouce = nullptr;
 		}
 
@@ -161,13 +163,14 @@ ID3D12Resource* Texture::UploadTextureData(ID3D12Resource* texture, const Direct
 
 
 void Texture::CreateSRVView(D3D12_CPU_DESCRIPTOR_HANDLE descHeapHandle) {
-	Engine::GetDevice()->CreateShaderResourceView(textureResouce, &srvDesc, descHeapHandle);
+	Engine::GetDevice()->CreateShaderResourceView(textureResouce.Get(), &srvDesc, descHeapHandle);
 }
 
 
 void Texture::ReleaseIntermediateResource() {
 	if (intermediateResource) {
 		intermediateResource->Release();
+		intermediateResource.Reset();
 		intermediateResource = nullptr;
 	}
 }

@@ -10,6 +10,8 @@
 #include <string>
 #include "Engine/ConstBuffer/ConstBuffer.h"
 
+#include <wrl.h>
+
 class Model {
 	struct VertData {
 		Vector4 position;
@@ -17,8 +19,8 @@ class Model {
 	};
 
 	struct Mesh {
-		ID3D12Resource* vertexBuffer = nullptr;
-		ID3D12Resource* indexBuffer = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12Resource> vertexBuffer = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12Resource> indexBuffer = nullptr;
 		// 頂点バッファビュー
 		D3D12_VERTEX_BUFFER_VIEW vertexView{};
 		// インデックスバッファビュー
@@ -69,17 +71,17 @@ private:
 
 
 private:
-	ID3D12DescriptorHeap* descHeap = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descHeap = nullptr;
 
 	Mesh meshData;
-	IDxcBlob* vertexShaderBlob = nullptr;
-	IDxcBlob* pixelShaderBlob = nullptr;
-	IDxcBlob* geometoryShaderBlob = nullptr;
-	IDxcBlob* hullShaderBlob = nullptr;
-	IDxcBlob* domainShaderBlob = nullptr;
+	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = nullptr;
+	Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob = nullptr;
+	Microsoft::WRL::ComPtr<IDxcBlob> geometoryShaderBlob = nullptr;
+	Microsoft::WRL::ComPtr<IDxcBlob> hullShaderBlob = nullptr;
+	Microsoft::WRL::ComPtr<IDxcBlob> domainShaderBlob = nullptr;
 
-	ID3D12RootSignature* rootSignature = nullptr;
-	ID3D12PipelineState* graphicsPipelineState = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState = nullptr;
 
 	bool loadObjFlg;
 	bool loadShaderFlg;

@@ -13,6 +13,42 @@
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wPram, LPARAM lPram);
 
 
+#ifdef _DEBUG
+Engine::Debug Engine::debugLayer;
+
+Engine::Debug::Debug() :
+	debugController(nullptr)
+{}
+
+Engine::Debug::~Debug() {
+	debugController.Reset();
+
+	// リソースリークチェック
+	IDXGIDebug1* debug;
+	if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&debug)))) {
+		debug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
+		debug->ReportLiveObjects(DXGI_DEBUG_APP, DXGI_DEBUG_RLO_ALL);
+		debug->ReportLiveObjects(DXGI_DEBUG_D3D12, DXGI_DEBUG_RLO_ALL);
+		debug->Release();
+	}
+}
+
+///
+/// デバッグレイヤー初期化
+/// 
+
+void Engine::Debug::InitializeDebugLayer() {
+	debugController = nullptr;
+	if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(debugController.GetAddressOf())))) {
+		// デバッグレイヤーを有効化する
+		debugController->EnableDebugLayer();
+		// さらにGPU側でもチェックするようにする
+		debugController->SetEnableGPUBasedValidation(TRUE);
+	}
+}
+
+#endif // _DEBUG
+
 /// 
 /// 各種初期化処理
 /// 
@@ -39,7 +75,7 @@ void Engine::Initialize(int windowWidth, int windowHeight, const std::string& wi
 
 #ifdef _DEBUG
 	// DebugLayer有効化
-	engine->InitializeDebugLayer();
+	debugLayer.InitializeDebugLayer();
 #endif
 
 	// Direct3D生成
@@ -88,22 +124,6 @@ LRESULT WindowProcedure(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
 
 
 
-///
-/// デバッグレイヤー初期化
-/// 
-#ifdef _DEBUG
-void Engine::InitializeDebugLayer() {
-	debugController = nullptr;
-	if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)))) {
-		// デバッグレイヤーを有効化する
-		debugController->EnableDebugLayer();
-		// さらにGPU側でもチェックするようにする
-		debugController->SetEnableGPUBasedValidation(TRUE);
-	}
-}
-#endif
-
-
 
 
 
@@ -113,7 +133,7 @@ void Engine::InitializeDebugLayer() {
 
 void Engine::InitializeDirect3D() {
 	// IDXGIFactory生成
-	auto hr = CreateDXGIFactory(IID_PPV_ARGS(&dxgiFactory));
+	auto hr = CreateDXGIFactory(IID_PPV_ARGS(dxgiFactory.GetAddressOf()));
 	assert(SUCCEEDED(hr));
 	if (hr != S_OK) {
 		return;
@@ -122,7 +142,7 @@ void Engine::InitializeDirect3D() {
 	// 使用するグラボの設定
 	useAdapter = nullptr;
 	for (UINT i = 0;
-		dxgiFactory->EnumAdapterByGpuPreference(i, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, IID_PPV_ARGS(&useAdapter)) != DXGI_ERROR_NOT_FOUND;
+		dxgiFactory->EnumAdapterByGpuPreference(i, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, IID_PPV_ARGS(useAdapter.GetAddressOf())) != DXGI_ERROR_NOT_FOUND;
 		++i) {
 
 		DXGI_ADAPTER_DESC3 adapterDesc{};
@@ -135,7 +155,7 @@ void Engine::InitializeDirect3D() {
 			Log(ConvertString(std::format(L"Use Adapter:{}\n", adapterDesc.Description)));
 			break;
 		}
-		useAdapter = nullptr;
+		useAdapter.Reset();
 	}
 	if (useAdapter == nullptr) {
 		return;
@@ -154,7 +174,7 @@ void Engine::InitializeDirect3D() {
 	};
 
 	for (size_t i = 0; i < _countof(featureLevels); ++i) {
-		hr = D3D12CreateDevice(useAdapter, featureLevels[i], IID_PPV_ARGS(&device));
+		hr = D3D12CreateDevice(useAdapter.Get(), featureLevels[i], IID_PPV_ARGS(device.GetAddressOf()));
 
 		if (SUCCEEDED(hr)) {
 			Log(std::format("FeatureLevel:{}\n", featureLevelString[i]));
@@ -224,17 +244,17 @@ void Engine::InitializeDirect12() {
 	// コマンドキューを作成
 	commandQueue = nullptr;
 	D3D12_COMMAND_QUEUE_DESC commandQueueDesc{};
-	HRESULT hr = device->CreateCommandQueue(&commandQueueDesc, IID_PPV_ARGS(&commandQueue));
+	HRESULT hr = device->CreateCommandQueue(&commandQueueDesc, IID_PPV_ARGS(commandQueue.GetAddressOf()));
 	assert(SUCCEEDED(hr));
 
 	// コマンドアロケータを生成する
 	commandAllocator = nullptr;
-	hr = device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&commandAllocator));
+	hr = device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(commandAllocator.GetAddressOf()));
 	assert(SUCCEEDED(hr));
 
 	// コマンドリストを作成する
 	commandList = nullptr;
-	hr = device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocator, nullptr, IID_PPV_ARGS(&commandList));
+	hr = device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocator.Get(), nullptr, IID_PPV_ARGS(commandList.GetAddressOf()));
 	assert(SUCCEEDED(hr));
 
 
@@ -249,7 +269,7 @@ void Engine::InitializeDirect12() {
 	swapChainDesc.BufferCount = 2;
 	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 
-	hr = dxgiFactory->CreateSwapChainForHwnd(commandQueue, WinApp::GetInstance()->GetHwnd(), &swapChainDesc, nullptr, nullptr, reinterpret_cast<IDXGISwapChain1**>(&swapChain));
+	hr = dxgiFactory->CreateSwapChainForHwnd(commandQueue.Get(), WinApp::GetInstance()->GetHwnd(), &swapChainDesc, nullptr, nullptr, reinterpret_cast<IDXGISwapChain1**>(swapChain.GetAddressOf()));
 	assert(SUCCEEDED(hr));
 
 	dxgiFactory->MakeWindowAssociation(
@@ -280,10 +300,10 @@ void Engine::InitializeDirect12() {
 	auto rtvStartHandle = rtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 
 	for (UINT i = 0; i < backBufferNum.BufferCount; ++i) {
-		hr = swapChain->GetBuffer(i, IID_PPV_ARGS(&swapChianResource[i]));
+		hr = swapChain->GetBuffer(i, IID_PPV_ARGS(swapChianResource[i].GetAddressOf()));
 		assert(SUCCEEDED(hr));
 		rtvHandles[i].ptr = rtvStartHandle.ptr + (i * device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV));
-		device->CreateRenderTargetView(swapChianResource[i], &rtvDesc, rtvHandles[i]);
+		device->CreateRenderTargetView(swapChianResource[i].Get(), &rtvDesc, rtvHandles[i]);
 	}
 
 	// ImGuiの初期化
@@ -292,10 +312,10 @@ void Engine::InitializeDirect12() {
 	ImGui::StyleColorsDark();
 	ImGui_ImplWin32_Init(WinApp::GetInstance()->GetHwnd());
 	ImGui_ImplDX12_Init(
-		device,
+		device.Get(),
 		swapChainDesc.BufferCount,
 		rtvDesc.Format,
-		srvDescriptorHeap,
+		srvDescriptorHeap.Get(),
 		srvDescriptorHeap->GetCPUDescriptorHandleForHeapStart(),
 		srvDescriptorHeap->GetGPUDescriptorHandleForHeapStart()
 	);
@@ -304,7 +324,7 @@ void Engine::InitializeDirect12() {
 	// 初期値0でFenceを作る
 	fence = nullptr;
 	fenceVal = 0;
-	hr = device->CreateFence(fenceVal, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
+	hr = device->CreateFence(fenceVal, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(fence.GetAddressOf()));
 	assert(SUCCEEDED(hr));
 
 	// FenceのSignalを持つためのイベントを作成する
@@ -398,7 +418,7 @@ void Engine::InitalizeDraw() {
 	dsvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
 
 	dsvHeap = nullptr;
-	if(!SUCCEEDED(device->CreateDescriptorHeap(&dsvHeapDesc, IID_PPV_ARGS(&dsvHeap)))) {
+	if(!SUCCEEDED(device->CreateDescriptorHeap(&dsvHeapDesc, IID_PPV_ARGS(dsvHeap.GetAddressOf())))) {
 		assert(!"CreateDescriptorHeap failed");
 	}
 
@@ -408,7 +428,7 @@ void Engine::InitalizeDraw() {
 	dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
 	dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
 
-	device->CreateDepthStencilView(depthStencilResource, &dsvDesc, dsvHeap->GetCPUDescriptorHandleForHeapStart());
+	device->CreateDepthStencilView(depthStencilResource.Get(), &dsvDesc, dsvHeap->GetCPUDescriptorHandleForHeapStart());
 }
 
 Vector4 Engine::UintToVector4(uint32_t color) {
@@ -461,7 +481,7 @@ void Engine::FrameStart() {
 	UINT backBufferIndex = engine->swapChain->GetCurrentBackBufferIndex();
 
 	Barrier(
-		engine->swapChianResource[backBufferIndex], 
+		engine->swapChianResource[backBufferIndex].Get(),
 		D3D12_RESOURCE_STATE_PRESENT, 
 		D3D12_RESOURCE_STATE_RENDER_TARGET
 	);
@@ -504,14 +524,14 @@ void Engine::FrameEnd() {
 	auto dsvH = engine->dsvHeap->GetCPUDescriptorHandleForHeapStart();
 	engine->commandList->OMSetRenderTargets(1, &engine->rtvHandles[backBufferIndex], false, &dsvH);
 
-	engine->commandList->SetDescriptorHeaps(1, &engine->srvDescriptorHeap);
+	engine->commandList->SetDescriptorHeaps(1, engine->srvDescriptorHeap.GetAddressOf());
 
 	// ImGui描画
 	ImGui::Render();
-	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), engine->commandList);
+	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), engine->commandList.Get());
 
 	Barrier(
-		engine->swapChianResource[backBufferIndex],
+		engine->swapChianResource[backBufferIndex].Get(),
 		D3D12_RESOURCE_STATE_RENDER_TARGET,
 		D3D12_RESOURCE_STATE_PRESENT
 	);
@@ -521,7 +541,7 @@ void Engine::FrameEnd() {
 	assert(SUCCEEDED(hr));
 
 	// GPUにコマンドリストの実行を行わせる
-	ID3D12CommandList* commandLists[] = { engine->commandList };
+	ID3D12CommandList* commandLists[] = { engine->commandList.Get()};
 	engine->commandQueue->ExecuteCommandLists(_countof(commandLists), commandLists);
 
 
@@ -531,7 +551,7 @@ void Engine::FrameEnd() {
 	// Fenceの値を更新
 	engine->fenceVal++;
 	// GPUがここまでたどり着いたときに、Fenceの値を指定した値に代入するようにSignalを送る
-	engine->commandQueue->Signal(engine->fence, engine->fenceVal);
+	engine->commandQueue->Signal(engine->fence.Get(), engine->fenceVal);
 
 	// Fenceの値が指定したSigna値にたどり着いているか確認する
 	// GetCompletedValueの初期値はFence作成時に渡した初期値
@@ -545,7 +565,7 @@ void Engine::FrameEnd() {
 	// 次フレーム用のコマンドリストを準備
 	hr = engine->commandAllocator->Reset();
 	assert(SUCCEEDED(hr));
-	hr = engine->commandList->Reset(engine->commandAllocator, nullptr);
+	hr = engine->commandList->Reset(engine->commandAllocator.Get(), nullptr);
 	assert(SUCCEEDED(hr));
 
 	// このフレームで画像読み込みが発生していたら開放する
@@ -568,30 +588,16 @@ Engine::~Engine() {
 	dsvHeap->Release();
 	depthStencilResource->Release();
 	CloseHandle(fenceEvent);
-	fence->Release();
 	srvDescriptorHeap->Release();
 	rtvDescriptorHeap->Release();
-	for (auto i = swapChianResource.rbegin(); i != swapChianResource.rend(); i++) {
+	/*for (auto i = swapChianResource.rbegin(); i != swapChianResource.rend(); i++) {
 		(*i)->Release();
 	}
-	swapChain->Release();
-	commandList->Release();
+	swapChain->Release();*/
+	/*commandList->Release();
 	commandAllocator->Release();
-	commandQueue->Release();
-	device->Release();
+	commandQueue->Release();*/
+	/*device->Release();
 	useAdapter->Release();
-	dxgiFactory->Release();
-#ifdef _DEBUG
-	debugController->Release();
-#endif
-
-
-	// リソースリークチェック
-	IDXGIDebug1* debug;
-	if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&debug)))) {
-		debug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
-		debug->ReportLiveObjects(DXGI_DEBUG_APP, DXGI_DEBUG_RLO_ALL);
-		debug->ReportLiveObjects(DXGI_DEBUG_D3D12, DXGI_DEBUG_RLO_ALL);
-		debug->Release();
-	}
+	dxgiFactory->Release();*/
 }

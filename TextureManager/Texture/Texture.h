@@ -4,6 +4,7 @@
 
 #include "externals//DirectXTex/DirectXTex.h"
 #include "externals//DirectXTex/d3dx12.h"
+#include <wrl.h>
 
 #include <string>
 
@@ -60,8 +61,8 @@ private:
 /// ÉÅÉìÉoä÷êî
 /// </summary>
 private:
-	ID3D12Resource* textureResouce = nullptr;
-	ID3D12Resource* intermediateResource = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> textureResouce = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource = nullptr;
 
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc;
 

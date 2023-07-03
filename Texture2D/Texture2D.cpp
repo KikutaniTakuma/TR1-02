@@ -16,11 +16,9 @@ Texture2D::Texture2D():
 }
 
 Texture2D::~Texture2D() {
-	graphicsPipelineState->Release();
-	rootSignature->Release();
-	indexResource->Release();
-	vertexResource->Release();
-	SRVHeap->Release();
+	if(indexResource)indexResource->Release();
+	if(vertexResource)vertexResource->Release();
+	if(SRVHeap)SRVHeap->Release();
 }
 
 void Texture2D::Initialize(const std::string& vsFileName, const std::string& psFileName) {
@@ -113,10 +111,10 @@ void Texture2D::CreateGraphicsPipeline(Blend blend) {
 	}
 	// バイナリをもとに生成
 	if (rootSignature) {
-		rootSignature->Release();
+		rootSignature.Reset();
 	}
 	rootSignature = nullptr;
-	hr = Engine::GetDevice()->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignature));
+	hr = Engine::GetDevice()->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(rootSignature.GetAddressOf()));
 	assert(SUCCEEDED(hr));
 	if (errorBlob) { errorBlob->Release(); }
 	signatureBlob->Release();
@@ -154,7 +152,7 @@ void Texture2D::CreateGraphicsPipeline(Blend blend) {
 
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
 
-	graphicsPipelineStateDesc.pRootSignature = rootSignature;
+	graphicsPipelineStateDesc.pRootSignature = rootSignature.Get();
 	graphicsPipelineStateDesc.InputLayout = inputLayoutDesc;
 
 	graphicsPipelineStateDesc.VS = {
@@ -212,10 +210,10 @@ void Texture2D::CreateGraphicsPipeline(Blend blend) {
 
 	// 実際に生成
 	if (graphicsPipelineState) {
-		graphicsPipelineState->Release();
+		graphicsPipelineState.Reset();
 	}
 	graphicsPipelineState = nullptr;
-	hr = Engine::GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&graphicsPipelineState));
+	hr = Engine::GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(graphicsPipelineState.GetAddressOf()));
 	assert(SUCCEEDED(hr));
 }
 
@@ -255,12 +253,12 @@ void Texture2D::Draw(Blend blend, const Mat4x4& worldMat, const Mat4x4& viewProj
 	*wvpMat = worldMat * viewProjection;
 
 	// 各種描画コマンドを積む
-	Engine::GetCommandList()->SetGraphicsRootSignature(rootSignature);
-	Engine::GetCommandList()->SetPipelineState(graphicsPipelineState);
+	Engine::GetCommandList()->SetGraphicsRootSignature(rootSignature.Get());
+	Engine::GetCommandList()->SetPipelineState(graphicsPipelineState.Get());
 	Engine::GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	Engine::GetCommandList()->IASetVertexBuffers(0, 1, &vertexView);
 	Engine::GetCommandList()->IASetIndexBuffer(&indexView);
-	Engine::GetCommandList()->SetDescriptorHeaps(1, &SRVHeap);
+	Engine::GetCommandList()->SetDescriptorHeaps(1, SRVHeap.GetAddressOf());
 	auto SrvHandle = SRVHeap->GetGPUDescriptorHandleForHeapStart();
 	Engine::GetCommandList()->SetGraphicsRootDescriptorTable(0, SrvHandle);
 	Engine::GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);

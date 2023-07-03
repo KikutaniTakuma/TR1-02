@@ -9,6 +9,7 @@
 
 #include <unordered_map>
 #include <string>
+#include <wrl.h>
 
 class ShaderManager {
 private:
@@ -43,14 +44,14 @@ private:
 		const wchar_t* profile);
 
 private:
-	IDxcUtils* dxcUtils = nullptr;
-	IDxcCompiler3* dxcCompiler = nullptr;
-	IDxcIncludeHandler* includeHandler = nullptr;
+	Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils = nullptr;
+	Microsoft::WRL::ComPtr<IDxcCompiler3> dxcCompiler = nullptr;
+	Microsoft::WRL::ComPtr<IDxcIncludeHandler> includeHandler = nullptr;
 
 private:
-	std::unordered_map<std::string, IDxcBlob*> vertexShader;
-	std::unordered_map<std::string, IDxcBlob*> hullShader;
-	std::unordered_map<std::string, IDxcBlob*> domainShader;
-	std::unordered_map<std::string, IDxcBlob*> geometoryShader;
-	std::unordered_map<std::string, IDxcBlob*> pixelShader;
+	std::unordered_map<std::string, Microsoft::WRL::ComPtr<IDxcBlob>> vertexShader;
+	std::unordered_map<std::string, Microsoft::WRL::ComPtr<IDxcBlob>> hullShader;
+	std::unordered_map<std::string, Microsoft::WRL::ComPtr<IDxcBlob>> domainShader;
+	std::unordered_map<std::string, Microsoft::WRL::ComPtr<IDxcBlob>> geometoryShader;
+	std::unordered_map<std::string, Microsoft::WRL::ComPtr<IDxcBlob>> pixelShader;
 };

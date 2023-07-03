@@ -12,12 +12,12 @@
 #include "Texture2D/Texture2D.h"
 
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
-	Engine::Initialize(1280, 720, "DirectXGame");
+	Engine::Initialize(1280, 720, "Yeah");
 
 
-	/*auto model = std::make_unique<Model>();
+	auto model = std::make_unique<Model>();
 	model->LoadObj("Cube.obj");
-	model->LoadShader("WaveShader/WaveNone.VS.hlsl", "WaveShader/Wave.PS.hlsl", "WaveShader/Wave.GS.hlsl");*/
+	model->LoadShader("WaveShader/WaveNone.VS.hlsl", "WaveShader/Wave.PS.hlsl", "WaveShader/Wave.GS.hlsl");
 
 
 	Mat4x4 worldMat = MakeMatrixAffin(Vector3D(1.0f,1.0f,1.0f), Vector3D(), Vector3D());
@@ -97,9 +97,15 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			cameraRotate.y += 0.01f;
 		}*/
 
-		if (Gamepad::GetInstans()->Released(Gamepad::Button::A)) {
+		/*if (Gamepad::GetInstans()->Released(Gamepad::Button::A)) {
 			tex->LoadTexture("./Resources/sakabannbasupisu.png");
 		}
+		else if (Gamepad::GetInstans()->Released(Gamepad::Button::B)) {
+			tex->LoadTexture("./Resources/watame.png");
+		}
+		else if (Gamepad::GetInstans()->Released(Gamepad::Button::X)) {
+			tex->LoadTexture("./Resources/uvChecker.png");
+		}*/
 
 
 
@@ -119,7 +125,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		///
 		/// ï`âÊèàóù
 		/// 
-		//pera->PreDraw();
+		pera->PreDraw();
 
 		viewMatrix = MakeMatrixInverse(MakeMatrixAffin(cameraScale, cameraRotate, cameraPos) * MakeMatrixAffin(Vector3D(1.0f,1.0f,1.0f), cameraMoveRotate, Vector3D()));
 		projectionMatrix = MakeMatrixPerspectiveFov(0.45f, static_cast<float>(Engine::GetInstance()->clientWidth) / static_cast<float>(Engine::GetInstance()->clientHeight), 0.1f, 100.0f);
@@ -130,7 +136,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		//tex1->Draw();
 		tex->Draw(Texture2D::Blend::None, MakeMatrixAffin(Vector3D(1280.0f,720.0f,1.0f), Vector3D(), Vector3D()));
 
-		//pera->Draw();
+		pera->Draw();
 		///
 		/// ï`âÊèàóùÇ±Ç±Ç‹Ç≈
 		/// 
@@ -148,8 +154,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	//model.reset();
 	//tex1.reset();
-	tex.reset();
-	pera.reset();
+	/*tex.reset();
+	pera.reset();*/
 
 	Engine::Finalize();
 

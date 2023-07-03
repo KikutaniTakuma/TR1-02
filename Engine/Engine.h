@@ -8,6 +8,7 @@
 #pragma comment(lib, "dxguid.lib")
 #include <dxcapi.h>
 #pragma comment(lib, "dxcompiler.lib")
+#include <wrl.h>
 
 #include <string>
 #include <vector>
@@ -62,15 +63,15 @@ public:
 	}
 
 	static ID3D12GraphicsCommandList* GetCommandList() {
-		return engine->commandList;
+		return engine->commandList.Get();
 	}
 
 	static inline ID3D12Device* GetDevice() {
-		return engine->device;
+		return engine->device.Get();
 	}
 
 	static inline ID3D12DescriptorHeap* GetDSVHeap() {
-		return engine->dsvHeap;
+		return engine->dsvHeap.Get();
 	}
 
 	static inline D3D12_DESCRIPTOR_HEAP_DESC GetMainRTVDesc() {
@@ -105,10 +106,19 @@ public:
 	/// Debug—p
 	/// 
 private:
-	void InitializeDebugLayer();
+	class Debug {
+	public:
+		Debug();
+		~Debug();
 
-private:
-	ID3D12Debug1* debugController = nullptr;
+	public:
+		void InitializeDebugLayer();
+
+	private:
+		Microsoft::WRL::ComPtr<ID3D12Debug1> debugController = nullptr;
+	};
+
+	static Debug debugLayer;
 #endif
 
 
@@ -121,9 +131,9 @@ private:
 	void InitializeDirect3D();
 
 private:
-	ID3D12Device* device = nullptr;
-	IDXGIFactory7* dxgiFactory = nullptr;
-	IDXGIAdapter4* useAdapter = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Device> device = nullptr;
+	Microsoft::WRL::ComPtr<IDXGIFactory7> dxgiFactory = nullptr;
+	Microsoft::WRL::ComPtr<IDXGIAdapter4> useAdapter = nullptr;
 
 
 
@@ -135,19 +145,19 @@ private:
 	void InitializeDirect12();
 
 private:
-	ID3D12CommandQueue* commandQueue = nullptr;
-	ID3D12CommandAllocator* commandAllocator = nullptr;
-	ID3D12GraphicsCommandList* commandList = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList = nullptr;
 
-	IDXGISwapChain4* swapChain = nullptr;
-	std::vector<ID3D12Resource*> swapChianResource;
+	Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain = nullptr;
+	std::vector< Microsoft::WRL::ComPtr<ID3D12Resource>> swapChianResource;
 
-	ID3D12DescriptorHeap* rtvDescriptorHeap = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap = nullptr;
 	std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> rtvHandles;
 
-	ID3D12DescriptorHeap* srvDescriptorHeap = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap = nullptr;
 
-	ID3D12Fence* fence = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Fence> fence = nullptr;
 	uint64_t fenceVal = 0;
 	HANDLE fenceEvent = nullptr;
 
@@ -160,8 +170,8 @@ public:
 
 
 private:
-	ID3D12Resource* depthStencilResource = nullptr;
-	ID3D12DescriptorHeap* dsvHeap = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvHeap = nullptr;
 
 
 

@@ -45,17 +45,17 @@ public:
 	void Draw();
 
 private:
-	ID3D12Resource* peraResource = nullptr;
-	ID3D12DescriptorHeap* peraRTVHeap = nullptr;
-	ID3D12DescriptorHeap* peraSRVHeap = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> peraResource = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> peraRTVHeap = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> peraSRVHeap = nullptr;
 
 	D3D12_VERTEX_BUFFER_VIEW peraVertexView;
-	ID3D12Resource* peraVertexResource = nullptr;
-	IDxcBlob* peraVertexShader = nullptr;
-	IDxcBlob* peraPixelShader = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> peraVertexResource = nullptr;
+	Microsoft::WRL::ComPtr<IDxcBlob> peraVertexShader = nullptr;
+	Microsoft::WRL::ComPtr<IDxcBlob> peraPixelShader = nullptr;
 
-	ID3D12RootSignature* rootSignature = nullptr;
-	ID3D12PipelineState* graphicsPipelineState = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState = nullptr;
 
 	ConstBuffer<Wipe> cbuffer;
 };

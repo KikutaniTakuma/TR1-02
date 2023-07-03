@@ -19,12 +19,10 @@ PeraRender::PeraRender():
 {}
 
 PeraRender::~PeraRender() {
-	graphicsPipelineState->Release();
-	rootSignature->Release();
-	peraVertexResource->Release();
-	peraSRVHeap->Release();
-	peraRTVHeap->Release();
 	peraResource->Release();
+	peraVertexResource->Release();
+	peraRTVHeap->Release();
+	peraSRVHeap->Release();
 }
 
 void PeraRender::Initialize(const std::string& vsFileName, const std::string& psFileName) {
@@ -33,6 +31,26 @@ void PeraRender::Initialize(const std::string& vsFileName, const std::string& ps
 	CreateShader(vsFileName, psFileName);
 
 	CreateGraphicsPipeline();
+
+	PeraVertexData pv[4] = {
+		{{-1.0f,-1.0f, 0.1f }, {0.0f, 1.0f}},
+		{{-1.0f,1.0f, 0.1f }, {0.0f, 0.0f}},
+		{{1.0f,-1.0f, 0.1f }, {1.0f, 1.0f}},
+		{{1.0f,1.0f, 0.1f }, {1.0f, 0.0f}}
+	};
+
+	peraVertexResource = Engine::CreateBufferResuorce(sizeof(pv));
+
+	peraVertexView.BufferLocation = peraVertexResource->GetGPUVirtualAddress();
+	peraVertexView.SizeInBytes = sizeof(pv);
+	peraVertexView.StrideInBytes = sizeof(PeraVertexData);
+
+	PeraVertexData* mappedData = nullptr;
+	peraVertexResource->Map(0, nullptr, reinterpret_cast<void**>(&mappedData));
+	for (int32_t i = 0; i < _countof(pv); i++) {
+		mappedData[i] = pv[i];
+	}
+	peraVertexResource->Unmap(0, nullptr);
 }
 
 
@@ -54,7 +72,7 @@ void PeraRender::CreateDescriptor() {
 	}
 
 	// 実際にリソースを作る
-	HRESULT hr = Engine::GetDevice()->CreateCommittedResource(&heapPropaerties, D3D12_HEAP_FLAG_NONE, &resDesc, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, &clearValue, IID_PPV_ARGS(&peraResource));
+	HRESULT hr = Engine::GetDevice()->CreateCommittedResource(&heapPropaerties, D3D12_HEAP_FLAG_NONE, &resDesc, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, &clearValue, IID_PPV_ARGS(peraResource.GetAddressOf()));
 	if (!SUCCEEDED(hr)) {
 		OutputDebugStringA("CreateCommittedResource Function Failed!!");
 		return;
@@ -66,7 +84,7 @@ void PeraRender::CreateDescriptor() {
 	rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 	rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 
-	Engine::GetDevice()->CreateRenderTargetView(peraResource, &rtvDesc, peraRTVHeap->GetCPUDescriptorHandleForHeapStart());
+	Engine::GetDevice()->CreateRenderTargetView(peraResource.Get(), &rtvDesc, peraRTVHeap->GetCPUDescriptorHandleForHeapStart());
 
 
 	peraSRVHeap = Engine::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 2, true);
@@ -84,7 +102,7 @@ void PeraRender::CreateDescriptor() {
 	srvDesc.Texture2D.MipLevels = 1;
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 
-	Engine::GetDevice()->CreateShaderResourceView(peraResource, &srvDesc, peraSRVHeap->GetCPUDescriptorHandleForHeapStart());
+	Engine::GetDevice()->CreateShaderResourceView(peraResource.Get(), &srvDesc, peraSRVHeap->GetCPUDescriptorHandleForHeapStart());
 }
 
 void PeraRender::CreateShader(const std::string& vsFileName, const std::string& psFileName) {
@@ -95,26 +113,6 @@ void PeraRender::CreateShader(const std::string& vsFileName, const std::string& 
 }
 
 void PeraRender::CreateGraphicsPipeline() {
-	PeraVertexData pv[4] = {
-		{{-1.0f,-1.0f, 0.1f }, {0.0f, 1.0f}},
-		{{-1.0f,1.0f, 0.1f }, {0.0f, 0.0f}},
-		{{1.0f,-1.0f, 0.1f }, {1.0f, 1.0f}},
-		{{1.0f,1.0f, 0.1f }, {1.0f, 0.0f}}
-	};
-
-	peraVertexResource = Engine::CreateBufferResuorce(sizeof(pv));
-
-	peraVertexView.BufferLocation = peraVertexResource->GetGPUVirtualAddress();
-	peraVertexView.SizeInBytes = sizeof(pv);
-	peraVertexView.StrideInBytes = sizeof(PeraVertexData);
-
-	PeraVertexData* mappedData = nullptr;
-	peraVertexResource->Map(0, nullptr, reinterpret_cast<void**>(&mappedData));
-	for (int32_t i = 0; i < _countof(pv); i++) {
-		mappedData[i] = pv[i];
-	}
-	peraVertexResource->Unmap(0, nullptr);
-
 	cbuffer.shaderRegister = 0;
 	cbuffer.shaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 	cbuffer->center.x = 640.0f;
@@ -167,8 +165,11 @@ void PeraRender::CreateGraphicsPipeline() {
 		assert(false);
 	}
 	// バイナリをもとに生成
+	if (rootSignature) {
+		rootSignature.Reset();
+	}
 	rootSignature = nullptr;
-	hr = Engine::GetDevice()->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignature));
+	hr = Engine::GetDevice()->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(rootSignature.GetAddressOf()));
 	assert(SUCCEEDED(hr));
 	if (errorBlob) { errorBlob->Release(); }
 	signatureBlob->Release();
@@ -206,7 +207,7 @@ void PeraRender::CreateGraphicsPipeline() {
 
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
 
-	graphicsPipelineStateDesc.pRootSignature = rootSignature;
+	graphicsPipelineStateDesc.pRootSignature = rootSignature.Get();
 	graphicsPipelineStateDesc.InputLayout = inputLayoutDesc;
 
 	graphicsPipelineStateDesc.VS = {
@@ -239,14 +240,17 @@ void PeraRender::CreateGraphicsPipeline() {
 	graphicsPipelineStateDesc.BlendState.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
 
 	// 実際に生成
+	if (graphicsPipelineState) {
+		graphicsPipelineState.Reset();
+	}
 	graphicsPipelineState = nullptr;
-	hr = Engine::GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&graphicsPipelineState));
+	hr = Engine::GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(graphicsPipelineState.GetAddressOf()));
 	assert(SUCCEEDED(hr));
 }
 
 void PeraRender::PreDraw() {
 	Engine::Barrier(
-		peraResource,
+		peraResource.Get(),
 		D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
 		D3D12_RESOURCE_STATE_RENDER_TARGET
 	);
@@ -261,7 +265,7 @@ void PeraRender::PreDraw() {
 
 void PeraRender::Draw() {
 	Engine::Barrier(
-		peraResource,
+		peraResource.Get(),
 		D3D12_RESOURCE_STATE_RENDER_TARGET,
 		D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE
 	);
@@ -277,11 +281,11 @@ void PeraRender::Draw() {
 	Engine::GetCommandList()->OMSetRenderTargets(1, &rtvHeapHandle, false, &dsvH);
 
 	// 各種描画コマンドを積む
-	Engine::GetCommandList()->SetGraphicsRootSignature(rootSignature);
-	Engine::GetCommandList()->SetPipelineState(graphicsPipelineState);
+	Engine::GetCommandList()->SetGraphicsRootSignature(rootSignature.Get());
+	Engine::GetCommandList()->SetPipelineState(graphicsPipelineState.Get());
 	Engine::GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 	Engine::GetCommandList()->IASetVertexBuffers(0, 1, &peraVertexView);
-	Engine::GetCommandList()->SetDescriptorHeaps(1, &peraSRVHeap);
+	Engine::GetCommandList()->SetDescriptorHeaps(1, peraSRVHeap.GetAddressOf());
 	auto perasSrvHandle = peraSRVHeap->GetGPUDescriptorHandleForHeapStart();
 	Engine::GetCommandList()->SetGraphicsRootDescriptorTable(0, perasSrvHandle);
 	Engine::GetCommandList()->DrawInstanced(4, 1, 0, 0);

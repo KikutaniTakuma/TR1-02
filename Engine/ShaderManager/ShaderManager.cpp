@@ -16,35 +16,35 @@ ShaderManager::ShaderManager() {
 	// dxcCompilerを初期化
 	dxcUtils = nullptr;
 	dxcCompiler = nullptr;
-	HRESULT hr = DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&dxcUtils));
+	HRESULT hr = DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(dxcUtils.GetAddressOf()));
 	assert(SUCCEEDED(hr));
-	hr = DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&dxcCompiler));
+	hr = DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(dxcCompiler.GetAddressOf()));
 	assert(SUCCEEDED(hr));
 
 	includeHandler = nullptr;
-	hr = dxcUtils->CreateDefaultIncludeHandler(&includeHandler);
+	hr = dxcUtils->CreateDefaultIncludeHandler(includeHandler.GetAddressOf());
 	assert(SUCCEEDED(hr));
 }
 
 ShaderManager::~ShaderManager() {
-	for (auto& i : vertexShader) {
-		i.second->Release();
+	/*for (auto& i : vertexShader) {
+		i.second.Reset();
 	}
 	for (auto& i : hullShader) {
-		i.second->Release();
+		i.second.Reset();
 	}
 	for (auto& i : domainShader) {
-		i.second->Release();
+		i.second.Reset();
 	}
 	for (auto& i : geometoryShader) {
-		i.second->Release();
+		i.second.Reset();
 	}
 	for (auto& i : pixelShader) {
-		i.second->Release();
+		i.second.Reset();
 	}
-	includeHandler->Release();
-	dxcCompiler->Release();
-	dxcUtils->Release();
+	includeHandler.Reset();
+	dxcCompiler.Reset();
+	dxcUtils.Reset();*/
 }
 
 void ShaderManager::Initialize() {
@@ -93,7 +93,7 @@ IDxcBlob* ShaderManager::CompilerShader(
 		&shaderSourceBuffer, // 読みこんだファイル
 		arguments,           // コンパイルオプション
 		_countof(arguments), // コンパイルオプションの数
-		includeHandler,      // includeが含まれた諸々
+		includeHandler.Get(),      // includeが含まれた諸々
 		IID_PPV_ARGS(&shaderResult) // コンパイル結果
 	);
 
@@ -116,8 +116,9 @@ IDxcBlob* ShaderManager::CompilerShader(
 	// 成功したログを出す
 	Log(ConvertString(std::format(L"Compile Succeeded, path:{}, profile:{}\n", filePath, profile)));
 	// もう使わないリソースを解放
-	shaderSource->Release();
 	shaderResult->Release();
+	shaderError->Release();
+	shaderSource->Release();
 	// 実行用バイナリをリターン
 	return shaderBlob;
 }
@@ -136,7 +137,7 @@ IDxcBlob* ShaderManager::LoadVertexShader(const std::string& fileName) {
 			vertexShader.insert(std::make_pair(fileName, shader));
 		}
 	}
-	return vertexShader[fileName];
+	return vertexShader[fileName].Get();
 }
 IDxcBlob* ShaderManager::LoadHullShader(const std::string& fileName) {
 	if (hullShader.empty()) {
@@ -153,7 +154,7 @@ IDxcBlob* ShaderManager::LoadHullShader(const std::string& fileName) {
 		}
 	}
 
-	return hullShader[fileName];
+	return hullShader[fileName].Get();
 }
 IDxcBlob* ShaderManager::LoadDomainShader(const std::string& fileName) {
 	if (domainShader.empty()) {
@@ -169,7 +170,7 @@ IDxcBlob* ShaderManager::LoadDomainShader(const std::string& fileName) {
 			domainShader.insert(std::make_pair(fileName, shader));
 		}
 	}
-	return domainShader[fileName];
+	return domainShader[fileName].Get();
 }
 IDxcBlob* ShaderManager::LoadGeometoryShader(const std::string& fileName) {
 	if (geometoryShader.empty()) {
@@ -185,7 +186,7 @@ IDxcBlob* ShaderManager::LoadGeometoryShader(const std::string& fileName) {
 			geometoryShader.insert(std::make_pair(fileName, shader));
 		}
 	}
-	return geometoryShader[fileName];
+	return geometoryShader[fileName].Get();
 }
 IDxcBlob* ShaderManager::LoadPixelShader(const std::string& fileName) {
 	if (!pixelShader.empty()) {
@@ -201,5 +202,5 @@ IDxcBlob* ShaderManager::LoadPixelShader(const std::string& fileName) {
 			pixelShader.insert(std::make_pair(fileName, shader));
 		}
 	}
-	return pixelShader[fileName];
+	return pixelShader[fileName].Get();
 }

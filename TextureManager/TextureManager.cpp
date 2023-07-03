@@ -25,7 +25,6 @@ TextureManager::TextureManager() :
 }
 
 TextureManager::~TextureManager() {
-	textures.clear();
 }
 
 

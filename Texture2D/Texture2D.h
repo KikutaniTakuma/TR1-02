@@ -54,19 +54,19 @@ public:
 	);
 
 private:
-	ID3D12DescriptorHeap* SRVHeap = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> SRVHeap = nullptr;
 
 	D3D12_VERTEX_BUFFER_VIEW vertexView;
-	ID3D12Resource* vertexResource = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource = nullptr;
 
 	D3D12_INDEX_BUFFER_VIEW indexView;
-	ID3D12Resource* indexResource = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource = nullptr;
 
 	IDxcBlob* vertexShader = nullptr;
 	IDxcBlob* pixelShader = nullptr;
 
-	ID3D12RootSignature* rootSignature = nullptr;
-	ID3D12PipelineState* graphicsPipelineState = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState = nullptr;
 
 	ConstBuffer<Mat4x4> wvpMat;
 

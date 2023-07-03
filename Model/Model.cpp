@@ -227,7 +227,7 @@ void Model::CreateGraphicsPipeline() {
 		}
 		// ƒoƒCƒiƒŠ‚ð‚à‚Æ‚É¶¬
 		rootSignature = nullptr;
-		hr = Engine::GetDevice()->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignature));
+		hr = Engine::GetDevice()->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(rootSignature.GetAddressOf()));
 		assert(SUCCEEDED(hr));
 		if (errorBlob) { errorBlob->Release(); }
 		signatureBlob->Release();
@@ -266,7 +266,7 @@ void Model::CreateGraphicsPipeline() {
 
 		// pso¶¬
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
-		graphicsPipelineStateDesc.pRootSignature = rootSignature;
+		graphicsPipelineStateDesc.pRootSignature = rootSignature.Get();
 		graphicsPipelineStateDesc.InputLayout = inputLayoutDesc;
 		graphicsPipelineStateDesc.VS = {
 			vertexShaderBlob->GetBufferPointer(),
@@ -317,7 +317,7 @@ void Model::CreateGraphicsPipeline() {
 
 		// ŽÀÛ‚É¶¬
 		graphicsPipelineState = nullptr;
-		hr = Engine::GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&graphicsPipelineState));
+		hr = Engine::GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(graphicsPipelineState.GetAddressOf()));
 		assert(SUCCEEDED(hr));
 
 		createGPFlg = true;
@@ -330,7 +330,7 @@ void Model::Update() {
 
 void Model::Draw(const Mat4x4& worldMat, const Mat4x4& viewMat, const Mat4x4& projectionMat, const Vector3D& cameraPos) {
 	if (!createGPFlg) {
-		this->CreateGraphicsPipeline();
+		CreateGraphicsPipeline();
 	}
 	assert(createGPFlg);
 
@@ -339,11 +339,11 @@ void Model::Draw(const Mat4x4& worldMat, const Mat4x4& viewMat, const Mat4x4& pr
 
 	dirLig->eyePos = cameraPos;
 
-	Engine::GetCommandList()->SetGraphicsRootSignature(rootSignature);
-	Engine::GetCommandList()->SetDescriptorHeaps(1, &descHeap);
+	Engine::GetCommandList()->SetGraphicsRootSignature(rootSignature.Get());
+	Engine::GetCommandList()->SetDescriptorHeaps(1, descHeap.GetAddressOf());
 	Engine::GetCommandList()->SetGraphicsRootDescriptorTable(0, descHeap->GetGPUDescriptorHandleForHeapStart());
 
-	Engine::GetCommandList()->SetPipelineState(this->graphicsPipelineState);
+	Engine::GetCommandList()->SetPipelineState(graphicsPipelineState.Get());
 	
 	//Engine::GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
 	Engine::GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -354,12 +354,6 @@ void Model::Draw(const Mat4x4& worldMat, const Mat4x4& viewMat, const Mat4x4& pr
 }
 
 Model::~Model() {
-	if (rootSignature) {
-		rootSignature->Release();
-	}
-	if (graphicsPipelineState) {
-		graphicsPipelineState->Release();
-	}
 	if (meshData.indexBuffer) {
 		meshData.indexBuffer->Release();
 	}
