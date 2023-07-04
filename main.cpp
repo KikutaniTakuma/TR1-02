@@ -12,12 +12,12 @@
 #include "Texture2D/Texture2D.h"
 
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
-	Engine::Initialize(1280, 720, "Yeah");
+	Engine::Initialize(1280, 720, "DirectXGame");
 
 
-	auto model = std::make_unique<Model>();
+	/*auto model = std::make_unique<Model>();
 	model->LoadObj("./Resources/cube.obj");
-	model->LoadShader("WaveShader/WaveNone.VS.hlsl", "WaveShader/Wave.PS.hlsl", "WaveShader/Wave.GS.hlsl");
+	model->LoadShader("WaveShader/WaveNone.VS.hlsl", "WaveShader/Wave.PS.hlsl", "WaveShader/Wave.GS.hlsl");*/
 
 
 	Mat4x4 worldMat = MakeMatrixAffin(Vector3D(1.0f,1.0f,1.0f), Vector3D(), Vector3D());
@@ -33,7 +33,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	auto tex = std::make_unique<Texture2D>();
 	tex->Initialize("Texture2DShader/Texture2D.VS.hlsl", "Texture2DShader/Texture2DNone.PS.hlsl");
-	tex->LoadTexture("./Resources/uvChecker.png");
+	tex->LoadTexture("./Resources/screenshot.png");
 
 	/*auto tex1 = std::make_unique<Texture2D>();
 	tex1->Initialize("Texture2DShader/Texture2D.VS.hlsl", "Texture2DShader/Texture2DNone.PS.hlsl");
@@ -41,7 +41,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 
 	auto pera = std::make_unique<PeraRender>();
-	pera->Initialize("PostShader/Post.VS.hlsl", "PostShader/Wipe.PS.hlsl");
+	pera->Initialize("PostShader/Post.VS.hlsl", "PostShader/PostNone.PS.hlsl");
 
 	/// 
 	/// ƒƒCƒ“ƒ‹[ƒv
@@ -97,7 +97,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			cameraRotate.y += 0.01f;
 		}*/
 
-		/*if (Gamepad::GetInstans()->Released(Gamepad::Button::A)) {
+		if (Gamepad::GetInstans()->Released(Gamepad::Button::A)) {
 			tex->LoadTexture("./Resources/sakabannbasupisu.png");
 		}
 		else if (Gamepad::GetInstans()->Released(Gamepad::Button::B)) {
@@ -105,7 +105,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		}
 		else if (Gamepad::GetInstans()->Released(Gamepad::Button::X)) {
 			tex->LoadTexture("./Resources/uvChecker.png");
-		}*/
+		}
 
 
 
@@ -131,10 +131,10 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		projectionMatrix = MakeMatrixPerspectiveFov(0.45f, static_cast<float>(Engine::GetInstance()->clientWidth) / static_cast<float>(Engine::GetInstance()->clientHeight), 0.1f, 100.0f);
 
 
-		model->Draw(worldMat, viewMatrix,  projectionMatrix, cameraPos);
+		//model->Draw(worldMat, viewMatrix,  projectionMatrix, cameraPos);
 
 		//tex1->Draw();
-		//tex->Draw(Texture2D::Blend::None, MakeMatrixAffin(Vector3D(1280.0f,720.0f,1.0f), Vector3D(), Vector3D()));
+		tex->Draw(Texture2D::Blend::None, MakeMatrixAffin(Vector3D(1280.0f,720.0f,1.0f), Vector3D(), Vector3D()));
 
 		pera->Draw();
 		///

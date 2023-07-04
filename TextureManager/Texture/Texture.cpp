@@ -16,12 +16,10 @@ Texture::~Texture() {
 	if (intermediateResource) {
 		intermediateResource->Release();
 		intermediateResource.Reset();
-		intermediateResource = nullptr;
 	}
 	if (textureResouce) {
 		textureResouce->Release();
 		textureResouce.Reset();
-		textureResouce = nullptr;
 	}
 }
 
@@ -81,12 +79,12 @@ void Texture::Unload() {
 		srvDesc = {};
 
 		if (intermediateResource) {
+			intermediateResource->Release();
 			intermediateResource.Reset();
-			intermediateResource = nullptr;
 		}
 		if (textureResouce) {
+			textureResouce->Release();
 			textureResouce.Reset();
-			textureResouce = nullptr;
 		}
 
 		// UnloadÏ‚Ý
@@ -171,6 +169,5 @@ void Texture::ReleaseIntermediateResource() {
 	if (intermediateResource) {
 		intermediateResource->Release();
 		intermediateResource.Reset();
-		intermediateResource = nullptr;
 	}
 }

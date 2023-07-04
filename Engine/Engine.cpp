@@ -433,7 +433,15 @@ void Engine::InitalizeDraw() {
 
 Vector4 Engine::UintToVector4(uint32_t color) {
 	static const float normal = 1.0f / 255.0f;
-	return Vector4(static_cast<float>((color & 0xff000000) >> 24) * normal, static_cast<float>((color & 0xff0000) >> 16) * normal, static_cast<float>((color & 0xff00) >> 8) * normal, static_cast<float>(color & 0xff) * normal);
+	Vector4 result;
+
+	result.color = {
+		static_cast<float>((color & 0xff000000) >> 24) * normal,
+		static_cast<float>((color & 0xff0000) >> 16) * normal,
+		static_cast<float>((color & 0xff00) >> 8) * normal,
+		static_cast<float>(color & 0xff) * normal
+	};
+	return result;
 }
 
 void Engine::Barrier(ID3D12Resource* resource, D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after) {
@@ -492,8 +500,8 @@ void Engine::FrameStart() {
 	engine->commandList->ClearDepthStencilView(dsvH, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
 	// 指定した色で画面全体をクリアする
-	float clearColor[] = { 0.1f, 0.25f, 0.5f, 0.0f };
-	engine->commandList->ClearRenderTargetView(engine->rtvHandles[backBufferIndex], clearColor, 0, nullptr);
+	Vector4 clearColor = { 0.1f, 0.25f, 0.5f, 0.0f };
+	engine->commandList->ClearRenderTargetView(engine->rtvHandles[backBufferIndex], clearColor.m.data(), 0, nullptr);
 
 
 	// ビューポート

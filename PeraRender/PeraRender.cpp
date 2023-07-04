@@ -259,8 +259,8 @@ void PeraRender::PreDraw() {
 	auto dsvH = Engine::GetDsvHandle();
 	Engine::GetCommandList()->OMSetRenderTargets(1, &rtvHeapHandle, false, &dsvH);
 
-	float clearColor[] = { 0.0f, 0.0f, 0.0f, 1.0f };
-	Engine::GetCommandList()->ClearRenderTargetView(rtvHeapHandle, clearColor, 0, nullptr);
+	Vector4 clearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
+	Engine::GetCommandList()->ClearRenderTargetView(rtvHeapHandle, clearColor.m.data(), 0, nullptr);
 }
 
 void PeraRender::Draw() {

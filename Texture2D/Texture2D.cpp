@@ -10,7 +10,7 @@ Texture2D::Texture2D():
 	vertexShader(nullptr),
 	pixelShader(nullptr),
 	rootSignature(nullptr),
-	graphicsPipelineState(nullptr),
+	graphicsPipelineState(),
 	tex()
 {
 }
@@ -51,6 +51,8 @@ void Texture2D::Initialize(const std::string& vsFileName, const std::string& psF
 	auto srvHandle = SRVHeap->GetCPUDescriptorHandleForHeapStart();
 	srvHandle.ptr += Engine::GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	wvpMat.CrerateView(srvHandle);
+
+	CreateGraphicsPipeline();
 }
 
 void Texture2D::CreateDescriptor() {
@@ -64,7 +66,14 @@ void Texture2D::CreateShader(const std::string& vsFileName, const std::string& p
 	assert(pixelShader);
 }
 
-void Texture2D::CreateGraphicsPipeline(Blend blend) {
+Texture2D::Blend& operator++(Texture2D::Blend& blend) {
+	uint16_t blendTmp = uint16_t(blend);
+	blendTmp++;
+	blend = Texture2D::Blend(blendTmp);
+	return blend;
+}
+
+void Texture2D::CreateGraphicsPipeline() {
 	// RootSignatureの生成
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
 	descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
@@ -102,9 +111,9 @@ void Texture2D::CreateGraphicsPipeline(Blend blend) {
 	descriptionRootSignature.NumStaticSamplers = 1;
 
 	// シリアライズしてバイナリにする
-	ID3DBlob* signatureBlob = nullptr;
-	ID3DBlob* errorBlob = nullptr;
-	HRESULT  hr = D3D12SerializeRootSignature(&descriptionRootSignature, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
+	Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob;
+	Microsoft::WRL::ComPtr<ID3DBlob> errorBlob;
+	HRESULT  hr = D3D12SerializeRootSignature(&descriptionRootSignature, D3D_ROOT_SIGNATURE_VERSION_1, signatureBlob.GetAddressOf(), errorBlob.GetAddressOf());
 	if (FAILED(hr)) {
 		OutputDebugStringA(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
 		assert(false);
@@ -113,11 +122,10 @@ void Texture2D::CreateGraphicsPipeline(Blend blend) {
 	if (rootSignature) {
 		rootSignature.Reset();
 	}
-	rootSignature = nullptr;
 	hr = Engine::GetDevice()->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(rootSignature.GetAddressOf()));
 	assert(SUCCEEDED(hr));
-	if (errorBlob) { errorBlob->Release(); }
-	signatureBlob->Release();
+	if (errorBlob) { errorBlob.Reset(); }
+	signatureBlob.Reset();
 
 
 	// pso生成
@@ -176,45 +184,46 @@ void Texture2D::CreateGraphicsPipeline(Blend blend) {
 	graphicsPipelineStateDesc.SampleDesc.Quality = 0;
 	graphicsPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 
-	switch (blend)
-	{
-	case Texture2D::Blend::Add:
-		graphicsPipelineStateDesc.BlendState.RenderTarget[0].BlendEnable = true;
-		graphicsPipelineStateDesc.BlendState.RenderTarget[0].SrcBlend = D3D12_BLEND_ONE; 
-		graphicsPipelineStateDesc.BlendState.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
-		graphicsPipelineStateDesc.BlendState.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
-		graphicsPipelineStateDesc.BlendState.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
-		graphicsPipelineStateDesc.BlendState.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
-		graphicsPipelineStateDesc.BlendState.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
-		break;
-	case Texture2D::Blend::Multiply:
-		graphicsPipelineStateDesc.BlendState.RenderTarget[0].BlendEnable = true;
-		graphicsPipelineStateDesc.BlendState.RenderTarget[0].SrcBlend = D3D12_BLEND_ZERO;
-		graphicsPipelineStateDesc.BlendState.RenderTarget[0].DestBlend = D3D12_BLEND_SRC_COLOR;
-		graphicsPipelineStateDesc.BlendState.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
-		graphicsPipelineStateDesc.BlendState.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
-		graphicsPipelineStateDesc.BlendState.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
-		graphicsPipelineStateDesc.BlendState.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
-		break;
-	case Texture2D::Blend::None:
-		graphicsPipelineStateDesc.BlendState.RenderTarget[0].BlendEnable = true;
-		graphicsPipelineStateDesc.BlendState.RenderTarget[0].SrcBlend = D3D12_BLEND_ONE; 
-		graphicsPipelineStateDesc.BlendState.RenderTarget[0].DestBlend = D3D12_BLEND_ZERO;
-		graphicsPipelineStateDesc.BlendState.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
-		graphicsPipelineStateDesc.BlendState.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
-		graphicsPipelineStateDesc.BlendState.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
-		graphicsPipelineStateDesc.BlendState.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
-	default:
-		break;
-	}
+	Blend blend = Blend::None;
 
-	// 実際に生成
-	if (graphicsPipelineState) {
-		graphicsPipelineState.Reset();
+	for (auto& i : graphicsPipelineState) {
+		switch (blend)
+		{
+		case Texture2D::Blend::None:
+		default:
+			graphicsPipelineStateDesc.BlendState.RenderTarget[0].BlendEnable = true;
+			graphicsPipelineStateDesc.BlendState.RenderTarget[0].SrcBlend = D3D12_BLEND_ONE;
+			graphicsPipelineStateDesc.BlendState.RenderTarget[0].DestBlend = D3D12_BLEND_ZERO;
+			graphicsPipelineStateDesc.BlendState.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+			graphicsPipelineStateDesc.BlendState.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
+			graphicsPipelineStateDesc.BlendState.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
+			graphicsPipelineStateDesc.BlendState.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
+			break;
+		case Texture2D::Blend::Add:
+			graphicsPipelineStateDesc.BlendState.RenderTarget[0].BlendEnable = true;
+			graphicsPipelineStateDesc.BlendState.RenderTarget[0].SrcBlend = D3D12_BLEND_ONE;
+			graphicsPipelineStateDesc.BlendState.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
+			graphicsPipelineStateDesc.BlendState.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+			graphicsPipelineStateDesc.BlendState.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
+			graphicsPipelineStateDesc.BlendState.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
+			graphicsPipelineStateDesc.BlendState.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
+			break;
+		case Texture2D::Blend::Multiply:
+			graphicsPipelineStateDesc.BlendState.RenderTarget[0].BlendEnable = true;
+			graphicsPipelineStateDesc.BlendState.RenderTarget[0].SrcBlend = D3D12_BLEND_ZERO;
+			graphicsPipelineStateDesc.BlendState.RenderTarget[0].DestBlend = D3D12_BLEND_SRC_COLOR;
+			graphicsPipelineStateDesc.BlendState.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+			graphicsPipelineStateDesc.BlendState.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
+			graphicsPipelineStateDesc.BlendState.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
+			graphicsPipelineStateDesc.BlendState.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
+			break;
+		}
+
+		hr = Engine::GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(i.GetAddressOf()));
+		assert(SUCCEEDED(hr));
+
+		++blend;
 	}
-	graphicsPipelineState = nullptr;
-	hr = Engine::GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(graphicsPipelineState.GetAddressOf()));
-	assert(SUCCEEDED(hr));
 }
 
 void Texture2D::LoadTexture(const std::string& fileName) {
@@ -234,8 +243,6 @@ void Texture2D::LoadTexture(const std::string& fileName) {
 }
 
 void Texture2D::Draw(Blend blend, const Mat4x4& worldMat, const Mat4x4& viewProjection, const Vector2D& uv0, const Vector2D& uv1, const Vector2D& uv2, const Vector2D& uv3) {
-	CreateGraphicsPipeline(blend);
-	
 	VertexData pv[4] = {
 		{{-0.5f,  0.5f, 0.1f }, uv3},
 		{{ 0.5f,  0.5f, 0.1f }, uv2},
@@ -254,7 +261,7 @@ void Texture2D::Draw(Blend blend, const Mat4x4& worldMat, const Mat4x4& viewProj
 
 	// 各種描画コマンドを積む
 	Engine::GetCommandList()->SetGraphicsRootSignature(rootSignature.Get());
-	Engine::GetCommandList()->SetPipelineState(graphicsPipelineState.Get());
+	Engine::GetCommandList()->SetPipelineState(graphicsPipelineState[size_t(blend)].Get());
 	Engine::GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	Engine::GetCommandList()->IASetVertexBuffers(0, 1, &vertexView);
 	Engine::GetCommandList()->IASetIndexBuffer(&indexView);

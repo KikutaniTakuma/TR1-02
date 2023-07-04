@@ -61,8 +61,8 @@ private:
 /// ÉÅÉìÉoä÷êî
 /// </summary>
 private:
-	Microsoft::WRL::ComPtr<ID3D12Resource> textureResouce = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> textureResouce;
+	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource;
 
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc;
 

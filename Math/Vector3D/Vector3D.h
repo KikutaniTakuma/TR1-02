@@ -18,15 +18,15 @@ public:
 	Vector3D& operator=(const Vector3D& vec) = default;
 	Vector3D operator+(const Vector3D& vec) const;
 	Vector3D operator-(const Vector3D& vec) const;
-	Vector3D operator+=(const Vector3D& vec);
-	Vector3D operator-=(const Vector3D& vec);
+	Vector3D& operator+=(const Vector3D& vec);
+	Vector3D& operator-=(const Vector3D& vec);
 	Vector3D operator*(float scalar) const;
-	Vector3D operator*=(float scalar);
-	Vector3D Normalize();
+	Vector3D& operator*=(float scalar);
+	Vector3D Normalize() const;
 	Vector3D operator*(const Mat4x4& mat) const;
 	Vector3D& operator*=(const Mat4x4& mat);
 
 	float Dot(const Vector3D& vec) const;
 	Vector3D Cross(const Vector3D& vec) const;
-	float Length();
+	float Length() const;
 };

@@ -30,7 +30,7 @@ Model::Model() :
 	dirLig->ligDirection = { 1.0f,-1.0f,-1.0f };
 	dirLig->ligDirection = dirLig->ligDirection.Normalize();
 	Vector4 colorTmp = Engine::UintToVector4(0xffffadff);
-	dirLig->ligColor = { colorTmp.x,colorTmp.y, colorTmp.z };
+	dirLig->ligColor = colorTmp.getVector3D();
 
 	dirLig->ptPos = { 5.0f,5.0f,5.0f };
 	dirLig->ptColor = { 15.0f,15.0f,15.0f };
@@ -39,7 +39,7 @@ Model::Model() :
 	*color = Engine::UintToVector4(0xff0000ff);
 	color.OffWright();
 
-	descHeap = Engine::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 3, true);
+	descHeap = Engine::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 16, true);
 
 	auto descHeaphandle = descHeap->GetCPUDescriptorHandleForHeapStart();
 	wvpData.CrerateView(descHeaphandle);

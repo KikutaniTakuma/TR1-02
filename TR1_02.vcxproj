@@ -161,6 +161,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Math\Mat4x4\Mat4x4.cpp" />
     <ClCompile Include="Math\Vector2D\Vector2D.cpp" />
     <ClCompile Include="Math\Vector3D\Vector3D.cpp" />
+    <ClCompile Include="Math\Vector4\Vector4.cpp" />
     <ClCompile Include="Model\Model.cpp" />
     <ClCompile Include="PeraRender\PeraRender.cpp" />
     <ClCompile Include="Texture2D\Texture2D.cpp" />

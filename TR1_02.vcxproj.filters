@@ -68,6 +68,9 @@
     <ClCompile Include="Texture2D\Texture2D.cpp">
       <Filter>Texture2D</Filter>
     </ClCompile>
+    <ClCompile Include="Math\Vector4\Vector4.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">

@@ -25,12 +25,12 @@ Vector3D Vector3D::operator-(const Vector3D& vec) const {
 
 	return tmp;
 }
-Vector3D Vector3D::operator+=(const Vector3D& vec) {
+Vector3D& Vector3D::operator+=(const Vector3D& vec) {
 	*this = *this + vec;
 
 	return *this;
 }
-Vector3D Vector3D::operator-=(const Vector3D& vec) {
+Vector3D& Vector3D::operator-=(const Vector3D& vec) {
 	*this = *this - vec;
 
 	return *this;
@@ -41,16 +41,16 @@ Vector3D Vector3D::operator*(float scalar) const {
 
 	return tmp;
 }
-Vector3D Vector3D::operator*=(float scalar) {
+Vector3D& Vector3D::operator*=(float scalar) {
 	*this = *this * scalar;
 
 	return *this;
 }
 
-Vector3D Vector3D::Normalize() {
-	float nor = this->Length();
+Vector3D Vector3D::Normalize() const {
+	float nor = 1.0f / this->Length();
 
-	return Vector3D(x / nor, y / nor, z / nor);
+	return *this * nor;
 }
 
 Vector3D Vector3D::operator*(const Mat4x4& mat) const {
@@ -74,8 +74,8 @@ Vector3D& Vector3D::operator*=(const Mat4x4& mat) {
 	return *this;
 }
 
-float Vector3D::Length() {
-	return sqrtf(powf(x,2.0f)+ powf(y, 2.0f)+ powf(z, 2.0f));
+float Vector3D::Length() const {
+	return sqrtf(x*x + y*y + z*z);
 }
 
 float Vector3D::Dot(const Vector3D& vec) const {

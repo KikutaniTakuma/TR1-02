@@ -55,12 +55,12 @@ std::shared_ptr<Texture> TextureManager::LoadTexture(const std::string& fileName
 void TextureManager::UnloadTexture(std::shared_ptr<Texture>& tex) {
 	auto itr = textures.find(tex->fileName);
 	assert(!(itr == textures.end()));
+
+	tex.reset();
+
 	if (itr->second.use_count() == 1) {
 		// 参照カウントが1の場合コンテナから削除
 		textures.erase(itr);
-	}
-	else {
-		tex.reset();
 	}
 }
 
