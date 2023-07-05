@@ -15,9 +15,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	Engine::Initialize(1280, 720, "DirectXGame");
 
 
-	/*auto model = std::make_unique<Model>();
-	model->LoadObj("./Resources/cube.obj");
-	model->LoadShader("WaveShader/WaveNone.VS.hlsl", "WaveShader/Wave.PS.hlsl", "WaveShader/Wave.GS.hlsl");*/
+	auto model = std::make_unique<Model>();
+	model->LoadObj("./Obj/Ball.obj");
+	model->LoadShader("WaveShader/WaveNone.VS.hlsl", "WaveShader/Wave.PS.hlsl", "WaveShader/Wave.GS.hlsl");
 
 
 	Mat4x4 worldMat = MakeMatrixAffin(Vector3D(1.0f,1.0f,1.0f), Vector3D(), Vector3D());
@@ -58,44 +58,44 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// XVˆ—
 		/// 
 		if ((Gamepad::GetInstans()->getStick(Gamepad::Stick::RIGHT_X) > 10000)) {
-			cameraMoveRotate.y += 0.01f;
+			cameraMoveRotate.y += 0.1f;
 		}
 		else if ((Gamepad::GetInstans()->getStick(Gamepad::Stick::RIGHT_X) < -10000)) {
-			cameraMoveRotate.y -= 0.01f;
+			cameraMoveRotate.y -= 0.1f;
 		}
 
 		if ((Gamepad::GetInstans()->getStick(Gamepad::Stick::RIGHT_Y) > 10000)) {
-			cameraMoveRotate.x += 0.01f;
+			cameraMoveRotate.x += 0.1f;
 		}
 		else if ((Gamepad::GetInstans()->getStick(Gamepad::Stick::RIGHT_Y) < -10000)) {
-			cameraMoveRotate.x -= 0.01f;
+			cameraMoveRotate.x -= 0.1f;
 		}
 
-		/*if (KeyInput::LongPush(VK_W)) {
+		if (KeyInput::LongPush(DIK_W)) {
 			cameraPos.z += 0.1f;
 		}
-		if (KeyInput::LongPush(VK_S)) {
+		if (KeyInput::LongPush(DIK_S)) {
 			cameraPos.z -= 0.1f;
 		}
-		if (KeyInput::LongPush(VK_A)) {
+		if (KeyInput::LongPush(DIK_A)) {
 			cameraPos.x -= 0.1f;
 		}
-		if (KeyInput::LongPush(VK_D)) {
+		if (KeyInput::LongPush(DIK_D)) {
 			cameraPos.x += 0.1f;
 		}
 
-		if (KeyInput::LongPush(VK_UP)) {
+		if (KeyInput::LongPush(DIK_UP)) {
 			cameraRotate.x += 0.01f;
 		}
-		if (KeyInput::LongPush(VK_DOWN)) {
+		if (KeyInput::LongPush(DIK_DOWN)) {
 			cameraRotate.x -= 0.01f;
 		}
-		if (KeyInput::LongPush(VK_LEFT)) {
+		if (KeyInput::LongPush(DIK_LEFT)) {
 			cameraRotate.y -= 0.01f;
 		}
-		if (KeyInput::LongPush(VK_RIGHT)) {
+		if (KeyInput::LongPush(DIK_RIGHT)) {
 			cameraRotate.y += 0.01f;
-		}*/
+		}
 
 		if (Gamepad::GetInstans()->Released(Gamepad::Button::A)) {
 			tex->LoadTexture("./Resources/sakabannbasupisu.png");
@@ -131,10 +131,10 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		projectionMatrix = MakeMatrixPerspectiveFov(0.45f, static_cast<float>(Engine::GetInstance()->clientWidth) / static_cast<float>(Engine::GetInstance()->clientHeight), 0.1f, 100.0f);
 
 
-		//model->Draw(worldMat, viewMatrix,  projectionMatrix, cameraPos);
+		model->Draw(worldMat, viewMatrix,  projectionMatrix, cameraPos);
 
 		//tex1->Draw();
-		tex->Draw(Texture2D::Blend::None, MakeMatrixAffin(Vector3D(1280.0f,720.0f,1.0f), Vector3D(), Vector3D()));
+		//tex->Draw(Texture2D::Blend::None, MakeMatrixAffin(Vector3D(1280.0f,720.0f,1.0f), Vector3D(), Vector3D()));
 
 		pera->Draw();
 		///

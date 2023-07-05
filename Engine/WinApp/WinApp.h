@@ -26,6 +26,10 @@ public:
 		return hwnd;
 	}
 
+	inline HINSTANCE getHinstance() const {
+		return w.hInstance;
+	}
+
 
 private:
 	HWND hwnd{};

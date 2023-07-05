@@ -6,6 +6,7 @@
 #include "ShaderManager/ShaderManager.h"
 #include "ConvertString/ConvertString.h"
 #include "TextureManager/TextureManager.h"
+#include "KeyInput/KeyInput.h"
 
 #include "externals/imgui/imgui.h"
 #include "externals/imgui/imgui_impl_dx12.h"
@@ -64,9 +65,6 @@ void Engine::Initialize(int windowWidth, int windowHeight, const std::string& wi
 	engine = new Engine();
 	assert(engine);
 
-	ShaderManager::Initialize();
-	TextureManager::Initialize();
-
 	engine->clientWidth = windowWidth;
 	engine->clientHeight = windowHeight;
 
@@ -85,11 +83,16 @@ void Engine::Initialize(int windowWidth, int windowHeight, const std::string& wi
 	engine->InitializeDirect12();
 
 	engine->InitalizeDraw();
+
+	KeyInput::Initialize();
+	ShaderManager::Initialize();
+	TextureManager::Initialize();
 }
 
 void Engine::Finalize() {
 	TextureManager::Finalize();
 	ShaderManager::Finalize();
+	KeyInput::Finalize();
 
 	delete engine;
 	engine = nullptr;

@@ -44,9 +44,9 @@ private:
 		const wchar_t* profile);
 
 private:
-	Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils = nullptr;
-	Microsoft::WRL::ComPtr<IDxcCompiler3> dxcCompiler = nullptr;
-	Microsoft::WRL::ComPtr<IDxcIncludeHandler> includeHandler = nullptr;
+	Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils;
+	Microsoft::WRL::ComPtr<IDxcCompiler3> dxcCompiler;
+	Microsoft::WRL::ComPtr<IDxcIncludeHandler> includeHandler;
 
 private:
 	std::unordered_map<std::string, Microsoft::WRL::ComPtr<IDxcBlob>> vertexShader;
