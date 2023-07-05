@@ -115,7 +115,7 @@ private:
 		void InitializeDebugLayer();
 
 	private:
-		Microsoft::WRL::ComPtr<ID3D12Debug1> debugController = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12Debug1> debugController;
 	};
 
 	static Debug debugLayer;
@@ -131,9 +131,9 @@ private:
 	void InitializeDirect3D();
 
 private:
-	Microsoft::WRL::ComPtr<ID3D12Device> device = nullptr;
-	Microsoft::WRL::ComPtr<IDXGIFactory7> dxgiFactory = nullptr;
-	Microsoft::WRL::ComPtr<IDXGIAdapter4> useAdapter = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Device> device;
+	Microsoft::WRL::ComPtr<IDXGIFactory7> dxgiFactory;
+	Microsoft::WRL::ComPtr<IDXGIAdapter4> useAdapter;
 
 
 
@@ -145,21 +145,21 @@ private:
 	void InitializeDirect12();
 
 private:
-	Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue;
+	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator;
+	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList;
 
-	Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain = nullptr;
+	Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain;
 	std::vector< Microsoft::WRL::ComPtr<ID3D12Resource>> swapChianResource;
 
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap;
 	std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> rtvHandles;
 
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap;
 
-	Microsoft::WRL::ComPtr<ID3D12Fence> fence = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Fence> fence;
 	uint64_t fenceVal = 0;
-	HANDLE fenceEvent = nullptr;
+	HANDLE fenceEvent;
 
 
 	/// 
@@ -170,8 +170,8 @@ public:
 
 
 private:
-	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvHeap = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvHeap;
 
 
 
