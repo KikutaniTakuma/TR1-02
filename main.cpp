@@ -47,6 +47,11 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		// •`‰æŠJŽnˆ—
 		Engine::FrameStart();
 
+		// fps
+		ImGui::Begin("Control panel");
+		ImGui::Text("Frame rate: %6.2f fps", ImGui::GetIO().Framerate);
+		ImGui::End();
+
 		// “ü—Íˆ—
 		Gamepad::GetInstans()->Input();
 		KeyInput::Input();
