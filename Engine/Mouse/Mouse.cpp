@@ -90,3 +90,7 @@ Vector2D Mouse::GetPos() {
 
 	return pos;
 }
+
+void Mouse::Show(bool flg) {
+	ShowCursor(BOOL(flg));
+}

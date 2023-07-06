@@ -36,6 +36,8 @@ public:
 
 	static Vector2D GetPos();
 
+	static void Show(bool flg);
+
 public:
 	static void Initialize();
 	static void Finalize();
