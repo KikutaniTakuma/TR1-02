@@ -26,12 +26,17 @@ public:
 		return hwnd;
 	}
 
-	inline HINSTANCE getHinstance() const {
-		return w.hInstance;
+	inline const WNDCLASSEX& getWNDCLASSEX() const {
+		return w;
+	}
+
+	inline std::wstring GetWindowClassName() const {
+		return windowName;
 	}
 
 
 private:
 	HWND hwnd{};
 	WNDCLASSEX w{};
+	std::wstring windowName;
 };

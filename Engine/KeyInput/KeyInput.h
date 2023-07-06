@@ -1,7 +1,6 @@
 #pragma once
 #include <array>
 #include <wrl.h>
-#define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
 
 #pragma comment(lib, "dinput8.lib")
@@ -10,7 +9,7 @@
 class KeyInput {
 private:
 	KeyInput();
-	~KeyInput() = default;
+	~KeyInput();
 	KeyInput& operator=(const KeyInput&) = delete;
 	
 
@@ -30,7 +29,6 @@ private:
 
 
 private:
-	Microsoft::WRL::ComPtr<IDirectInput8> directInput;
 	Microsoft::WRL::ComPtr<IDirectInputDevice8> keyBoard;
 
 	// キー入力バッファー

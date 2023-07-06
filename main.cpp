@@ -8,6 +8,7 @@
 #include "Engine/WinApp/WinApp.h"
 #include "Engine/Gamepad/Gamepad.h"
 #include "Engine/KeyInput/KeyInput.h"
+#include "Engine/Mouse/Mouse.h"
 #include "PeraRender/PeraRender.h"
 #include "Texture2D/Texture2D.h"
 
@@ -15,9 +16,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	Engine::Initialize(1280, 720, "DirectXGame");
 
 
-	auto model = std::make_unique<Model>();
-	model->LoadObj("./Obj/Ball.obj");
-	model->LoadShader("WaveShader/WaveNone.VS.hlsl", "WaveShader/Wave.PS.hlsl", "WaveShader/Wave.GS.hlsl");
+	/*auto model = std::make_unique<Model>();
+	model->LoadObj("./Resources/cube.obj");
+	model->LoadShader("WaveShader/WaveNone.VS.hlsl", "WaveShader/Wave.PS.hlsl", "WaveShader/Wave.GS.hlsl");*/
 
 
 	Mat4x4 worldMat = MakeMatrixAffin(Vector3D(1.0f,1.0f,1.0f), Vector3D(), Vector3D());
@@ -33,11 +34,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	auto tex = std::make_unique<Texture2D>();
 	tex->Initialize("Texture2DShader/Texture2D.VS.hlsl", "Texture2DShader/Texture2DNone.PS.hlsl");
-	tex->LoadTexture("./Resources/screenshot.png");
-
-	/*auto tex1 = std::make_unique<Texture2D>();
-	tex1->Initialize("Texture2DShader/Texture2D.VS.hlsl", "Texture2DShader/Texture2DNone.PS.hlsl");
-	tex1->LoadTexture("./Resources/uvChecker.png");*/
+	tex->LoadTexture("./Resources/uvChecker.png");
 
 
 	auto pera = std::make_unique<PeraRender>();
@@ -53,6 +50,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		// ì¸óÕèàóù
 		Gamepad::GetInstans()->Input();
 		KeyInput::Input();
+		Mouse::Input();
 
 		/// 
 		/// çXêVèàóù
@@ -116,6 +114,13 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		ImGui::DragFloat3("cameraMoveRotate", &cameraMoveRotate.x, 0.01f);
 		ImGui::End();
 
+		ImGui::Begin("Mouse");
+
+		ImGui::Text("mouse Button pos %.2f : %.2f", Mouse::GetPos().x, Mouse::GetPos().y);
+		ImGui::Text("mouse Button velocity %.2f : %.2f", Mouse::GetVelocity().x, Mouse::GetVelocity().y);
+
+		ImGui::End();
+
 		//model->Update();
 
 		///
@@ -131,10 +136,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		projectionMatrix = MakeMatrixPerspectiveFov(0.45f, static_cast<float>(Engine::GetInstance()->clientWidth) / static_cast<float>(Engine::GetInstance()->clientHeight), 0.1f, 100.0f);
 
 
-		model->Draw(worldMat, viewMatrix,  projectionMatrix, cameraPos);
+		//model->Draw(worldMat, viewMatrix,  projectionMatrix, cameraPos);
 
-		//tex1->Draw();
-		//tex->Draw(Texture2D::Blend::None, MakeMatrixAffin(Vector3D(1280.0f,720.0f,1.0f), Vector3D(), Vector3D()));
+		tex->Draw(Texture2D::Blend::None, MakeMatrixAffin(Vector3D(1280.0f,720.0f,1.0f), Vector3D(), Vector3D()));
 
 		pera->Draw();
 		///
@@ -146,7 +150,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		Engine::FrameEnd();
 
 		// EscapeÇ™âüÇ≥ÇÍÇΩÇÁèIóπ
-		if (KeyInput::Releaed(VK_ESCAPE)) {
+		if (KeyInput::Releaed(DIK_ESCAPE)) {
 			break;
 		}
 	}

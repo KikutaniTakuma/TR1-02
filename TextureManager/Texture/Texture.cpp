@@ -13,14 +13,7 @@ Texture::Texture():
 {}
 
 Texture::~Texture() {
-	if (intermediateResource) {
-		intermediateResource->Release();
-		intermediateResource.Reset();
-	}
-	if (textureResouce) {
-		textureResouce->Release();
-		textureResouce.Reset();
-	}
+	Unload();
 }
 
 
@@ -147,14 +140,13 @@ ID3D12Resource* Texture::UploadTextureData(ID3D12Resource* texture, const Direct
 	ID3D12Resource* resource = Engine::CreateBufferResuorce(intermediateSize);
 	UpdateSubresources(Engine::GetCommandList(), texture, resource, 0, 0, UINT(subresources.size()), subresources.data());
 	// Texture‚Ö‚Ì“]‘—Œã‚Í—˜—p‚Å‚«‚é‚æ‚¤AD3D12_STATE_COPY_DEST‚©‚çD3D12_RESOURCE_STATE_GENERIC_READ‚ÖResouceState‚ð•ÏX‚·‚é
-	D3D12_RESOURCE_BARRIER barrier{};
-	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	barrier.Transition.pResource = texture;
-	barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
-	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;
-	Engine::GetCommandList()->ResourceBarrier(1, &barrier);
+	Engine::Barrier(
+		texture,
+		D3D12_RESOURCE_STATE_COPY_DEST,
+		D3D12_RESOURCE_STATE_GENERIC_READ,
+		D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES
+	);
+	
 	return resource;
 }
 

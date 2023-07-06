@@ -6,8 +6,8 @@
 template<class T>
 class ConstBuffer {
 public:
-	inline ConstBuffer():
-		bufferResource(nullptr),
+	inline ConstBuffer() noexcept:
+		bufferResource(),
 		cbvDesc(),
 		data(nullptr),
 		isWright(true),
@@ -26,49 +26,49 @@ public:
 		roootParamater.ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	}
 
-	inline ~ConstBuffer() {
+	inline ~ConstBuffer() noexcept {
 		bufferResource->Release();
 	}
 
 public:
-	void OnWright() {
+	void OnWright() noexcept {
 		if (!isWright) {
 			bufferResource->Map(0, nullptr, reinterpret_cast<void**>(&data));
 			isWright = !isWright;
 		}
 	}
 
-	void OffWright() {
+	void OffWright() noexcept {
 		if (isWright) {
 			bufferResource->Unmap(0, nullptr);
 			isWright = !isWright;
 		}
 	}
 
-	T& operator*() const {
+	T& operator*() const noexcept {
 		return *data;
 	}
 
-	T* operator->() const {
+	T* operator->() const noexcept {
 		return data;
 	}
 
-	D3D12_GPU_VIRTUAL_ADDRESS GetGPUVtlAdrs() const {
+	D3D12_GPU_VIRTUAL_ADDRESS GetGPUVtlAdrs() const noexcept {
 		return bufferResource->GetGPUVirtualAddress();
 	}
 
-	const D3D12_ROOT_PARAMETER& GetRoootParamater() {
+	const D3D12_ROOT_PARAMETER& GetRoootParamater() noexcept {
 		roootParamater.ShaderVisibility = shaderVisibility;
 		roootParamater.Descriptor.ShaderRegister = shaderRegister;
 		return roootParamater;
 	}
 
-	void CrerateView(D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle) {
+	void CrerateView(D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle) noexcept {
 		Engine::GetDevice()->CreateConstantBufferView(&cbvDesc, descriptorHandle);
 	}
 
 private:
-	Microsoft::WRL::ComPtr<ID3D12Resource> bufferResource = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> bufferResource ;
 	D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc;
 
 	T* data;

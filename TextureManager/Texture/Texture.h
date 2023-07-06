@@ -22,11 +22,11 @@ public:
 	Texture& operator=(Texture&& tex) noexcept;
 
 public:
-	inline explicit operator bool() {
+	inline explicit operator bool() const noexcept {
 		return loadFlg;
 	}
 
-	inline bool operator!() {
+	inline bool operator!() const noexcept {
 		return !loadFlg;
 	}
 
