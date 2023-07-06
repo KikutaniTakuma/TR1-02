@@ -12,7 +12,12 @@ public:
 	enum class Button : uint8_t {
 		Left = 0,
 		Right,
-		Middle
+		Middle,
+		EX0,
+		EX1,
+		EX2,
+		EX3,
+		EX4
 	};
 
 

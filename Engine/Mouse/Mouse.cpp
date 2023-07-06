@@ -25,7 +25,7 @@ Mouse::Mouse() :
 	HRESULT hr = Engine::GetDirectInput()->CreateDevice(GUID_SysMouse, mouse.GetAddressOf(), NULL);
 	assert(SUCCEEDED(hr));
 
-	hr = mouse->SetDataFormat(&c_dfDIMouse);
+	hr = mouse->SetDataFormat(&c_dfDIMouse2);
 	assert(SUCCEEDED(hr));
 
 	hr = mouse->SetCooperativeLevel(WinApp::GetInstance()->GetHwnd(), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
@@ -44,7 +44,7 @@ void Mouse::Input() {
 	instance->mouse->Acquire();
 
 	instance->mosueState = {};
-	instance->mouse->GetDeviceState(sizeof(DIMOUSESTATE), &instance->mosueState);
+	instance->mouse->GetDeviceState(sizeof(DIMOUSESTATE2), &instance->mosueState);
 }
 
 bool Mouse::Pushed(Mouse::Button button) {

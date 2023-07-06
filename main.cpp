@@ -114,13 +114,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		ImGui::DragFloat3("cameraMoveRotate", &cameraMoveRotate.x, 0.01f);
 		ImGui::End();
 
-		ImGui::Begin("Mouse");
-
-		ImGui::Text("mouse Button pos %.2f : %.2f", Mouse::GetPos().x, Mouse::GetPos().y);
-		ImGui::Text("mouse Button velocity %.2f : %.2f", Mouse::GetVelocity().x, Mouse::GetVelocity().y);
-
-		ImGui::End();
-
 		//model->Update();
 
 		///
