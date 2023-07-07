@@ -65,7 +65,7 @@ public:
 
 	void Update();
 
-	void Draw(const Mat4x4& worldMat, const Mat4x4& viewMat, const Mat4x4& projectionMat, const Vector3& cameraPos);
+	void Draw(const Mat4x4& worldMat, const Mat4x4& viewProjectionMat, const Vector3& cameraPos);
 private:
 	void CreateGraphicsPipeline();
 

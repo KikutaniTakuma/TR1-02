@@ -328,14 +328,14 @@ void Model::Update() {
 	
 }
 
-void Model::Draw(const Mat4x4& worldMat, const Mat4x4& viewMat, const Mat4x4& projectionMat, const Vector3& cameraPos) {
+void Model::Draw(const Mat4x4& worldMat, const Mat4x4& viewProjectionMat, const Vector3& cameraPos) {
 	if (!createGPFlg) {
 		CreateGraphicsPipeline();
 	}
 	assert(createGPFlg);
 
 	wvpData->worldMat = worldMat;
-	wvpData->viewProjectoionMat = viewMat * projectionMat;
+	wvpData->viewProjectoionMat = viewProjectionMat;
 
 	dirLig->eyePos = cameraPos;
 
