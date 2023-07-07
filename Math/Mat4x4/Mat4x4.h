@@ -13,6 +13,7 @@ public:
 	Mat4x4();
 
 	Mat4x4(const Mat4x4& mat);
+	Mat4x4(Mat4x4&& mat);
 
 	Mat4x4(const std::array<std::array<float, 4>, 4>& num);
 
@@ -26,14 +27,15 @@ private:
 	std::array<std::array<float, 4>, 4> m;
 
 public:
+	Mat4x4& operator=(const Mat4x4& mat);
+	Mat4x4& operator=(Mat4x4&& mat);
 	Mat4x4 operator*(const Mat4x4& mat) const;
-	const Mat4x4& operator=(const Mat4x4& mat);
-	const Mat4x4& operator*=(const Mat4x4& mat);
+	Mat4x4& operator*=(const Mat4x4& mat);
 
 	Mat4x4 operator+(const Mat4x4& mat) const;
-	const Mat4x4& operator+=(const Mat4x4& mat);
+	Mat4x4& operator+=(const Mat4x4& mat);
 	Mat4x4 operator-(const Mat4x4& mat) const;
-	const Mat4x4& operator-=(const Mat4x4& mat);
+	Mat4x4& operator-=(const Mat4x4& mat);
 
 	std::array<float, 4>& operator[](size_t index);
 

@@ -13,6 +13,10 @@ Mat4x4::Mat4x4(const Mat4x4& mat) {
 	*this = mat;
 }
 
+Mat4x4::Mat4x4(Mat4x4&& mat) {
+	*this = std::move(mat);
+}
+
 Mat4x4 Mat4x4::operator*(const Mat4x4& mat) const{
 	Mat4x4 tmp;
 
@@ -31,13 +35,19 @@ Mat4x4::Mat4x4(const std::array<std::array<float, 4>, 4>& num) {
 	m = num;
 }
 
-const Mat4x4& Mat4x4::operator=(const Mat4x4& mat) {
+Mat4x4& Mat4x4::operator=(const Mat4x4& mat) {
 	std::copy(mat.m.begin(), mat.m.end(), m.begin());
 
 	return *this;
 }
 
-const Mat4x4& Mat4x4::operator*=(const Mat4x4& mat) {
+Mat4x4& Mat4x4::operator=(Mat4x4&& mat) {
+	m = std::move(mat.m);
+
+	return *this;
+}
+
+Mat4x4& Mat4x4::operator*=(const Mat4x4& mat) {
 	*this = *this * mat;
 
 	return *this;
@@ -54,7 +64,7 @@ Mat4x4 Mat4x4::operator+(const Mat4x4& mat) const {
 
 	return tmp;
 }
-const Mat4x4& Mat4x4::operator+=(const Mat4x4& mat) {
+Mat4x4& Mat4x4::operator+=(const Mat4x4& mat) {
 	for (int y = 0; y < Mat4x4::HEIGHT; y++) {
 		for (int x = 0; x < Mat4x4::WIDTH; x++) {
 			this->m[y][x] += mat.m[y][x];
@@ -74,7 +84,7 @@ Mat4x4 Mat4x4::operator-(const Mat4x4& mat) const {
 
 	return tmp;
 }
-const Mat4x4& Mat4x4::operator-=(const Mat4x4& mat) {
+Mat4x4& Mat4x4::operator-=(const Mat4x4& mat) {
 	for (int y = 0; y < Mat4x4::HEIGHT; y++) {
 		for (int x = 0; x < Mat4x4::WIDTH; x++) {
 			this->m[y][x] -= mat.m[y][x];
