@@ -141,6 +141,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AudioManager\AudioManager.cpp" />
+    <ClCompile Include="AudioManager\Audio\Audio.cpp" />
     <ClCompile Include="Engine\ConvertString\ConvertString.cpp" />
     <ClCompile Include="Engine\Engine.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Disabled</Optimization>
@@ -169,6 +171,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="TextureManager\Texture\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AudioManager\AudioManager.h" />
+    <ClInclude Include="AudioManager\Audio\Audio.h" />
     <ClInclude Include="Engine\ConstBuffer\ConstBuffer.h" />
     <ClInclude Include="Engine\ConvertString\ConvertString.h" />
     <ClInclude Include="Engine\Engine.h" />

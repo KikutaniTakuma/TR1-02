@@ -71,6 +71,12 @@
     <ClCompile Include="Math\Vector4\Vector4.cpp">
       <Filter>Math</Filter>
     </ClCompile>
+    <ClCompile Include="AudioManager\AudioManager.cpp">
+      <Filter>AudioManager</Filter>
+    </ClCompile>
+    <ClCompile Include="AudioManager\Audio\Audio.cpp">
+      <Filter>AudioManager\Audio</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -117,6 +123,12 @@
     </Filter>
     <Filter Include="Texture2D">
       <UniqueIdentifier>{192c5cda-f43f-40d2-9f13-b9f849327730}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AudioManager">
+      <UniqueIdentifier>{2487b7fc-0f80-433c-af4a-03b5842ec259}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AudioManager\Audio">
+      <UniqueIdentifier>{7d34ec95-2a47-42f6-93fb-23ebe8cc0e42}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -194,6 +206,12 @@
     </ClInclude>
     <ClInclude Include="Texture2D\Texture2D.h">
       <Filter>Texture2D</Filter>
+    </ClInclude>
+    <ClInclude Include="AudioManager\AudioManager.h">
+      <Filter>AudioManager</Filter>
+    </ClInclude>
+    <ClInclude Include="AudioManager\Audio\Audio.h">
+      <Filter>AudioManager\Audio</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

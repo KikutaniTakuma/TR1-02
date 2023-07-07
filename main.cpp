@@ -10,6 +10,7 @@
 #include "Engine/KeyInput/KeyInput.h"
 #include "PeraRender/PeraRender.h"
 #include "Texture2D/Texture2D.h"
+#include "AudioManager/AudioManager.h"
 
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	Engine::Initialize(1280, 720, "DirectXGame");
@@ -42,6 +43,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	auto pera = std::make_unique<PeraRender>();
 	pera->Initialize("PostShader/Post.VS.hlsl", "PostShader/PostNone.PS.hlsl");
+
+	AudioManager::GetInstance()->LoadWav("Alarm01.wav");
+	AudioManager::GetInstance()->Start("Alarm01.wav", false, 1.0f);
 
 	/// 
 	/// ÉÅÉCÉìÉãÅ[Év
