@@ -43,6 +43,7 @@ void AudioManager::LoadWav(const std::string& fileName, bool flg) {
 
 void AudioManager::Start(const std::string& fileName, float volume) {
 	HRESULT hr = audios[fileName]->pSourceVoice->Start();
+	audios[fileName]->pSourceVoice->SetVolume(volume);
 	assert(SUCCEEDED(hr));
 }
 

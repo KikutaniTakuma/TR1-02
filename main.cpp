@@ -41,8 +41,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	auto pera = std::make_unique<PeraRender>();
 	pera->Initialize("PostShader/Post.VS.hlsl", "PostShader/PostNone.PS.hlsl");
 
-	AudioManager::GetInstance()->LoadWav("Alarm01.wav");
-	AudioManager::GetInstance()->Start("Alarm01.wav", false, 1.0f);
+	AudioManager::GetInstance()->LoadWav("Alarm01.wav", true);
+	AudioManager::GetInstance()->Start("Alarm01.wav", 1.0f);
 
 	/// 
 	/// ƒƒCƒ“ƒ‹[ƒv
@@ -122,15 +122,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		ImGui::DragFloat3("cameraScale", &cameraScale.x, 0.01f);
 		ImGui::DragFloat3("cameraMoveRotate", &cameraMoveRotate.x, 0.01f);
 		ImGui::End();
-
-		if (Mouse::Pushed(Mouse::Button::Left)) {
-			mouseFlg = true;
-		}
-		else if(Mouse::Pushed(Mouse::Button::Right)) {
-			mouseFlg = false;
-		}
-
-		Mouse::Show(mouseFlg);
 
 		//model->Update();
 

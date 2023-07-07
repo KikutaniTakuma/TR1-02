@@ -69,7 +69,7 @@ void Audio::Load(const std::string& fileName, bool loopFlg) {
 	buf.pAudioData = pBuffer;
 	buf.AudioBytes = bufferSize;
 	buf.Flags = XAUDIO2_END_OF_STREAM;
-	buf.LoopCount = flg ? XAUDIO2_LOOP_INFINITE : 0;
+	buf.LoopCount = loopFlg ? XAUDIO2_LOOP_INFINITE : 0;
 
 	hr = pSourceVoice->SubmitSourceBuffer(&buf);
 }
