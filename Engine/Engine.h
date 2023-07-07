@@ -9,6 +9,11 @@
 #include <dxcapi.h>
 #pragma comment(lib, "dxcompiler.lib")
 #include <wrl.h>
+#if DIRECTINPUT_VERSION != 0x0800
+#define DIRECTINPUT_VERSION 0x0800
+#endif
+#include <dinput.h>
+#pragma comment(lib, "dinput8.lib")
 
 #include <string>
 #include <vector>
@@ -21,9 +26,9 @@
 
 class Engine {
 public:
-/// <summary>
-/// ê√ìIä÷êî
-/// </summary>
+	/// <summary>
+	/// ê√ìIä÷êî
+	/// </summary>
 	static ID3D12DescriptorHeap* CreateDescriptorHeap(
 		D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderrVisible
 	);
@@ -34,7 +39,7 @@ public:
 
 	static Vector4 UintToVector4(uint32_t color);
 
-	static void Barrier(ID3D12Resource* resource, D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after);
+	static void Barrier(ID3D12Resource* resource, D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after, UINT subResource = 0);
 
 private:
 	Engine() = default;
@@ -91,6 +96,9 @@ public:
 		return engine->rtvHandles[backBufferIndex];
 	}
 
+	static inline IDirectInput8* GetDirectInput() {
+		return engine->directInput.Get();
+	}
 
 	///
 	/// Windowê∂ê¨óp
@@ -160,6 +168,16 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Fence> fence;
 	uint64_t fenceVal = 0;
 	HANDLE fenceEvent;
+
+
+/// <summary>
+/// ì¸óÕä÷åW
+/// </summary>
+private:
+	void InitializeInput();
+
+private:
+	Microsoft::WRL::ComPtr<IDirectInput8> directInput;
 
 
 	/// 

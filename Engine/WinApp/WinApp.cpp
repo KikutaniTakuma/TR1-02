@@ -35,6 +35,8 @@ void WinApp::Create(const std::wstring& windowTitle, int32_t width, int32_t heig
 	HRESULT hr =  CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 	assert(SUCCEEDED(hr));
 
+	windowName = windowTitle;
+
 	w.cbSize = sizeof(WNDCLASSEX);
 	w.lpfnWndProc = WindowProcedure;
 	w.lpszClassName = windowTitle.c_str();

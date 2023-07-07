@@ -1,5 +1,6 @@
 #include "KeyInput.h"
 #include "Engine/WinApp/WinApp.h"
+#include "Engine/Engine.h"
 #include <cassert>
 
 void KeyInput::Input() {
@@ -34,16 +35,12 @@ void KeyInput::Finalize() {
 }
 
 KeyInput::KeyInput():
-	directInput(),
 	keyBoard(),
 	key{0},
 	preKey{0}
 {
-	HRESULT hr = DirectInput8Create(WinApp::GetInstance()->getHinstance(), DIRECTINPUT_VERSION, IID_IDirectInput8,
-		reinterpret_cast<void**>(directInput.GetAddressOf()), nullptr);
-	assert(SUCCEEDED(hr));
-
-	hr = directInput->CreateDevice(GUID_SysKeyboard, keyBoard.GetAddressOf(), NULL);
+	
+	HRESULT hr = Engine::GetDirectInput()->CreateDevice(GUID_SysKeyboard, keyBoard.GetAddressOf(), NULL);
 	assert(SUCCEEDED(hr));
 
 	hr = keyBoard->SetDataFormat(&c_dfDIKeyboard);
@@ -51,4 +48,8 @@ KeyInput::KeyInput():
 
 	hr = keyBoard->SetCooperativeLevel(WinApp::GetInstance()->GetHwnd(), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
 	assert(SUCCEEDED(hr));
+}
+
+KeyInput::~KeyInput() {
+	keyBoard->Unacquire();
 }
