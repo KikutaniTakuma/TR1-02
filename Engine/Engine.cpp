@@ -8,6 +8,7 @@
 #include "TextureManager/TextureManager.h"
 #include "KeyInput/KeyInput.h"
 #include "Mouse/Mouse.h"
+#include "AudioManager/AudioManager.h"
 
 #include "externals/imgui/imgui.h"
 #include "externals/imgui/imgui_impl_dx12.h"
@@ -91,9 +92,11 @@ void Engine::Initialize(int windowWidth, int windowHeight, const std::string& wi
 	Mouse::Initialize();
 	ShaderManager::Initialize();
 	TextureManager::Initialize();
+	AudioManager::Inititalize();
 }
 
 void Engine::Finalize() {
+	AudioManager::Finalize();
 	TextureManager::Finalize();
 	ShaderManager::Finalize();
 	Mouse::Finalize();
