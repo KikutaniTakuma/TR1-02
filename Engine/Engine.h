@@ -202,7 +202,4 @@ public:
 	static void FrameStart();
 
 	static void FrameEnd();
-
-private:
-	MSG msg{};
 };

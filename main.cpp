@@ -50,8 +50,10 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		Engine::FrameStart();
 
 		// fps
-		ImGui::Begin("Control panel");
-		ImGui::Text("Frame rate: %6.2f fps", ImGui::GetIO().Framerate);
+		ImGui::SetNextWindowPos({});
+		ImGui::SetNextWindowSize({150,50});
+		ImGui::Begin("fps");
+		ImGui::Text("Frame rate: %3.0f fps", ImGui::GetIO().Framerate);
 		ImGui::End();
 
 		// ì¸óÕèàóù

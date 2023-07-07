@@ -26,12 +26,11 @@ Engine::Debug::~Debug() {
 	debugController.Reset();
 
 	// リソースリークチェック
-	IDXGIDebug1* debug;
-	if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&debug)))) {
+	Microsoft::WRL::ComPtr<IDXGIDebug1> debug;
+	if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(debug.GetAddressOf())))) {
 		debug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
 		debug->ReportLiveObjects(DXGI_DEBUG_APP, DXGI_DEBUG_RLO_ALL);
 		debug->ReportLiveObjects(DXGI_DEBUG_D3D12, DXGI_DEBUG_RLO_ALL);
-		debug->Release();
 	}
 }
 
@@ -106,31 +105,6 @@ void Engine::Finalize() {
 	// COM 終了
 	CoUninitialize();
 }
-
-
-
-/// 
-/// Window生成
-/// 
-
-// windowプロシージャ
-LRESULT WindowProcedure(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
-	assert(SUCCEEDED(CoInitializeEx(0, COINIT_MULTITHREADED)));
-
-	if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam)) {
-		return true;
-	}
-
-	switch (msg) {
-	case WM_DESTROY:
-		PostQuitMessage(0);
-		return 0;
-	}
-
-	return DefWindowProc(hwnd, msg, wparam, lparam);
-}
-
-
 
 
 
@@ -496,12 +470,14 @@ void Engine::Barrier(ID3D12Resource* resource, D3D12_RESOURCE_STATES before, D3D
 /// 
 
 bool Engine::WindowMassage() {
-	if (PeekMessage(&engine->msg, nullptr, 0, 0, PM_REMOVE)) {
-		TranslateMessage(&engine->msg);
-		DispatchMessage(&engine->msg);
+	MSG msg{};
+
+	if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
 	}
 
-	return engine->msg.message != WM_QUIT;
+	return msg.message != WM_QUIT;
 }
 
 void Engine::FrameStart() {
