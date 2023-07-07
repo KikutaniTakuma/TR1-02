@@ -102,6 +102,23 @@ Vector4& Vector4::operator*=(float scalar) noexcept {
 	return *this;
 }
 
+Vector4 Vector4::operator/(float scalar) const noexcept {
+	Vector4 result;
+
+	for (size_t i = 0; i < result.m.size(); i++) {
+		result.m[i] = m[i] / scalar;
+	}
+
+	return result;
+}
+Vector4& Vector4::operator/=(float scalar) noexcept {
+	for (auto& i : m) {
+		i /= scalar;
+	}
+
+	return *this;
+}
+
 Vector4 Vector4::operator*(const class Mat4x4& mat) const noexcept {
 	Vector4 result;
 
@@ -128,11 +145,22 @@ Vector4& Vector4::operator*=(const class Mat4x4& mat) noexcept {
 	return *this;
 }
 
+bool Vector4::operator==(const Vector4& right) const noexcept {
+	return m == right.m;
+}
+bool Vector4::operator!=(const Vector4& right) const noexcept {
+	return m != right.m;
+}
+
 float Vector4::Length() const noexcept {
 	return std::sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z + vec.w * vec.w);
 }
 
 Vector4 Vector4::Normalize() const noexcept {
+	if (*this == Vector4()) {
+		return *this;
+	}
+
 	float nor = 1.0f / this->Length();
 
 	return Vector4(*this) * nor;

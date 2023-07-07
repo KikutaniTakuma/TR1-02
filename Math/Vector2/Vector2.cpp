@@ -2,150 +2,130 @@
 #include <assert.h>
 #include <cmath>
 
-Vector2::Vector2() {
-	this->x = 0.0f;
-	this->y = 0.0f;
+Vector2::Vector2() noexcept :
+	x(0.0f),
+	y(0.0f)
+{}
+
+Vector2::Vector2(const Vector2& right) noexcept {
+	*this = right;
 }
-Vector2::Vector2(const Vector2& num) {
-	this->x = num.x;
-	this->y = num.y;
-}
-Vector2::Vector2(const float& X, const float& Y) {
-	this->x = X;
-	this->y = Y;
+Vector2::Vector2(float x, float y) noexcept :
+	x(x),
+	y(y)
+{}
+
+Vector2::Vector2(Vector2&& right) noexcept {
+	*this = std::move(right);
 }
 
 Vector2 Vector2::identity = { 1.0f,1.0f };
-
 Vector2 iHat = { 1.0f,0.0f };
 Vector2 jHat = { 0.0f,1.0f };
 
 
-Vector2 Vector2::operator+(const Vector2& num) const {
-	Vector2 tmp;
+Vector2 Vector2::operator+(const Vector2& right) const noexcept {
+	Vector2 result;
 
-	tmp.x = this->x + num.x;
-	tmp.y = this->y + num.y;
+	result.x = this->x + right.x;
+	result.y = this->y + right.y;
 
-	return tmp;
+	return result;
 };
-Vector2 Vector2::operator-(const Vector2& num) const {
-	Vector2 tmp;
+Vector2 Vector2::operator-(const Vector2& right) const noexcept {
+	Vector2 result;
 
-	tmp.x = this->x - num.x;
-	tmp.y = this->y - num.y;
+	result.x = this->x - right.x;
+	result.y = this->y - right.y;
 
-	return tmp;
+	return result;
 }
 
 
-Vector2 Vector2::operator*(float num) const {
-	Vector2 tmp;
+Vector2 Vector2::operator*(float scalar) const noexcept {
+	Vector2 result;
 
-	tmp.x = this->x * num;
-	tmp.y = this->y * num;
+	result.x = this->x * scalar;
+	result.y = this->y * scalar;
 
-	return tmp;
+	return result;
 }
-Vector2 Vector2::operator/(float num) const {
-	Vector2 tmp;
+Vector2 Vector2::operator/(float scalar) const noexcept {
+	Vector2 result;
 
-	tmp.x = this->x / num;
-	tmp.y = this->y / num;
+	result.x = this->x / scalar;
+	result.y = this->y / scalar;
 
-	return tmp;
-}
-
-Vector2 operator+(float num, const Vector2& vec) {
-	Vector2 tmp;
-
-	tmp.x = num + vec.x;
-	tmp.y = num + vec.y;
-
-	return tmp;
-}
-Vector2 operator-(float num, const Vector2& vec) {
-	Vector2 tmp;
-
-	tmp.x = num - vec.x;
-	tmp.y = num - vec.y;
-
-	return tmp;
-}
-Vector2 operator*(float num, const Vector2& vec) {
-	Vector2 tmp;
-
-	tmp.x = num * vec.x;
-	tmp.y = num * vec.y;
-
-	return tmp;
-}
-Vector2 operator/(float num, const Vector2& vec) {
-	Vector2 tmp;
-
-	tmp.x = num / vec.x;
-	tmp.y = num / vec.y;
-
-	return tmp;
+	return result;
 }
 
-const Vector2& Vector2::operator=(const Vector2& num) {
-	this->x = num.x;
-	this->y = num.y;
+Vector2& Vector2::operator=(const Vector2& right) noexcept {
+	this->x = right.x;
+	this->y = right.y;
+
+	return *this;
+}
+
+Vector2& Vector2::operator=(Vector2&& right) noexcept {
+	this->x = std::move(right.x);
+	this->y = std::move(right.y);
 
 	return *this;
 }
 
 
-const Vector2& Vector2::operator+=(const Vector2& num) {
-	this->x += num.x;
-	this->y += num.y;
+Vector2& Vector2::operator+=(const Vector2& right) noexcept {
+	this->x += right.x;
+	this->y += right.y;
 
 	return *this;
 }
-const Vector2& Vector2::operator-=(const Vector2& num) {
-	this->x -= num.x;
-	this->y -= num.y;
-
-	return *this;
-}
-
-const Vector2& Vector2::operator*=(float num) {
-	this->x *= num;
-	this->y *= num;
-
-	return *this;
-}
-const Vector2& Vector2::operator/=(float num) {
-	this->x /= num;
-	this->y /= num;
+Vector2& Vector2::operator-=(const Vector2& right) noexcept {
+	this->x -= right.x;
+	this->y -= right.y;
 
 	return *this;
 }
 
-bool Vector2::operator==(const Vector2& num) const {
-	return this->x == num.x && this->y == num.y;
+Vector2& Vector2::operator*=(float scalar) noexcept {
+	this->x *= scalar;
+	this->y *= scalar;
+
+	return *this;
 }
-bool Vector2::operator!=(const Vector2& num) const {
-	return this->x != num.x && this->y != num.y;
+Vector2& Vector2::operator/=(float scalar) noexcept {
+	this->x /= scalar;
+	this->y /= scalar;
+
+	return *this;
 }
 
-void Vector2::Rotate(float rad) {
+bool Vector2::operator==(const Vector2& right) const noexcept {
+	return this->x == right.x && this->y == right.y;
+}
+bool Vector2::operator!=(const Vector2& right) const noexcept {
+	return this->x != right.x && this->y != right.y;
+}
+
+void Vector2::Rotate(float rad) noexcept {
 	x *= cosf(rad);
 	y *= sinf(rad);
 }
 
-float Vector2::Cross(const Vector2& vec) const {
-	return x * vec.y - y * vec.x;
+float Vector2::Cross(const Vector2& right) const noexcept {
+	return x * right.y - y * right.x;
 }
-float Vector2::Dot(const Vector2& vec) const {
-	return x * vec.x + y * vec.y;
+float Vector2::Dot(const Vector2& right) const noexcept {
+	return x * right.x + y * right.y;
 }
 
-float Vector2::Length() const {
+float Vector2::Length() const noexcept {
 	return std::hypot(x, y);
 }
 
-Vector2 Vector2::Normalize() const {
+Vector2 Vector2::Normalize() const noexcept {
+	if (*this == Vector2()) {
+		return *this;
+	}
 	return *this / Length();
 }

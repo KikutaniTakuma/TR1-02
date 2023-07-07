@@ -1,13 +1,12 @@
 #pragma once
 #include <string>
 
-class Mat4x4;
-
-class Vector3 {
+class Vector3 final {
 public:
-	Vector3();
-	Vector3(float x, float y, float z);
-	Vector3(const Vector3& vec) = default;
+	Vector3() noexcept;
+	Vector3(float x, float y, float z) noexcept;
+	Vector3(const Vector3& right) noexcept;
+	Vector3(Vector3&& right) noexcept;
 
 public:
 	static Vector3 identity;
@@ -21,21 +20,25 @@ public:
 	float z;
 
 public:
-	Vector3& operator=(const Vector3& vec) = default;
-	Vector3 operator+(const Vector3& vec) const;
-	Vector3 operator-(const Vector3& vec) const;
-	Vector3& operator+=(const Vector3& vec);
-	Vector3& operator-=(const Vector3& vec);
-	Vector3 operator*(float scalar) const;
-	Vector3& operator*=(float scalar);
-	Vector3 operator*(const Mat4x4& mat) const;
-	Vector3& operator*=(const Mat4x4& mat);
+	Vector3& operator=(const Vector3& right) noexcept;
+	Vector3& operator=(Vector3&& right) noexcept;
+	Vector3 operator+(const Vector3& right) const noexcept;
+	Vector3 operator-(const Vector3& right) const noexcept;
+	Vector3& operator+=(const Vector3& right) noexcept;
+	Vector3& operator-=(const Vector3& right) noexcept;
+	Vector3 operator*(float scalar) const noexcept;
+	Vector3& operator*=(float scalar) noexcept;
+	Vector3 operator*(const class Mat4x4& mat) const noexcept;
+	Vector3& operator*=(const class Mat4x4& mat) noexcept;
 
-	bool operator==(const Vector3& vec) const;
-	bool operator!=(const Vector3& vec) const;
+	Vector3& operator=(const class Vector2& right) noexcept;
 
-	float Dot(const Vector3& vec) const;
-	Vector3 Cross(const Vector3& vec) const;
-	float Length() const;
-	Vector3 Normalize() const;
+
+	bool operator==(const Vector3& right) const noexcept;
+	bool operator!=(const Vector3& right) const noexcept;
+
+	float Dot(const Vector3& right) const noexcept;
+	Vector3 Cross(const Vector3& right) const noexcept;
+	float Length() const noexcept;
+	Vector3 Normalize() const noexcept;
 };

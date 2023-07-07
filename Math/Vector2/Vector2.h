@@ -1,13 +1,14 @@
 #pragma once
 
-class Vector2 {
+class Vector2 final {
 public:
-	Vector2();
-	Vector2(const float& X, const float& Y);
+	Vector2() noexcept;
+	Vector2(float x, float y) noexcept;
 
-	Vector2(const Vector2& num);
+	Vector2(const Vector2& right) noexcept;
+	Vector2(Vector2&& right) noexcept;
 
-	inline ~Vector2(){}
+	~Vector2() = default;
 
 public:
 	static Vector2 identity;
@@ -20,25 +21,26 @@ public:
 
 public:
 
-	Vector2 operator+(const Vector2& num) const;
-	Vector2 operator-(const Vector2& num) const;
-	Vector2 operator*(float num) const;
-	Vector2 operator/(float num) const;
-	const Vector2& operator=(const Vector2& num);
-	const Vector2& operator+=(const Vector2& num);
-	const Vector2& operator-=(const Vector2& num);
-	const Vector2& operator*=(float num);
-	const Vector2& operator/=(float num);
-	bool operator==(const Vector2& num) const;
-	bool operator!=(const Vector2& num) const;
+	Vector2 operator+(const Vector2& right) const noexcept;
+	Vector2 operator-(const Vector2& right) const noexcept;
+	Vector2 operator*(float scalar) const noexcept;
+	Vector2 operator/(float scalar) const noexcept;
+	Vector2& operator=(const Vector2& right) noexcept;
+	Vector2& operator=(Vector2&& right) noexcept;
+	Vector2& operator+=(const Vector2& right) noexcept;
+	Vector2& operator-=(const Vector2& right) noexcept;
+	Vector2& operator*=(float scalar) noexcept;
+	Vector2& operator/=(float scalar) noexcept;
+	bool operator==(const Vector2& right) const noexcept;
+	bool operator!=(const Vector2& right) const noexcept;
 
 	// =================================================================================
 
-	void Rotate(float rad);
+	void Rotate(float rad) noexcept;
 
-	float Cross(const Vector2& vec) const;
-	float Dot(const Vector2& vec) const;
-	float Length() const;
+	float Cross(const Vector2& right) const noexcept;
+	float Dot(const Vector2& right) const noexcept;
+	float Length() const noexcept;
 
-	Vector2 Normalize() const;
+	Vector2 Normalize() const noexcept;
 };

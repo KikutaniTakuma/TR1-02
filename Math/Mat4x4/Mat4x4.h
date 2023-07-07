@@ -8,7 +8,7 @@ static const int kColumnWidth = 60;
 
 class Vector3;
 
-class Mat4x4 {
+class Mat4x4 final {
 public:
 	Mat4x4();
 

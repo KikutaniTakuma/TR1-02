@@ -31,7 +31,7 @@ public:
 
 private:
 	/// <summary>
-	/// Textureのコンテナ(キー値: ファイルネーム  コンテナデータ型: 参照カウント Texture*)
+	/// Textureのコンテナ(キー値: ファイルネーム  コンテナデータ型: Texture*)
 	/// </summary>
 	std::unordered_map<std::string, std::shared_ptr<Texture>> textures;
 

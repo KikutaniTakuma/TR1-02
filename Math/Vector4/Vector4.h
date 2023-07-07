@@ -40,9 +40,14 @@ public:
 
 	Vector4 operator*(float scalar) const noexcept;
 	Vector4& operator*=(float scalar) noexcept;
+	Vector4 operator/(float scalar) const noexcept;
+	Vector4& operator/=(float scalar) noexcept;
 
 	Vector4 operator*(const class Mat4x4& mat) const noexcept;
 	Vector4& operator*=(const class Mat4x4& mat) noexcept;
+
+	bool operator==(const Vector4& right) const noexcept;
+	bool operator!=(const Vector4& right) const noexcept;
 
 public:
 	float Length() const noexcept;
