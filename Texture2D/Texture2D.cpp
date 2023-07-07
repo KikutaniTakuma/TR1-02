@@ -242,7 +242,15 @@ void Texture2D::LoadTexture(const std::string& fileName) {
 	}
 }
 
-void Texture2D::Draw(Blend blend, const Mat4x4& worldMat, const Mat4x4& viewProjection, const Vector2& uv0, const Vector2& uv1, const Vector2& uv2, const Vector2& uv3) {
+void Texture2D::Draw(
+	const Vector2& scale,
+	float rotate,
+	const Vector2& pos,
+	const Mat4x4& viewProjection, 
+	Blend blend, 
+	const Vector2& uv0, const Vector2& uv1, 
+	const Vector2& uv2, const Vector2& uv3
+) {
 	VertexData pv[4] = {
 		{{-0.5f,  0.5f, 0.1f }, uv3},
 		{{ 0.5f,  0.5f, 0.1f }, uv2},
@@ -257,7 +265,11 @@ void Texture2D::Draw(Blend blend, const Mat4x4& worldMat, const Mat4x4& viewProj
 	}
 	vertexResource->Unmap(0, nullptr);
 
-	*wvpMat = worldMat * viewProjection;
+	*wvpMat = MakeMatrixAffin(
+		Vector3(scale.x * tex->getSize().x, scale.y * tex->getSize().y, 1.0f), 
+		Vector3(0.0f, 0.0f, rotate), 
+		Vector3(pos.x, pos.y, 0.01f)
+	) * viewProjection;
 
 	// 各種描画コマンドを積む
 	Engine::GetCommandList()->SetGraphicsRootSignature(rootSignature.Get());

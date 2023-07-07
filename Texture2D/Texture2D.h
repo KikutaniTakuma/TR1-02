@@ -49,17 +49,11 @@ public:
 
 public:
 	void Draw(
-		Blend blend = Blend::None, 
-		const Mat4x4& worldMat = MakeMatrixAffin(Vector3(1.0f,1.0f,1.0f),Vector3(), Vector3()),
-		const Mat4x4& viewProjection = 
-		MakeMatrixInverse(MakeMatrixAffin(Vector3(1.0f, 1.0f, 1.0f), Vector3(), Vector3())) *
-		MakeMatrixOrthographic(
-			-static_cast<float>(Engine::GetInstance()->clientWidth) * 0.5f, 
-			static_cast<float>(Engine::GetInstance()->clientHeight) * 0.5f, 
-			static_cast<float>(Engine::GetInstance()->clientWidth) * 0.5f, 
-			-static_cast<float>(Engine::GetInstance()->clientHeight) * 0.5f, 
-			0.01f, 1000.0f
-		),
+		const Vector2& scale,
+		float rotate,
+		const Vector2& pos,
+		const Mat4x4& viewProjection,
+		Blend blend = Blend::None,
 		const Vector2& uv0 = {0.0f, 1.0f}, const Vector2& uv1 = {1.0f, 1.0f}, 
 		const Vector2& uv2 = {1.0f, 0.0f}, const Vector2& uv3 = {0.0f, 0.0f}
 	);
