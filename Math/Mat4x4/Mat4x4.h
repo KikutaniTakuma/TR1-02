@@ -6,7 +6,7 @@
 static const int kRowHeight = 20;
 static const int kColumnWidth = 60;
 
-class Vector3D;
+class Vector3;
 
 class Mat4x4 {
 public:
@@ -47,9 +47,9 @@ public:
 public:
 	void Indentity();
 
-	void Translate(const Vector3D& vec);
+	void Translate(const Vector3& vec);
 
-	void Scalar(const Vector3D& vec);
+	void Scalar(const Vector3& vec);
 
 	void RotateX(float rad);
 
@@ -57,7 +57,7 @@ public:
 
 	void RotateZ(float rad);
 
-	void Affin(const Vector3D& scale, const Vector3D& rad, const Vector3D& translate);
+	void Affin(const Vector3& scale, const Vector3& rad, const Vector3& translate);
 
 	void Inverse();
 
@@ -73,9 +73,9 @@ public:
 
 Mat4x4 MakeMatrixIndentity();
 
-Mat4x4 MakeMatrixTranslate(Vector3D vec);
+Mat4x4 MakeMatrixTranslate(Vector3 vec);
 
-Mat4x4 MakeMatrixScalar(Vector3D vec);
+Mat4x4 MakeMatrixScalar(Vector3 vec);
 
 Mat4x4 MakeMatrixRotateX(float rad);
 
@@ -83,7 +83,7 @@ Mat4x4 MakeMatrixRotateY(float rad);
 
 Mat4x4 MakeMatrixRotateZ(float rad);
 
-Mat4x4 MakeMatrixAffin(const Vector3D& scale, const Vector3D& rad, const Vector3D& translate);
+Mat4x4 MakeMatrixAffin(const Vector3& scale, const Vector3& rad, const Vector3& translate);
 
 Mat4x4 MakeMatrixInverse(Mat4x4 mat);
 

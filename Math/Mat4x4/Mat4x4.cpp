@@ -1,5 +1,5 @@
 #include "Mat4x4.h"
-#include "Math/Vector3D/Vector3D.h"
+#include "Math/Vector3/Vector3.h"
 #include <cmath>
 #include <algorithm>
 #include <Windows.h>
@@ -104,7 +104,7 @@ void Mat4x4::Indentity() {
 	}
 }
 
-void Mat4x4::Translate(const Vector3D& vec) {
+void Mat4x4::Translate(const Vector3& vec) {
 	this->m = { 0.0f };
 
 	this->m[0][0] = 1.0f;
@@ -117,7 +117,7 @@ void Mat4x4::Translate(const Vector3D& vec) {
 	this->m[3][2] = vec.z;
 }
 
-void Mat4x4::Scalar(const Vector3D& vec) {
+void Mat4x4::Scalar(const Vector3& vec) {
 	this->m = { 0.0f };
 
 	this->m[0][0] = vec.x;
@@ -160,7 +160,7 @@ void Mat4x4::RotateZ(float rad) {
 }
 
 
-void Mat4x4::Affin(const Vector3D& scale, const Vector3D& rad, const Vector3D& translate) {
+void Mat4x4::Affin(const Vector3& scale, const Vector3& rad, const Vector3& translate) {
 	Mat4x4 rotate = MakeMatrixRotateX(rad.x) * MakeMatrixRotateY(rad.y) * MakeMatrixRotateZ(rad.z);
 
 	*this = Mat4x4({
@@ -292,7 +292,7 @@ Mat4x4 MakeMatrixTransepose(Mat4x4 mat) {
 	return tmp;
 }
 
-Mat4x4 MakeMatrixTranslate(Vector3D vec) {
+Mat4x4 MakeMatrixTranslate(Vector3 vec) {
 	Mat4x4 mat;
 
 	mat.Translate(vec);
@@ -300,7 +300,7 @@ Mat4x4 MakeMatrixTranslate(Vector3D vec) {
 	return mat;
 }
 
-Mat4x4 MakeMatrixScalar(Vector3D vec) {
+Mat4x4 MakeMatrixScalar(Vector3 vec) {
 	Mat4x4 mat;
 
 	mat.Scalar(vec);
@@ -332,7 +332,7 @@ Mat4x4 MakeMatrixRotateZ(float rad) {
 	return tmp;
 }
 
-Mat4x4 MakeMatrixAffin(const Vector3D& scale, const Vector3D& rad, const Vector3D& translate) {
+Mat4x4 MakeMatrixAffin(const Vector3& scale, const Vector3& rad, const Vector3& translate) {
 	Mat4x4 tmp;
 
 	tmp.Affin(scale, rad, translate);

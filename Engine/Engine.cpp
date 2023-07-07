@@ -40,7 +40,6 @@ Engine::Debug::~Debug() {
 /// 
 
 void Engine::Debug::InitializeDebugLayer() {
-	debugController = nullptr;
 	if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(debugController.GetAddressOf())))) {
 		// デバッグレイヤーを有効化する
 		debugController->EnableDebugLayer();

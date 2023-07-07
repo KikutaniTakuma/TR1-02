@@ -4,8 +4,8 @@
 #include <dxcapi.h>
 #pragma comment(lib, "dxcompiler.lib")
 #include "Math/Mat4x4/Mat4x4.h"
-#include "Math/Vector2D/Vector2D.h"
-#include "Math/Vector3D/Vector3D.h"
+#include "Math/Vector2/Vector2.h"
+#include "Math/Vector3/Vector3.h"
 #include "Math/Vector4/Vector4.h"
 #include <string>
 #include "Engine/ConstBuffer/ConstBuffer.h"
@@ -15,7 +15,7 @@
 class Model {
 	struct VertData {
 		Vector4 position;
-		Vector3D normal;
+		Vector3 normal;
 	};
 
 	struct Mesh {
@@ -40,15 +40,15 @@ class Model {
 	};
 
 	struct DirectionLight {
-		Vector3D ligDirection;
+		Vector3 ligDirection;
 		float pad0;
-		Vector3D ligColor;
+		Vector3 ligColor;
 		float pad1;
-		Vector3D eyePos;
+		Vector3 eyePos;
 		float pad2;
-		Vector3D ptPos;
+		Vector3 ptPos;
 		float pad3;
-		Vector3D ptColor;
+		Vector3 ptColor;
 		float ptRange;
 	};
 
@@ -65,7 +65,7 @@ public:
 
 	void Update();
 
-	void Draw(const Mat4x4& worldMat, const Mat4x4& viewMat, const Mat4x4& projectionMat, const Vector3D& cameraPos);
+	void Draw(const Mat4x4& worldMat, const Mat4x4& viewMat, const Mat4x4& projectionMat, const Vector3& cameraPos);
 private:
 	void CreateGraphicsPipeline();
 

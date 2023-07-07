@@ -1,7 +1,7 @@
 #include "Vector4.h"
 #include "Math/Mat4x4/Mat4x4.h"
-#include "Math/Vector3D/Vector3D.h"
-#include "Math/Vector2D/Vector2D.h"
+#include "Math/Vector3/Vector3.h"
+#include "Math/Vector2/Vector2.h"
 #include <cmath>
 
 Vector4::Vector4() noexcept :
@@ -25,7 +25,7 @@ Vector4& Vector4::operator=(const Vector4& right) noexcept {
 	return *this;
 }
 
-Vector4& Vector4::operator=(const Vector3D& right) noexcept {
+Vector4& Vector4::operator=(const Vector3& right) noexcept {
 	vec.x = right.x;
 	vec.y = right.y;
 	vec.z = right.z;
@@ -34,7 +34,7 @@ Vector4& Vector4::operator=(const Vector3D& right) noexcept {
 	return *this;
 }
 
-Vector4& Vector4::operator=(const Vector2D& right) noexcept {
+Vector4& Vector4::operator=(const Vector2& right) noexcept {
 	vec.x = right.x;
 	vec.y = right.y;
 	vec.z = 0.0f;
@@ -138,9 +138,9 @@ Vector4 Vector4::Normalize() const noexcept {
 	return Vector4(*this) * nor;
 }
 
-Vector3D Vector4::getVector3D() const noexcept {
-	return Vector3D(vec.x, vec.y, vec.z);
+Vector3 Vector4::getVector3D() const noexcept {
+	return Vector3(vec.x, vec.y, vec.z);
 }
-Vector2D Vector4::getVector2D() const noexcept {
-	return Vector2D(vec.x, vec.y);
+Vector2 Vector4::getVector2D() const noexcept {
+	return Vector2(vec.x, vec.y);
 }

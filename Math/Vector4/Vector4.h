@@ -28,8 +28,8 @@ public:
 
 public:
 	Vector4& operator=(const Vector4& right) noexcept;
-	Vector4& operator=(const class Vector3D& right) noexcept;
-	Vector4& operator=(const class Vector2D& right) noexcept;
+	Vector4& operator=(const class Vector3& right) noexcept;
+	Vector4& operator=(const class Vector2& right) noexcept;
 	Vector4& operator=(Vector4&& right) noexcept;
 
 	Vector4 operator+(const Vector4& right) const noexcept;
@@ -49,8 +49,8 @@ public:
 
 	Vector4 Normalize() const noexcept;
 
-	class Vector3D getVector3D() const noexcept;
-	class Vector2D getVector2D() const noexcept;
+	class Vector3 getVector3D() const noexcept;
+	class Vector2 getVector2D() const noexcept;
 
 public:
 	union {

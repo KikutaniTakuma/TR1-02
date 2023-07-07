@@ -143,6 +143,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   <ItemGroup>
     <ClCompile Include="AudioManager\AudioManager.cpp" />
     <ClCompile Include="AudioManager\Audio\Audio.cpp" />
+    <ClCompile Include="Camera\Camera.cpp" />
     <ClCompile Include="Engine\ConvertString\ConvertString.cpp" />
     <ClCompile Include="Engine\Engine.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Disabled</Optimization>
@@ -161,8 +162,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="externals\imgui\imgui_widgets.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Math\Mat4x4\Mat4x4.cpp" />
-    <ClCompile Include="Math\Vector2D\Vector2D.cpp" />
-    <ClCompile Include="Math\Vector3D\Vector3D.cpp" />
+    <ClCompile Include="Math\Vector2\Vector2.cpp" />
+    <ClCompile Include="Math\Vector3\Vector3.cpp" />
     <ClCompile Include="Math\Vector4\Vector4.cpp" />
     <ClCompile Include="Model\Model.cpp" />
     <ClCompile Include="PeraRender\PeraRender.cpp" />
@@ -173,6 +174,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   <ItemGroup>
     <ClInclude Include="AudioManager\AudioManager.h" />
     <ClInclude Include="AudioManager\Audio\Audio.h" />
+    <ClInclude Include="Camera\Camera.h" />
     <ClInclude Include="Engine\ConstBuffer\ConstBuffer.h" />
     <ClInclude Include="Engine\ConvertString\ConvertString.h" />
     <ClInclude Include="Engine\Engine.h" />
@@ -190,8 +192,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="externals\imgui\imstb_textedit.h" />
     <ClInclude Include="externals\imgui\imstb_truetype.h" />
     <ClInclude Include="Math\Mat4x4\Mat4x4.h" />
-    <ClInclude Include="Math\Vector2D\Vector2D.h" />
-    <ClInclude Include="Math\Vector3D\Vector3D.h" />
+    <ClInclude Include="Math\Vector2\Vector2.h" />
+    <ClInclude Include="Math\Vector3\Vector3.h" />
     <ClInclude Include="Math\Vector4\Vector4.h" />
     <ClInclude Include="Model\Model.h" />
     <ClInclude Include="PeraRender\PeraRender.h" />

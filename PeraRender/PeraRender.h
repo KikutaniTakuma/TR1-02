@@ -4,8 +4,8 @@
 #include <dxcapi.h>
 #pragma comment(lib, "dxcompiler.lib")
 #include "Math/Mat4x4/Mat4x4.h"
-#include "Math/Vector2D/Vector2D.h"
-#include "Math/Vector3D/Vector3D.h"
+#include "Math/Vector2/Vector2.h"
+#include "Math/Vector3/Vector3.h"
 #include "Math/Vector4/Vector4.h"
 #include <string>
 #include "Engine/ConstBuffer/ConstBuffer.h"
@@ -13,12 +13,12 @@
 class PeraRender {
 public:
 	struct PeraVertexData {
-		Vector3D position;
-		Vector2D uv;
+		Vector3 position;
+		Vector2 uv;
 	};
 
 	struct Wipe {
-		Vector2D center;
+		Vector2 center;
 		//float pad[2];
 		float wipeSize;
 	};

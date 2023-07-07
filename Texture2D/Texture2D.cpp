@@ -242,7 +242,7 @@ void Texture2D::LoadTexture(const std::string& fileName) {
 	}
 }
 
-void Texture2D::Draw(Blend blend, const Mat4x4& worldMat, const Mat4x4& viewProjection, const Vector2D& uv0, const Vector2D& uv1, const Vector2D& uv2, const Vector2D& uv3) {
+void Texture2D::Draw(Blend blend, const Mat4x4& worldMat, const Mat4x4& viewProjection, const Vector2& uv0, const Vector2& uv1, const Vector2& uv2, const Vector2& uv3) {
 	VertexData pv[4] = {
 		{{-0.5f,  0.5f, 0.1f }, uv3},
 		{{ 0.5f,  0.5f, 0.1f }, uv2},

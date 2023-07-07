@@ -77,16 +77,16 @@ bool Mouse::Releaed(Mouse::Button button) {
 	return false;
 }
 
-Vector2D Mouse::GetVelocity() {
+Vector2 Mouse::GetVelocity() {
 	return { static_cast<float>(instance->mosueState.lX), -static_cast<float>(instance->mosueState.lY) };
 }
 
-Vector2D Mouse::GetPos() {
+Vector2 Mouse::GetPos() {
 	POINT p{};
 	GetCursorPos(&p);
 	ScreenToClient(FindWindowW(WinApp::GetInstance()->GetWindowClassName().c_str(), nullptr), &p);
 
-	Vector2D pos{ static_cast<float>(p.x),static_cast<float>(p.y) };
+	Vector2 pos{ static_cast<float>(p.x),static_cast<float>(p.y) };
 
 	return pos;
 }

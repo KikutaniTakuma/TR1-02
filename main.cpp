@@ -17,21 +17,21 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	Engine::Initialize(1280, 720, "DirectXGame");
 
 
-	/*auto model = std::make_unique<Model>();
+	auto model = std::make_unique<Model>();
 	model->LoadObj("./Resources/cube.obj");
-	model->LoadShader("WaveShader/WaveNone.VS.hlsl", "WaveShader/Wave.PS.hlsl", "WaveShader/Wave.GS.hlsl");*/
+	model->LoadShader("WaveShader/WaveNone.VS.hlsl", "WaveShader/Wave.PS.hlsl", "WaveShader/Wave.GS.hlsl");
 
 
-	Mat4x4 worldMat = MakeMatrixAffin(Vector3D(1.0f,1.0f,1.0f), Vector3D(), Vector3D());
+	Mat4x4 worldMat = MakeMatrixAffin(Vector3(1.0f,1.0f,1.0f), Vector3(), Vector3());
 
 	Mat4x4 viewMatrix;
 	Mat4x4 projectionMatrix;
 
-	Vector3D cameraPos{ 8.24f,9.63f,-20.53f };
-	Vector3D cameraRotate{ 0.44f,-0.4f, 0.0f};
-	Vector3D cameraScale{1.0f,1.0f,1.0f};
+	Vector3 cameraPos{ 8.24f,9.63f,-20.53f };
+	Vector3 cameraRotate{ 0.44f,-0.4f, 0.0f};
+	Vector3 cameraScale{1.0f,1.0f,1.0f};
 
-	Vector3D cameraMoveRotate{};
+	Vector3 cameraMoveRotate{};
 
 	auto tex = std::make_unique<Texture2D>();
 	tex->Initialize("Texture2DShader/Texture2D.VS.hlsl", "Texture2DShader/Texture2DNone.PS.hlsl");
@@ -40,9 +40,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	auto pera = std::make_unique<PeraRender>();
 	pera->Initialize("PostShader/Post.VS.hlsl", "PostShader/PostNone.PS.hlsl");
-
-	AudioManager::GetInstance()->LoadWav("Alarm01.wav", true);
-	AudioManager::GetInstance()->Start("Alarm01.wav", 1.0f);
 
 	/// 
 	/// メインループ
@@ -106,16 +103,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			cameraRotate.y += 0.01f;
 		}
 
-		if (Gamepad::GetInstans()->Released(Gamepad::Button::A)) {
-			tex->LoadTexture("./Resources/sakabannbasupisu.png");
-		}
-		else if (Gamepad::GetInstans()->Released(Gamepad::Button::B)) {
-			tex->LoadTexture("./Resources/watame.png");
-		}
-		else if (Gamepad::GetInstans()->Released(Gamepad::Button::X)) {
-			tex->LoadTexture("./Resources/uvChecker.png");
-		}
-
 
 
 		ImGui::Begin("Camera");
@@ -125,7 +112,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		ImGui::DragFloat3("cameraMoveRotate", &cameraMoveRotate.x, 0.01f);
 		ImGui::End();
 
-		//model->Update();
+		model->Update();
 
 		///
 		/// 更新処理ここまで
@@ -136,13 +123,11 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// 
 		pera->PreDraw();
 
-		viewMatrix = MakeMatrixInverse(MakeMatrixAffin(cameraScale, cameraRotate, cameraPos) * MakeMatrixAffin(Vector3D(1.0f,1.0f,1.0f), cameraMoveRotate, Vector3D()));
+		viewMatrix = MakeMatrixInverse(MakeMatrixAffin(cameraScale, cameraRotate, cameraPos) * MakeMatrixAffin(Vector3(1.0f,1.0f,1.0f), cameraMoveRotate, Vector3()));
 		projectionMatrix = MakeMatrixPerspectiveFov(0.45f, static_cast<float>(Engine::GetInstance()->clientWidth) / static_cast<float>(Engine::GetInstance()->clientHeight), 0.1f, 100.0f);
 
 
-		//model->Draw(worldMat, viewMatrix,  projectionMatrix, cameraPos);
-
-		tex->Draw(Texture2D::Blend::None, MakeMatrixAffin(Vector3D(1280.0f,720.0f,1.0f), Vector3D(), Vector3D()));
+		model->Draw(worldMat, viewMatrix,  projectionMatrix, cameraPos);
 
 		pera->Draw();
 		///

@@ -54,7 +54,7 @@ void Model::LoadObj(const std::string& fileName) {
 		std::ifstream objFile(fileName);
 		assert(objFile);
 
-		std::vector<Vector3D> normalPos(0);
+		std::vector<Vector3> normalPos(0);
 		uint32_t vertPositionNum = 0;
 		meshData.indexNum = 0;
 
@@ -137,7 +137,7 @@ void Model::LoadObj(const std::string& fileName) {
 					}
 					if (posBuf.size() == 3) {
 						meshData.vertexMap[i].position = Vector4(posBuf[0], posBuf[1], posBuf[2], 1.0f);
-						meshData.vertexMap[i].normal = Vector3D(posBuf[0], posBuf[1], posBuf[2]).Normalize();
+						meshData.vertexMap[i].normal = Vector3(posBuf[0], posBuf[1], posBuf[2]).Normalize();
 					}
 					i++;
 					if (i >= vertPositionNum) {
@@ -328,7 +328,7 @@ void Model::Update() {
 	
 }
 
-void Model::Draw(const Mat4x4& worldMat, const Mat4x4& viewMat, const Mat4x4& projectionMat, const Vector3D& cameraPos) {
+void Model::Draw(const Mat4x4& worldMat, const Mat4x4& viewMat, const Mat4x4& projectionMat, const Vector3& cameraPos) {
 	if (!createGPFlg) {
 		CreateGraphicsPipeline();
 	}

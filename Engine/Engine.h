@@ -19,9 +19,9 @@
 #include <vector>
 #include <chrono>
 
-#include "Math/Vector3D/Vector3D.h"
+#include "Math/Vector3/Vector3.h"
 #include "Math/Mat4x4/Mat4x4.h"
-#include "Math/Vector2D/Vector2D.h"
+#include "Math/Vector2/Vector2.h"
 #include "Math/Vector4/Vector4.h" 
 
 class Engine {

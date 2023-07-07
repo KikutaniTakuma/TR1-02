@@ -5,7 +5,7 @@
 #pragma comment(lib, "dinput8.lib")
 #pragma comment(lib, "dxguid.lib")
 
-#include "Math/Vector2D/Vector2D.h"
+#include "Math/Vector2/Vector2.h"
 
 class Mouse {
 public:
@@ -32,9 +32,9 @@ public:
 	static bool LongPush(Mouse::Button button);
 	static bool Releaed(Mouse::Button button);
 
-	static Vector2D GetVelocity();
+	static Vector2 GetVelocity();
 
-	static Vector2D GetPos();
+	static Vector2 GetPos();
 
 	static void Show(bool flg);
 

@@ -4,8 +4,8 @@
 #include "Engine/ConstBuffer/ConstBuffer.h"
 
 #include "Math/Mat4x4/Mat4x4.h"
-#include "Math/Vector2D/Vector2D.h"
-#include "Math/Vector3D/Vector3D.h"
+#include "Math/Vector2/Vector2.h"
+#include "Math/Vector3/Vector3.h"
 #include "Math/Vector4/Vector4.h"
 
 #include <array>
@@ -26,8 +26,8 @@ public:
 	};
 
 	struct VertexData {
-		Vector3D position;
-		Vector2D uv;
+		Vector3 position;
+		Vector2 uv;
 	};
 
 public:
@@ -50,9 +50,9 @@ public:
 public:
 	void Draw(
 		Blend blend = Blend::None, 
-		const Mat4x4& worldMat = MakeMatrixAffin(Vector3D(1.0f,1.0f,1.0f),Vector3D(), Vector3D()),
+		const Mat4x4& worldMat = MakeMatrixAffin(Vector3(1.0f,1.0f,1.0f),Vector3(), Vector3()),
 		const Mat4x4& viewProjection = 
-		MakeMatrixInverse(MakeMatrixAffin(Vector3D(1.0f, 1.0f, 1.0f), Vector3D(), Vector3D())) *
+		MakeMatrixInverse(MakeMatrixAffin(Vector3(1.0f, 1.0f, 1.0f), Vector3(), Vector3())) *
 		MakeMatrixOrthographic(
 			-static_cast<float>(Engine::GetInstance()->clientWidth) * 0.5f, 
 			static_cast<float>(Engine::GetInstance()->clientHeight) * 0.5f, 
@@ -60,8 +60,8 @@ public:
 			-static_cast<float>(Engine::GetInstance()->clientHeight) * 0.5f, 
 			0.01f, 1000.0f
 		),
-		const Vector2D& uv0 = {0.0f, 1.0f}, const Vector2D& uv1 = {1.0f, 1.0f}, 
-		const Vector2D& uv2 = {1.0f, 0.0f}, const Vector2D& uv3 = {0.0f, 0.0f}
+		const Vector2& uv0 = {0.0f, 1.0f}, const Vector2& uv1 = {1.0f, 1.0f}, 
+		const Vector2& uv2 = {1.0f, 0.0f}, const Vector2& uv3 = {0.0f, 0.0f}
 	);
 
 private:
