@@ -3,8 +3,8 @@
 #include <chrono>
 #include <thread>
 #include <numbers>
-#include "Model/Model.h"
 #include <memory>
+#include "Model/Model.h"
 #include "Engine/WinApp/WinApp.h"
 #include "Engine/Gamepad/Gamepad.h"
 #include "Engine/KeyInput/KeyInput.h"
@@ -12,6 +12,7 @@
 #include "PeraRender/PeraRender.h"
 #include "Texture2D/Texture2D.h"
 #include "AudioManager/AudioManager.h"
+#include "Camera/Camera.h"
 
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	Engine::Initialize(1280, 720, "DirectXGame");
@@ -22,14 +23,14 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	model->LoadShader("WaveShader/WaveNone.VS.hlsl", "WaveShader/Wave.PS.hlsl", "WaveShader/Wave.GS.hlsl");
 
 
-	Mat4x4 worldMat = MakeMatrixAffin(Vector3(1.0f,1.0f,1.0f), Vector3(), Vector3());
+	Mat4x4 worldMat = MakeMatrixAffin(Vector3::identity, Vector3(), Vector3());
 
-	Mat4x4 viewMatrix;
-	Mat4x4 projectionMatrix;
+	Camera camera;
+	camera.fov = 0.45f;
+	camera.pos ={ 8.24f,9.63f,-20.53f };
+	camera.rotate = { 0.44f,-0.4f, 0.0f };
 
-	Vector3 cameraPos{ 8.24f,9.63f,-20.53f };
-	Vector3 cameraRotate{ 0.44f,-0.4f, 0.0f};
-	Vector3 cameraScale{1.0f,1.0f,1.0f};
+	Camera camera2D;
 
 	Vector3 cameraMoveRotate{};
 
@@ -78,39 +79,42 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		}
 
 		if (KeyInput::LongPush(DIK_W)) {
-			cameraPos.z += 0.1f;
+			camera.pos.z += 0.1f;
 		}
 		if (KeyInput::LongPush(DIK_S)) {
-			cameraPos.z -= 0.1f;
+			camera.pos.z -= 0.1f;
 		}
 		if (KeyInput::LongPush(DIK_A)) {
-			cameraPos.x -= 0.1f;
+			camera.pos.x -= 0.1f;
 		}
 		if (KeyInput::LongPush(DIK_D)) {
-			cameraPos.x += 0.1f;
+			camera.pos.x += 0.1f;
 		}
 
 		if (KeyInput::LongPush(DIK_UP)) {
-			cameraRotate.x += 0.01f;
+			camera.rotate.x += 0.01f;
 		}
 		if (KeyInput::LongPush(DIK_DOWN)) {
-			cameraRotate.x -= 0.01f;
+			camera.rotate.x -= 0.01f;
 		}
 		if (KeyInput::LongPush(DIK_LEFT)) {
-			cameraRotate.y -= 0.01f;
+			camera.rotate.y -= 0.01f;
 		}
 		if (KeyInput::LongPush(DIK_RIGHT)) {
-			cameraRotate.y += 0.01f;
+			camera.rotate.y += 0.01f;
 		}
 
 
 
 		ImGui::Begin("Camera");
-		ImGui::DragFloat3("cameraPos", &cameraPos.x, 0.01f);
-		ImGui::DragFloat3("cameraRotate", &cameraRotate.x, 0.01f);
-		ImGui::DragFloat3("cameraScale", &cameraScale.x, 0.01f);
+		ImGui::DragFloat3("cameraPos", &camera.pos.x, 0.01f);
+		ImGui::DragFloat3("cameraRotate", &camera.rotate.x, 0.01f);
+		ImGui::DragFloat3("cameraScale", &camera.scale.x, 0.01f);
 		ImGui::DragFloat3("cameraMoveRotate", &cameraMoveRotate.x, 0.01f);
 		ImGui::End();
+
+		camera.Update();
+		camera2D.Update();
 
 		model->Update();
 
@@ -123,11 +127,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// 
 		pera->PreDraw();
 
-		viewMatrix = MakeMatrixInverse(MakeMatrixAffin(cameraScale, cameraRotate, cameraPos) * MakeMatrixAffin(Vector3(1.0f,1.0f,1.0f), cameraMoveRotate, Vector3()));
-		projectionMatrix = MakeMatrixPerspectiveFov(0.45f, static_cast<float>(Engine::GetInstance()->clientWidth) / static_cast<float>(Engine::GetInstance()->clientHeight), 0.1f, 100.0f);
+		model->Draw(worldMat, camera.getViewProjection(), camera.pos);
 
-
-		model->Draw(worldMat, viewMatrix,  projectionMatrix, cameraPos);
+		tex->Draw(Vector2(2.5f, 1.40625f), 0.0f, Vector2(), camera2D.getViewOthographics());
 
 		pera->Draw();
 		///
