@@ -8,6 +8,8 @@
 
 #include <string>
 
+#include "Math/Vector2/Vector2.h"
+
 class Texture {
 	friend class TextureManager;
 
@@ -68,6 +70,12 @@ private:
 
 	bool loadFlg;
 	bool threadLoadFlg;
+
+	Vector2 size;
+public:
+	inline const Vector2& getSize() const {
+		return size;
+	}
 
 private:
 	std::string fileName;

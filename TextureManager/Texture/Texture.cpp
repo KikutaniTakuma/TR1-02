@@ -2,6 +2,7 @@
 #include "Engine/ConvertString/ConvertString.h"
 #include "Engine/Engine.h"
 #include <cassert>
+#include <iostream>
 
 Texture::Texture():
 	textureResouce(nullptr),
@@ -9,6 +10,7 @@ Texture::Texture():
 	srvDesc(),
 	loadFlg(false),
 	threadLoadFlg(false),
+	size(),
 	fileName()
 {}
 
@@ -36,6 +38,7 @@ void Texture::Load(const std::string& filePath) {
 
 		DirectX::ScratchImage mipImages = LoadTexture(filePath);
 		const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
+		size = { static_cast<float>(metadata.width),static_cast<float>(metadata.height) };
 		textureResouce = CreateTextureResource(metadata);
 		intermediateResource = UploadTextureData(textureResouce.Get(), mipImages);
 
