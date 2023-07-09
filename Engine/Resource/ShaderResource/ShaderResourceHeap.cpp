@@ -44,8 +44,8 @@ D3D12_ROOT_PARAMETER ShaderResourceHeap::GetParameter() {
 	uint32_t shaderRegisterCountSRV = 0u;
 	uint32_t shaderRegisterCountCBV = 0u;
 	uint32_t shaderRegisterCountUAV = 0u;
-	for (auto itr = heapOrder.begin(); itr != heapOrder.end(); itr++) {
-		if (heapOrder.size() == 1) {
+	for (auto itr = heapOrder.begin(); itr != heapOrder.end();) {
+		if (heapOrder.size() == 1 || nextHeapType == heapOrder.end() || *nextHeapType != *itr) {
 			D3D12_DESCRIPTOR_RANGE descriptorRange{};
 
 			descriptorRange.NumDescriptors = descriptorNum;
@@ -56,86 +56,32 @@ D3D12_ROOT_PARAMETER ShaderResourceHeap::GetParameter() {
 			case HeapType::CBV:
 				descriptorRange.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
 				descriptorRange.BaseShaderRegister = shaderRegisterCountCBV;
+				shaderRegisterCountCBV += descriptorNum;
 				break;
 
 			case HeapType::SRV:
 				descriptorRange.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 				descriptorRange.BaseShaderRegister = shaderRegisterCountSRV;
+				shaderRegisterCountSRV += descriptorNum;
 				break;
 
 			case HeapType::UAV:
 				descriptorRange.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
 				descriptorRange.BaseShaderRegister = shaderRegisterCountUAV;
-				break;
-			}
-
-			descriptorRanges.push_back(descriptorRange);
-
-			break;
-		}
-		else if (*nextHeapType != *itr) {
-			D3D12_DESCRIPTOR_RANGE descriptorRange{};
-
-			descriptorRange.NumDescriptors = descriptorNum;
-			descriptorRange.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
-
-			switch (*itr)
-			{
-			case HeapType::CBV:
-				descriptorRange.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
-				descriptorRange.BaseShaderRegister = shaderRegisterCountCBV;
-				shaderRegisterCountCBV += descriptorNum - 1u;
-				break;
-
-			case HeapType::SRV:
-				descriptorRange.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
-				descriptorRange.BaseShaderRegister = shaderRegisterCountSRV;
-				shaderRegisterCountSRV += descriptorNum - 1u;
-				break;
-
-			case HeapType::UAV:
-				descriptorRange.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
-				descriptorRange.BaseShaderRegister = shaderRegisterCountUAV;
-				shaderRegisterCountUAV += descriptorNum - 1u;
+				shaderRegisterCountUAV += descriptorNum;
 				break;
 			}
 
 			descriptorRanges.push_back(descriptorRange);
 			descriptorNum = 0u;
-		}
 
-		nextHeapType = itr;
-		nextHeapType++;
-
-		if (nextHeapType == heapOrder.end()) {
-			D3D12_DESCRIPTOR_RANGE descriptorRange{};
-
-			descriptorRange.NumDescriptors = descriptorNum;
-			descriptorRange.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
-
-			switch (*itr)
-			{
-			case HeapType::CBV:
-				descriptorRange.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
-				descriptorRange.BaseShaderRegister = shaderRegisterCountCBV;
-				break;
-
-			case HeapType::SRV:
-				descriptorRange.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
-				descriptorRange.BaseShaderRegister = shaderRegisterCountSRV;
-				break;
-
-			case HeapType::UAV:
-				descriptorRange.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
-				descriptorRange.BaseShaderRegister = shaderRegisterCountUAV;
+			if (heapOrder.size() == 1 || nextHeapType == heapOrder.end()) {
 				break;
 			}
-
-			descriptorRanges.push_back(descriptorRange);
-
-			break;
 		}
 
+		nextHeapType = ++itr;
+		nextHeapType++;
 		descriptorNum++;
 	}
 
