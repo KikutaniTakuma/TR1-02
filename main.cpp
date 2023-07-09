@@ -42,6 +42,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	auto pera = std::make_unique<PeraRender>();
 	pera->Initialize("PostShader/Post.VS.hlsl", "PostShader/PostNone.PS.hlsl");
 
+	Vector2 texPos;
+
 	/// 
 	/// ƒƒCƒ“ƒ‹[ƒv
 	/// 
@@ -113,6 +115,10 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		ImGui::DragFloat3("cameraMoveRotate", &cameraMoveRotate.x, 0.01f);
 		ImGui::End();
 
+		ImGui::Begin("Texture");
+		ImGui::DragFloat2("tex pos", &texPos.x, 1.0f);
+		ImGui::End();
+
 		camera.Update();
 		camera2D.Update();
 
@@ -129,7 +135,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		model->Draw(worldMat, camera.GetViewProjection(), camera.pos);
 
-		//tex->Draw(Vector2(2.5f, 1.40625f), 0.0f, Vector2(), camera2D.GetViewOthographics());
+		tex->Draw(Vector2::identity, 0.0f, texPos, camera2D.GetViewOthographics());
 
 		pera->Draw();
 		///
