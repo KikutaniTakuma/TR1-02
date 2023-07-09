@@ -35,7 +35,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	Vector3 cameraMoveRotate{};
 
 	auto tex = std::make_unique<Texture2D>();
-	tex->LoadTexture("./Resources/uvChecker.png");
+	tex->LoadTexture("./Resources/watame4k.png");
 	tex->Initialize("Texture2DShader/Texture2D.VS.hlsl", "Texture2DShader/Texture2DNone.PS.hlsl");
 
 
@@ -43,6 +43,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	pera->Initialize("PostShader/Post.VS.hlsl", "PostShader/PostNone.PS.hlsl");
 
 	Vector2 texPos;
+	float texRotate = 0.0f;
 
 	/// 
 	/// ƒƒCƒ“ƒ‹[ƒv
@@ -117,6 +118,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		ImGui::Begin("Texture");
 		ImGui::DragFloat2("tex pos", &texPos.x, 1.0f);
+		ImGui::DragFloat("tex rotate", &texRotate, 0.01f);
 		ImGui::End();
 
 		camera.Update();
@@ -135,7 +137,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		model->Draw(worldMat, camera.GetViewProjection(), camera.pos);
 
-		tex->Draw(Vector2::identity, 0.0f, texPos, camera2D.GetViewOthographics());
+		tex->Draw(Vector2(0.2f,0.2f), texRotate, texPos, camera2D.GetViewOthographics());
 
 		pera->Draw();
 		///
