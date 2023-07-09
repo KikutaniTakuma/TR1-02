@@ -21,7 +21,8 @@ Model::Model() :
 	waveCountSpd(0.01f),
 	wvpData(),
 	dirLig(),
-	color()
+	color(),
+	descHeap(16)
 {
 	// 単位行列を書き込んでおく
 	wvpData->worldMat = MakeMatrixIndentity();
@@ -39,14 +40,9 @@ Model::Model() :
 	*color = Engine::UintToVector4(0xff0000ff);
 	color.OffWright();
 
-	descHeap = Engine::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 16, true);
-
-	auto descHeaphandle = descHeap->GetCPUDescriptorHandleForHeapStart();
-	wvpData.CrerateView(descHeaphandle);
-	descHeaphandle.ptr += Engine::GetIncrementSRVCBVUAVHeap();
-	dirLig.CrerateView(descHeaphandle);
-	descHeaphandle.ptr += Engine::GetIncrementSRVCBVUAVHeap();
-	color.CrerateView(descHeaphandle);
+	descHeap.CreateConstBufferView(wvpData);
+	descHeap.CreateConstBufferView(dirLig);
+	descHeap.CreateConstBufferView(color);
 }
 
 void Model::LoadObj(const std::string& fileName) {
@@ -200,20 +196,8 @@ void Model::CreateGraphicsPipeline() {
 		D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
 		descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
-		D3D12_DESCRIPTOR_RANGE ranges[1];
-		ranges[0].BaseShaderRegister = 0;
-		ranges[0].NumDescriptors = 3;
-		ranges[0].RegisterSpace = 0;
-		ranges[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
-		ranges[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
-
 		// RootParamater作成。複数設定出来るので配列
-		D3D12_ROOT_PARAMETER roootParamaters{};
-		roootParamaters.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-		roootParamaters.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-		roootParamaters.DescriptorTable.pDescriptorRanges = ranges;
-		roootParamaters.DescriptorTable.NumDescriptorRanges = _countof(ranges);
-
+		D3D12_ROOT_PARAMETER roootParamaters = descHeap.GetParameter();
 		descriptionRootSignature.pParameters = &roootParamaters;
 		descriptionRootSignature.NumParameters = 1;
 
@@ -340,8 +324,7 @@ void Model::Draw(const Mat4x4& worldMat, const Mat4x4& viewProjectionMat, const 
 	dirLig->eyePos = cameraPos;
 
 	Engine::GetCommandList()->SetGraphicsRootSignature(rootSignature.Get());
-	Engine::GetCommandList()->SetDescriptorHeaps(1, descHeap.GetAddressOf());
-	Engine::GetCommandList()->SetGraphicsRootDescriptorTable(0, descHeap->GetGPUDescriptorHandleForHeapStart());
+	descHeap.Use();
 
 	Engine::GetCommandList()->SetPipelineState(graphicsPipelineState.Get());
 	
@@ -360,5 +343,4 @@ Model::~Model() {
 	if (meshData.vertexBuffer) {
 		meshData.vertexBuffer->Release();
 	}
-	descHeap->Release();
 }

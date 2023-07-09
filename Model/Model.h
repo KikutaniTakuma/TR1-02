@@ -9,6 +9,7 @@
 #include "Math/Vector4/Vector4.h"
 #include <string>
 #include "Engine/ConstBuffer/ConstBuffer.h"
+#include "Engine/Resource/ShaderResource/ShaderResourceHeap.h"
 
 #include <wrl.h>
 
@@ -71,7 +72,7 @@ private:
 
 
 private:
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descHeap = nullptr;
+	ShaderResourceHeap descHeap;
 
 	Mesh meshData;
 	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = nullptr;

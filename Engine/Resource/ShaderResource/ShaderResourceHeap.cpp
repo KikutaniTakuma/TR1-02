@@ -84,19 +84,19 @@ D3D12_ROOT_PARAMETER ShaderResourceHeap::GetParameter() {
 			case HeapType::CBV:
 				descriptorRange.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
 				descriptorRange.BaseShaderRegister = shaderRegisterCountCBV;
-				shaderRegisterCountCBV += descriptorNum;
+				shaderRegisterCountCBV += descriptorNum - 1u;
 				break;
 
 			case HeapType::SRV:
 				descriptorRange.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 				descriptorRange.BaseShaderRegister = shaderRegisterCountSRV;
-				shaderRegisterCountSRV += descriptorNum;
+				shaderRegisterCountSRV += descriptorNum - 1u;
 				break;
 
 			case HeapType::UAV:
 				descriptorRange.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
 				descriptorRange.BaseShaderRegister = shaderRegisterCountUAV;
-				shaderRegisterCountUAV += descriptorNum;
+				shaderRegisterCountUAV += descriptorNum - 1u;
 				break;
 			}
 
@@ -104,7 +104,6 @@ D3D12_ROOT_PARAMETER ShaderResourceHeap::GetParameter() {
 			descriptorNum = 0u;
 		}
 
-		descriptorNum++;
 		nextHeapType = itr;
 		nextHeapType++;
 
@@ -136,6 +135,8 @@ D3D12_ROOT_PARAMETER ShaderResourceHeap::GetParameter() {
 
 			break;
 		}
+
+		descriptorNum++;
 	}
 
 	D3D12_ROOT_PARAMETER roootParamater{};

@@ -127,9 +127,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// 
 		pera->PreDraw();
 
-		//model->Draw(worldMat, camera.GetViewProjection(), camera.pos);
+		model->Draw(worldMat, camera.GetViewProjection(), camera.pos);
 
-		tex->Draw(Vector2(2.5f, 1.40625f), 0.0f, Vector2(), camera2D.GetViewOthographics());
+		//tex->Draw(Vector2(2.5f, 1.40625f), 0.0f, Vector2(), camera2D.GetViewOthographics());
 
 		pera->Draw();
 		///
