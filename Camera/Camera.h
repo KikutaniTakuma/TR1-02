@@ -6,7 +6,14 @@
 
 class Camera {
 public:
+	enum class Mode : uint8_t {
+		Projecction,
+		Othographic
+	};
+
+public:
 	Camera() noexcept;
+	Camera(Camera::Mode mode) noexcept;
 	Camera(const Camera& right) noexcept;
 	Camera(Camera&& right) noexcept;
 	~Camera() noexcept = default;
@@ -19,15 +26,18 @@ public:
 	void Update();
 
 	// ìßéãìäâe
-	inline const Mat4x4& getViewProjection() noexcept {
+	inline const Mat4x4& GetViewProjection() noexcept {
 		return viewProjecction;
 	}
 	// ïΩçtìäâe
-	inline const Mat4x4& getViewOthographics() noexcept {
+	inline const Mat4x4& GetViewOthographics() noexcept {
 		return viewOthograohics;
 	}
 
 	//void SetViewPort();
+
+public:
+	Mode mode;
 
 public:
 	Vector3 pos;

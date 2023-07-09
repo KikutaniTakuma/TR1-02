@@ -143,6 +143,27 @@ private:
 	Microsoft::WRL::ComPtr<IDXGIFactory7> dxgiFactory;
 	Microsoft::WRL::ComPtr<IDXGIAdapter4> useAdapter;
 
+	static UINT incrementSRVCBVUAVHeap;
+	static UINT incrementRTVHeap;
+	static UINT incrementDSVHeap;
+	static UINT incrementSAMPLER;
+public:
+	static UINT GetIncrementSRVCBVUAVHeap() {
+		return incrementSRVCBVUAVHeap;
+	}
+
+	static UINT GetIncrementRTVHeap() {
+		return incrementRTVHeap;
+	}
+
+	static UINT GetIncrementDSVHeap() {
+		return incrementDSVHeap;
+	}
+
+	static UINT GetIncrementSAMPLER() {
+		return incrementSAMPLER;
+	}
+
 
 
 
@@ -158,7 +179,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList;
 
 	Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain;
-	std::vector< Microsoft::WRL::ComPtr<ID3D12Resource>> swapChianResource;
+	std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> swapChianResource;
 
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap;
 	std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> rtvHandles;
@@ -167,7 +188,10 @@ private:
 
 	Microsoft::WRL::ComPtr<ID3D12Fence> fence;
 	uint64_t fenceVal = 0;
-	HANDLE fenceEvent;
+	HANDLE fenceEvent = nullptr;
+
+
+
 
 
 /// <summary>
@@ -178,6 +202,9 @@ private:
 
 private:
 	Microsoft::WRL::ComPtr<IDirectInput8> directInput;
+
+
+
 
 
 	/// 

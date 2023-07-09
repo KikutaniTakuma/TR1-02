@@ -43,9 +43,9 @@ Model::Model() :
 
 	auto descHeaphandle = descHeap->GetCPUDescriptorHandleForHeapStart();
 	wvpData.CrerateView(descHeaphandle);
-	descHeaphandle.ptr += Engine::GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	descHeaphandle.ptr += Engine::GetIncrementSRVCBVUAVHeap();
 	dirLig.CrerateView(descHeaphandle);
-	descHeaphandle.ptr += Engine::GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	descHeaphandle.ptr += Engine::GetIncrementSRVCBVUAVHeap();
 	color.CrerateView(descHeaphandle);
 }
 

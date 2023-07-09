@@ -116,6 +116,10 @@ void Engine::Finalize() {
 /// Direct3D‰Šú‰»
 /// 
 
+UINT Engine::incrementSRVCBVUAVHeap = 0u;
+UINT Engine::incrementRTVHeap = 0u;
+UINT Engine::incrementDSVHeap = 0u;
+UINT Engine::incrementSAMPLER = 0u;
 void Engine::InitializeDirect3D() {
 	// IDXGIFactory¶¬
 	auto hr = CreateDXGIFactory(IID_PPV_ARGS(dxgiFactory.GetAddressOf()));
@@ -200,6 +204,11 @@ void Engine::InitializeDirect3D() {
 		infoQueue->Release();
 	}
 #endif
+
+	incrementSRVCBVUAVHeap = engine->device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	incrementRTVHeap = engine->device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	incrementDSVHeap = engine->device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+	incrementSAMPLER = engine->device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER);
 }
 
 
@@ -287,7 +296,7 @@ void Engine::InitializeDirect12() {
 	for (UINT i = 0; i < backBufferNum.BufferCount; ++i) {
 		hr = swapChain->GetBuffer(i, IID_PPV_ARGS(swapChianResource[i].GetAddressOf()));
 		assert(SUCCEEDED(hr));
-		rtvHandles[i].ptr = rtvStartHandle.ptr + (i * device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV));
+		rtvHandles[i].ptr = rtvStartHandle.ptr + (i * incrementRTVHeap);
 		device->CreateRenderTargetView(swapChianResource[i].Get(), &rtvDesc, rtvHandles[i]);
 	}
 

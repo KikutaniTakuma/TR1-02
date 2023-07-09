@@ -80,6 +80,12 @@
     <ClCompile Include="Math\Vector3\Vector3.cpp">
       <Filter>Math</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Resource\RenderTarget\RenderTarget.cpp">
+      <Filter>Engine\Resource\RenderTarget</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Resource\ShaderResource\ShaderResourceHeap.cpp">
+      <Filter>Engine\Resource\ShaderResource</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -135,6 +141,15 @@
     </Filter>
     <Filter Include="Camera">
       <UniqueIdentifier>{83ad4e33-18a7-4b34-afb3-3b41fc1e2017}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Resource">
+      <UniqueIdentifier>{f998d943-f444-4e6f-9d72-081e699db552}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Resource\RenderTarget">
+      <UniqueIdentifier>{ece16fea-31ac-410e-9402-f17c929ef028}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Resource\ShaderResource">
+      <UniqueIdentifier>{5325ce8c-6115-444a-84db-472a18839f17}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -221,6 +236,12 @@
     </ClInclude>
     <ClInclude Include="Math\Vector3\Vector3.h">
       <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Resource\RenderTarget\RenderTarget.h">
+      <Filter>Engine\Resource\RenderTarget</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Resource\ShaderResource\ShaderResourceHeap.h">
+      <Filter>Engine\Resource\ShaderResource</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

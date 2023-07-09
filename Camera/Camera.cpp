@@ -2,6 +2,20 @@
 #include "Engine/Engine.h"
 
 Camera::Camera() noexcept :
+	mode(Mode::Projecction),
+	pos(),
+	scale(Vector3::identity),
+	rotate(),
+	kNearClip(0.01f),
+	farClip(1000.0f),
+	fov(0.45f),
+	view(),
+	projection(),
+	othograohics()
+{}
+
+Camera::Camera(Camera::Mode mode) noexcept :
+	mode(mode),
 	pos(),
 	scale(Vector3::identity),
 	rotate(),
@@ -14,13 +28,13 @@ Camera::Camera() noexcept :
 {}
 
 Camera::Camera(const Camera& right) noexcept :
-	kNearClip(0.01f)
+	kNearClip(right.kNearClip)
 {
 	*this = right;
 }
 
 Camera::Camera(Camera&& right) noexcept :
-	kNearClip(0.01f)
+	kNearClip(std::move(right.kNearClip))
 {
 	*this = std::move(right);
 }
@@ -59,18 +73,25 @@ void Camera::Update() {
 	view.Inverse();
 
 	auto engine = Engine::GetInstance();
-
 	float aspect = static_cast<float>(engine->clientWidth) / static_cast<float>(engine->clientHeight);
-	fov = std::clamp(fov, 0.0f, 1.0f);
-	projection.PerspectiveFov(fov, aspect, kNearClip, farClip);
 
-	othograohics.Orthographic(
-		-static_cast<float>(engine->clientWidth) * 0.5f,
-		static_cast<float>(engine->clientHeight) * 0.5f,
-		static_cast<float>(engine->clientWidth) * 0.5f,
-		-static_cast<float>(engine->clientHeight) * 0.5f,
-		kNearClip, farClip);
+	switch (mode)
+	{
+	case Camera::Mode::Projecction:
+	default:
+		fov = std::clamp(fov, 0.0f, 1.0f);
+		projection.PerspectiveFov(fov, aspect, kNearClip, farClip);
+		viewProjecction = view * projection;
+		break;
 
-	viewProjecction = view * projection;
-	viewOthograohics = view * othograohics;
+	case Camera::Mode::Othographic:
+		othograohics.Orthographic(
+			-static_cast<float>(engine->clientWidth) * 0.5f,
+			static_cast<float>(engine->clientHeight) * 0.5f,
+			static_cast<float>(engine->clientWidth) * 0.5f,
+			-static_cast<float>(engine->clientHeight) * 0.5f,
+			kNearClip, farClip);
+		viewOthograohics = view * othograohics;
+		break;
+	}
 }

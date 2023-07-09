@@ -30,13 +30,13 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	camera.pos ={ 8.24f,9.63f,-20.53f };
 	camera.rotate = { 0.44f,-0.4f, 0.0f };
 
-	Camera camera2D;
+	Camera camera2D(Camera::Mode::Othographic);
 
 	Vector3 cameraMoveRotate{};
 
 	auto tex = std::make_unique<Texture2D>();
-	tex->Initialize("Texture2DShader/Texture2D.VS.hlsl", "Texture2DShader/Texture2DNone.PS.hlsl");
 	tex->LoadTexture("./Resources/uvChecker.png");
+	tex->Initialize("Texture2DShader/Texture2D.VS.hlsl", "Texture2DShader/Texture2DNone.PS.hlsl");
 
 
 	auto pera = std::make_unique<PeraRender>();
@@ -127,9 +127,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// 
 		pera->PreDraw();
 
-		model->Draw(worldMat, camera.getViewProjection(), camera.pos);
+		//model->Draw(worldMat, camera.GetViewProjection(), camera.pos);
 
-		tex->Draw(Vector2(2.5f, 1.40625f), 0.0f, Vector2(), camera2D.getViewOthographics());
+		tex->Draw(Vector2(2.5f, 1.40625f), 0.0f, Vector2(), camera2D.GetViewOthographics());
 
 		pera->Draw();
 		///

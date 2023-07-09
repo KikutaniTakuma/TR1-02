@@ -2,6 +2,7 @@
 #include "TextureManager/TextureManager.h"
 #include "Engine/Engine.h"
 #include "Engine/ConstBuffer/ConstBuffer.h"
+#include "Engine/Resource/ShaderResource/ShaderResourceHeap.h"
 
 #include "Math/Mat4x4/Mat4x4.h"
 #include "Math/Vector2/Vector2.h"
@@ -38,8 +39,6 @@ public:
 	void Initialize(const std::string& vsFileName, const std::string& psFileName);
 
 private:
-	void CreateDescriptor();
-
 	void CreateShader(const std::string& vsFileName, const std::string& psFileName);
 
 	void CreateGraphicsPipeline();
@@ -59,7 +58,7 @@ public:
 	);
 
 private:
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> SRVHeap;
+	ShaderResourceHeap SRVHeap;
 
 	D3D12_VERTEX_BUFFER_VIEW vertexView;
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource;

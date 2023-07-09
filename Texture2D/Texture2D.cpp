@@ -2,7 +2,7 @@
 #include "Engine/ShaderManager/ShaderManager.h"
 
 Texture2D::Texture2D():
-	SRVHeap(nullptr),
+	SRVHeap(),
 	vertexView(),
 	vertexResource(nullptr),
 	indexView(),
@@ -18,12 +18,9 @@ Texture2D::Texture2D():
 Texture2D::~Texture2D() {
 	if(indexResource)indexResource->Release();
 	if(vertexResource)vertexResource->Release();
-	if(SRVHeap)SRVHeap->Release();
 }
 
 void Texture2D::Initialize(const std::string& vsFileName, const std::string& psFileName) {
-	CreateDescriptor();
-
 	CreateShader(vsFileName, psFileName);
 
 	vertexResource = Engine::CreateBufferResuorce(sizeof(VertexData) * 4);
@@ -47,16 +44,9 @@ void Texture2D::Initialize(const std::string& vsFileName, const std::string& psF
 	}
 	indexResource->Unmap(0, nullptr);
 
-
-	auto srvHandle = SRVHeap->GetCPUDescriptorHandleForHeapStart();
-	srvHandle.ptr += Engine::GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-	wvpMat.CrerateView(srvHandle);
+	SRVHeap.CreateConstBufferView(wvpMat);
 
 	CreateGraphicsPipeline();
-}
-
-void Texture2D::CreateDescriptor() {
-	SRVHeap = Engine::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 4, true);
 }
 
 void Texture2D::CreateShader(const std::string& vsFileName, const std::string& psFileName) {
@@ -78,23 +68,9 @@ void Texture2D::CreateGraphicsPipeline() {
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
 	descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
-	D3D12_DESCRIPTOR_RANGE descriptorRange[2] = {};
-	descriptorRange[0].BaseShaderRegister = 0;
-	descriptorRange[0].NumDescriptors = 1;
-	descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
-	descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
-	descriptorRange[1].BaseShaderRegister = 0;
-	descriptorRange[1].NumDescriptors = 1;
-	descriptorRange[1].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
-	descriptorRange[1].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
-
-	D3D12_ROOT_PARAMETER roootParamater[1] = {};
-	roootParamater[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-	roootParamater[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-	roootParamater[0].DescriptorTable.pDescriptorRanges = descriptorRange;
-	roootParamater[0].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);
-	descriptionRootSignature.pParameters = roootParamater;
-	descriptionRootSignature.NumParameters = _countof(roootParamater);
+	D3D12_ROOT_PARAMETER roootParamater = SRVHeap.GetParameter();
+	descriptionRootSignature.pParameters = &roootParamater;
+	descriptionRootSignature.NumParameters = 1;
 
 
 	// sampler
@@ -235,10 +211,7 @@ void Texture2D::LoadTexture(const std::string& fileName) {
 	if (!tex) {
 		tex = TextureManager::GetInstance()->LoadTexture(fileName);
 
-		auto heapHandle = SRVHeap->GetCPUDescriptorHandleForHeapStart();
-		//heapHandle.ptr += Engine::GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-
-		tex->CreateSRVView(heapHandle);
+		SRVHeap.CreateTxtureView(tex);
 	}
 }
 
@@ -277,8 +250,6 @@ void Texture2D::Draw(
 	Engine::GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	Engine::GetCommandList()->IASetVertexBuffers(0, 1, &vertexView);
 	Engine::GetCommandList()->IASetIndexBuffer(&indexView);
-	Engine::GetCommandList()->SetDescriptorHeaps(1, SRVHeap.GetAddressOf());
-	auto SrvHandle = SRVHeap->GetGPUDescriptorHandleForHeapStart();
-	Engine::GetCommandList()->SetGraphicsRootDescriptorTable(0, SrvHandle);
+	SRVHeap.Use();
 	Engine::GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
 }

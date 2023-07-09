@@ -9,6 +9,7 @@
 #include "Math/Vector4/Vector4.h"
 #include <string>
 #include "Engine/ConstBuffer/ConstBuffer.h"
+#include "Engine/Resource/RenderTarget/RenderTarget.h"
 
 class PeraRender {
 public:
@@ -19,7 +20,6 @@ public:
 
 	struct Wipe {
 		Vector2 center;
-		//float pad[2];
 		float wipeSize;
 	};
 
@@ -33,8 +33,6 @@ public:
 	void Initialize(const std::string& vsFileName, const std::string& psFileName);
 
 private:
-	void CreateDescriptor();
-
 	void CreateShader(const std::string& vsFileName, const std::string& psFileName);
 
 	void CreateGraphicsPipeline();
@@ -45,9 +43,7 @@ public:
 	void Draw();
 
 private:
-	Microsoft::WRL::ComPtr<ID3D12Resource> peraResource = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> peraRTVHeap = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> peraSRVHeap = nullptr;
+	RenderTarget render;
 
 	D3D12_VERTEX_BUFFER_VIEW peraVertexView;
 	Microsoft::WRL::ComPtr<ID3D12Resource> peraVertexResource = nullptr;
