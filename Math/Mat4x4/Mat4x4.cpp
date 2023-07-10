@@ -6,32 +6,32 @@
 
 
 Mat4x4::Mat4x4()
-	:m({ 0.0f })
+	:m()
 {}
 
 Mat4x4::Mat4x4(const Mat4x4& mat) {
 	*this = mat;
 }
 
-Mat4x4::Mat4x4(Mat4x4&& mat) {
+Mat4x4::Mat4x4(Mat4x4&& mat) noexcept {
 	*this = std::move(mat);
 }
 
 Mat4x4 Mat4x4::operator*(const Mat4x4& mat) const{
 	Mat4x4 tmp;
+	Vector4 width;
 
 	for (int y = 0; y < Mat4x4::HEIGHT; y++) {
 		for (int x = 0; x < Mat4x4::WIDTH; x++) {
-			for (int i = 0; i < Mat4x4::WIDTH; i++) {
-				tmp.m[y][x] += this->m[y][i] * mat.m[i][x];
-			}
+			width = { mat[0][x],mat[1][x], mat[2][x], mat[3][x] };
+			tmp.m[y][x] = m[y].Dot(width);
 		}
 	}
 
 	return tmp;
 }
 
-Mat4x4::Mat4x4(const std::array<std::array<float, 4>, 4>& num) {
+Mat4x4::Mat4x4(const std::array<Vector4, 4>& num) {
 	m = num;
 }
 
@@ -41,7 +41,7 @@ Mat4x4& Mat4x4::operator=(const Mat4x4& mat) {
 	return *this;
 }
 
-Mat4x4& Mat4x4::operator=(Mat4x4&& mat) {
+Mat4x4& Mat4x4::operator=(Mat4x4&& mat) noexcept {
 	m = std::move(mat.m);
 
 	return *this;
@@ -94,7 +94,11 @@ Mat4x4& Mat4x4::operator-=(const Mat4x4& mat) {
 	return *this;
 }
 
-std::array<float, 4>& Mat4x4::operator[](size_t index) {
+Vector4& Mat4x4::operator[](size_t index) {
+	return m[index];
+}
+
+const Vector4& Mat4x4::operator[](size_t index) const {
 	return m[index];
 }
 
@@ -107,7 +111,7 @@ bool Mat4x4::operator!=(const Mat4x4& mat) const {
 }
 
 void Mat4x4::Indentity() {
-	m = { 0.0f };
+	m = {};
 
 	for (int i = 0; i < WIDTH; i++) {
 		m[i][i] = 1.0f;
@@ -115,7 +119,7 @@ void Mat4x4::Indentity() {
 }
 
 void Mat4x4::Translate(const Vector3& vec) {
-	this->m = { 0.0f };
+	this->m = {};
 
 	this->m[0][0] = 1.0f;
 	this->m[1][1] = 1.0f;
@@ -128,7 +132,7 @@ void Mat4x4::Translate(const Vector3& vec) {
 }
 
 void Mat4x4::Scalar(const Vector3& vec) {
-	this->m = { 0.0f };
+	this->m = {};
 
 	this->m[0][0] = vec.x;
 	this->m[1][1] = vec.y;
@@ -137,7 +141,7 @@ void Mat4x4::Scalar(const Vector3& vec) {
 }
 
 void Mat4x4::RotateX(float rad) {
-	this->m = { 0.0f };
+	this->m = {};
 	this->m[0][0] = 1.0f;
 	this->m[3][3] = 1.0f;
 
@@ -148,7 +152,7 @@ void Mat4x4::RotateX(float rad) {
 }
 
 void Mat4x4::RotateY(float rad) {
-	this->m = { 0.0f };
+	this->m = {};
 	this->m[1][1] = 1.0f;
 	this->m[3][3] = 1.0f;
 
@@ -159,7 +163,7 @@ void Mat4x4::RotateY(float rad) {
 }
 
 void Mat4x4::RotateZ(float rad) {
-	this->m = { 0.0f };
+	this->m = {};
 	this->m[2][2] = 1.0f;
 	this->m[3][3] = 1.0f;
 	
@@ -173,12 +177,14 @@ void Mat4x4::RotateZ(float rad) {
 void Mat4x4::Affin(const Vector3& scale, const Vector3& rad, const Vector3& translate) {
 	Mat4x4 rotate = MakeMatrixRotateX(rad.x) * MakeMatrixRotateY(rad.y) * MakeMatrixRotateZ(rad.z);
 
-	*this = Mat4x4({
-		scale.x * rotate.m[0][0], scale.x * rotate.m[0][1],scale.x * rotate.m[0][2], 0.0f,
-		scale.y * rotate.m[1][0], scale.y * rotate.m[1][1],scale.y * rotate.m[1][2], 0.0f,
-		scale.z * rotate.m[2][0], scale.z * rotate.m[2][1],scale.z * rotate.m[2][2], 0.0f,
-		translate.x, translate.y, translate.z, 1.0f
-		});
+	*this = Mat4x4{ 
+		std::array<Vector4, 4>{
+		Vector4{scale.x* rotate.m[0][0], scale.x* rotate.m[0][1],scale.x* rotate.m[0][2], 0.0f},
+		Vector4{scale.y * rotate.m[1][0], scale.y * rotate.m[1][1],scale.y * rotate.m[1][2], 0.0f },
+		Vector4{scale.z * rotate.m[2][0], scale.z * rotate.m[2][1],scale.z * rotate.m[2][2], 0.0f},
+		Vector4{translate.x, translate.y, translate.z, 1.0f}
+			}
+		};
 }
 
 
@@ -187,7 +193,7 @@ void Mat4x4::Inverse() {
 
 	Mat4x4 identity = MakeMatrixIndentity();
 
-	float toOne = *(tmp.m.begin()->begin());
+	float toOne = *(tmp.m.begin()->m.begin());
 
 	float tmpNum = 0.0f;
 
@@ -207,8 +213,8 @@ void Mat4x4::Inverse() {
 				return;
 			}
 
-			tmp.m[i].swap(tmp.m[pibIndex]);
-			identity.m[i].swap(identity.m[pibIndex]);
+			tmp.m[i].m.swap(tmp.m[pibIndex].m);
+			identity.m[i].m.swap(identity.m[pibIndex].m);
 		}
 
 		toOne = tmp.m[i][i];
@@ -248,7 +254,7 @@ void Mat4x4::Transepose() {
 }
 
 void Mat4x4::PerspectiveFov(float fovY, float aspectRatio, float nearClip, float farClip) {
-	m = { 0.0f };
+	m = {};
 
 	m[0][0] = (1.0f / aspectRatio) * (1.0f / std::tan(fovY / 2.0f));
 	m[1][1] = 1.0f / std::tan(fovY / 2.0f);
@@ -258,7 +264,7 @@ void Mat4x4::PerspectiveFov(float fovY, float aspectRatio, float nearClip, float
 }
 
 void Mat4x4::Orthographic(float left, float top, float right, float bottom, float nearClip, float farClip) {
-	m = { 0.0f };
+	m = {};
 
 	m[0][0] = 2.0f / (right - left);
 	m[1][1] = 2.0f / (top - bottom);
@@ -271,7 +277,7 @@ void Mat4x4::Orthographic(float left, float top, float right, float bottom, floa
 }
 
 void Mat4x4::ViewPort(float left, float top, float width, float height, float minDepth, float maxDepth) {
-	m = { 0.0f };
+	m = {};
 
 	m[0][0] = width / 2.0f;
 	m[1][1] = height/ -2.0f;

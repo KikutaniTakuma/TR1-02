@@ -75,11 +75,11 @@ private:
 	ShaderResourceHeap descHeap;
 
 	Mesh meshData;
-	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = nullptr;
-	Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob = nullptr;
-	Microsoft::WRL::ComPtr<IDxcBlob> geometoryShaderBlob = nullptr;
-	Microsoft::WRL::ComPtr<IDxcBlob> hullShaderBlob = nullptr;
-	Microsoft::WRL::ComPtr<IDxcBlob> domainShaderBlob = nullptr;
+	IDxcBlob* vertexShaderBlob = nullptr;
+	IDxcBlob* pixelShaderBlob = nullptr;
+	IDxcBlob* geometoryShaderBlob = nullptr;
+	IDxcBlob* hullShaderBlob = nullptr;
+	IDxcBlob* domainShaderBlob = nullptr;
 
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState = nullptr;

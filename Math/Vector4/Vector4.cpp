@@ -3,6 +3,7 @@
 #include "Math/Vector3/Vector3.h"
 #include "Math/Vector2/Vector2.h"
 #include <cmath>
+#include <immintrin.h>
 
 Vector4::Vector4() noexcept :
 	m{0.0f}
@@ -152,6 +153,14 @@ bool Vector4::operator!=(const Vector4& right) const noexcept {
 	return m != right.m;
 }
 
+float& Vector4::operator[](size_t index) noexcept {
+	return m[index];
+}
+
+const float& Vector4::operator[](size_t index) const noexcept {
+	return m[index];
+}
+
 float Vector4::Length() const noexcept {
 	return std::sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z + vec.w * vec.w);
 }
@@ -164,6 +173,13 @@ Vector4 Vector4::Normalize() const noexcept {
 	float nor = 1.0f / this->Length();
 
 	return Vector4(*this) * nor;
+}
+
+float Vector4::Dot(const Vector4& right)  const noexcept {
+	__m128 left = *(__m128*)m.data();
+	__m128 rightTmp = *(__m128*)right.m.data();
+
+	return _mm_cvtss_f32(_mm_dp_ps(left, rightTmp, 0xff));
 }
 
 Vector3 Vector4::getVector3D() const noexcept {
