@@ -49,10 +49,15 @@ public:
 	bool operator==(const Vector4& right) const noexcept;
 	bool operator!=(const Vector4& right) const noexcept;
 
+	float& operator[](size_t index) noexcept;
+	const float& operator[](size_t index) const noexcept;
+
 public:
 	float Length() const noexcept;
 
 	Vector4 Normalize() const noexcept;
+
+	float Dot(const Vector4& right) const noexcept;
 
 	class Vector3 getVector3D() const noexcept;
 	class Vector2 getVector2D() const noexcept;

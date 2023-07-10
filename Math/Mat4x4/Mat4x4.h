@@ -2,6 +2,7 @@
 
 #include <array>
 #include <string>
+#include "Math/Vector4/Vector4.h"
 
 static const int kRowHeight = 20;
 static const int kColumnWidth = 60;
@@ -13,9 +14,9 @@ public:
 	Mat4x4();
 
 	Mat4x4(const Mat4x4& mat);
-	Mat4x4(Mat4x4&& mat);
+	Mat4x4(Mat4x4&& mat) noexcept;
 
-	Mat4x4(const std::array<std::array<float, 4>, 4>& num);
+	Mat4x4(const std::array<Vector4, 4>& num);
 
 	~Mat4x4() = default;
 
@@ -24,11 +25,11 @@ private:
 	static const int WIDTH = 4;
 
 private:
-	std::array<std::array<float, 4>, 4> m;
+	std::array<Vector4, 4> m;
 
 public:
 	Mat4x4& operator=(const Mat4x4& mat);
-	Mat4x4& operator=(Mat4x4&& mat);
+	Mat4x4& operator=(Mat4x4&& mat) noexcept;
 	Mat4x4 operator*(const Mat4x4& mat) const;
 	Mat4x4& operator*=(const Mat4x4& mat);
 
@@ -37,12 +38,13 @@ public:
 	Mat4x4 operator-(const Mat4x4& mat) const;
 	Mat4x4& operator-=(const Mat4x4& mat);
 
-	std::array<float, 4>& operator[](size_t index);
+	Vector4& operator[](size_t index);
+	const Vector4& operator[](size_t index) const;
 
 	bool operator==(const Mat4x4& mat) const;
 	bool operator!=(const Mat4x4& mat) const;
 
-	inline std::array<std::array<float, 4>, 4> get() const {
+	inline std::array<Vector4, 4> get() const {
 		return m;
 	}
 
