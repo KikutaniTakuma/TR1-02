@@ -14,39 +14,39 @@ Gamepad* Gamepad::GetInstans() {
 }
 
 void Gamepad::Input() {
-	preButton = state.Gamepad.wButtons;
-    XInputGetState(0, &state);
+	Gamepad::GetInstans()->preButton = Gamepad::GetInstans()->state.Gamepad.wButtons;
+    XInputGetState(0, &Gamepad::GetInstans()->state);
 }
 
-bool Gamepad::getButton(Button type) {
-    return (state.Gamepad.wButtons >> static_cast<short>(type)) % 2 == 1;
+bool Gamepad::GetButton(Button type) {
+    return (Gamepad::GetInstans()->state.Gamepad.wButtons >> static_cast<short>(type)) % 2 == 1;
 }
 
-bool Gamepad::getPreButton(Button type) {
-	return (preButton >> static_cast<short>(type)) % 2 == 1;
+bool Gamepad::GetPreButton(Button type) {
+	return (Gamepad::GetInstans()->preButton >> static_cast<short>(type)) % 2 == 1;
 }
 
 bool Gamepad::Pushed(Button type) {
-	return getButton(type) && !getPreButton(type);
+	return GetButton(type) && !GetPreButton(type);
 }
 
 bool Gamepad::LongPush(Button type) {
-	return getButton(type) && getPreButton(type);
+	return GetButton(type) && GetPreButton(type);
 }
 
 bool Gamepad::Released(Button type) {
-	return !getButton(type) && getPreButton(type);
+	return !GetButton(type) && GetPreButton(type);
 }
 
-unsigned char Gamepad::getTriger(Triger type) {
+unsigned char Gamepad::GetTriger(Triger type) {
 	switch (type)
 	{
 	case Gamepad::Triger::LEFT:
-		return state.Gamepad.bLeftTrigger;
+		return Gamepad::GetInstans()->state.Gamepad.bLeftTrigger;
 		break;
 
 	case Gamepad::Triger::RIGHT:
-		return state.Gamepad.bRightTrigger;
+		return Gamepad::GetInstans()->state.Gamepad.bRightTrigger;
 		break;
 
 	default:
@@ -55,20 +55,20 @@ unsigned char Gamepad::getTriger(Triger type) {
 	}
 }
 
-short Gamepad::getStick(Stick type) {
+short Gamepad::GetStick(Stick type) {
 	switch (type)
 	{
 	case Gamepad::Stick::LEFT_X:
-		return state.Gamepad.sThumbLX;
+		return Gamepad::GetInstans()->state.Gamepad.sThumbLX;
 		break;
 	case Gamepad::Stick::LEFT_Y:
-		return state.Gamepad.sThumbLY;
+		return Gamepad::GetInstans()->state.Gamepad.sThumbLY;
 		break;
 	case Gamepad::Stick::RIGHT_X:
-		return state.Gamepad.sThumbRX;
+		return Gamepad::GetInstans()->state.Gamepad.sThumbRX;
 		break;
 	case Gamepad::Stick::RIGHT_Y:
-		return state.Gamepad.sThumbRY;
+		return Gamepad::GetInstans()->state.Gamepad.sThumbRY;
 		break;
 	default:
 		return 0;
@@ -76,38 +76,31 @@ short Gamepad::getStick(Stick type) {
 	}
 }
 
-void Gamepad::isVibration(const int& flag) {
-	if(flag >= 1){
-		vibration.wLeftMotorSpeed = 65535;
-		vibration.wRightMotorSpeed = 65535;
-		XInputSetState(0, &vibration);
-	}
-	else {
-		vibration.wLeftMotorSpeed = 0;
-		vibration.wRightMotorSpeed = 0;
-		XInputSetState(0, &vibration);
-	}
+void Gamepad::Vibration(uint16_t leftVibIntensity, uint16_t rightVibIntensity) {
+	Gamepad::GetInstans()->vibration.wLeftMotorSpeed = WORD(leftVibIntensity);
+	Gamepad::GetInstans()->vibration.wRightMotorSpeed = WORD(rightVibIntensity);
+	XInputSetState(0, &Gamepad::GetInstans()->vibration);
 }
 
 void Gamepad::Draw() {
-    printf("LeftX = %.2f%%\n", static_cast<float>(getStick(Stick::LEFT_X)) / SHRT_MAX * 100.0f);
-	printf( "LeftY = %.2f%%\n", static_cast<float>(getStick(Stick::LEFT_Y)) / SHRT_MAX * 100.0f);
-	printf( "RightX = %.2f%%\n", static_cast<float>(getStick(Stick::RIGHT_X)) / SHRT_MAX * 100.0f);
-	printf( "RightY = %.2f%%\n", static_cast<float>(getStick(Stick::RIGHT_Y)) / SHRT_MAX * 100.0f);
-	printf( "UP = %d\n", getButton(Button::UP));
-	printf("DOWN = %d\n", getButton(Button::DOWN));
-	printf("LEFT = %d\n", getButton(Button::LEFT));
-	printf("RIGHT = %d\n", getButton(Button::RIGHT));
-	printf("START = %d\n", getButton(Button::START));
-	printf("BACK = %d\n", getButton(Button::BACK));
-	printf("LEFT_THUMB = %d\n", getButton(Button::LEFT_THUMB));
-	printf("RIGHT_THUMB = %d\n", getButton(Button::RIGHT_THUMB));
-	printf("LEFT_SHOULDER = %d\n", getButton(Button::LEFT_SHOULDER));
-	printf("RIGHT_SHOULDER = %d\n", getButton(Button::RIGHT_SHOULDER));
-	printf("A = %d\n", getButton(Button::A));
-	printf("B = %d\n", getButton(Button::B));
-	printf("X = %d\n", getButton(Button::X));
-	printf("Y = %d\n", getButton(Button::Y));
-	printf("LEFT_TRIGER = %d\n", getTriger(Triger::LEFT));
-	printf("RIGHT_TRIGER = %d\n", getTriger(Triger::RIGHT));
+    printf("LeftX = %.2f%%\n", static_cast<float>(GetStick(Stick::LEFT_X)) / SHRT_MAX * 100.0f);
+	printf( "LeftY = %.2f%%\n", static_cast<float>(GetStick(Stick::LEFT_Y)) / SHRT_MAX * 100.0f);
+	printf( "RightX = %.2f%%\n", static_cast<float>(GetStick(Stick::RIGHT_X)) / SHRT_MAX * 100.0f);
+	printf( "RightY = %.2f%%\n", static_cast<float>(GetStick(Stick::RIGHT_Y)) / SHRT_MAX * 100.0f);
+	printf( "UP = %d\n", GetButton(Button::UP));
+	printf("DOWN = %d\n", GetButton(Button::DOWN));
+	printf("LEFT = %d\n", GetButton(Button::LEFT));
+	printf("RIGHT = %d\n", GetButton(Button::RIGHT));
+	printf("START = %d\n", GetButton(Button::START));
+	printf("BACK = %d\n", GetButton(Button::BACK));
+	printf("LEFT_THUMB = %d\n", GetButton(Button::LEFT_THUMB));
+	printf("RIGHT_THUMB = %d\n", GetButton(Button::RIGHT_THUMB));
+	printf("LEFT_SHOULDER = %d\n", GetButton(Button::LEFT_SHOULDER));
+	printf("RIGHT_SHOULDER = %d\n", GetButton(Button::RIGHT_SHOULDER));
+	printf("A = %d\n", GetButton(Button::A));
+	printf("B = %d\n", GetButton(Button::B));
+	printf("X = %d\n", GetButton(Button::X));
+	printf("Y = %d\n", GetButton(Button::Y));
+	printf("LEFT_TRIGER = %d\n", GetTriger(Triger::LEFT));
+	printf("RIGHT_TRIGER = %d\n", GetTriger(Triger::RIGHT));
 }

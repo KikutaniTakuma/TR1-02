@@ -3,6 +3,7 @@
 #include <Windows.h>
 #include <Xinput.h>
 #pragma comment (lib, "xinput.lib")
+#include <stdint.h>
 
 // Xボックスコントローラーでやったのでコメントアウトの説明はそれ
 // ほかのコントローラーは分からないので検証必須
@@ -44,45 +45,49 @@ public:
 
 private:
 	Gamepad();
-	inline ~Gamepad() {}
+	Gamepad(const Gamepad&) = delete;
+	Gamepad(Gamepad&&) = delete;
+	~Gamepad() = default;
+	Gamepad& operator=(const Gamepad&) = delete;
+	Gamepad& operator=(Gamepad&&) = delete;
 
 private:
 	short preButton;
 	XINPUT_STATE state;
 	XINPUT_VIBRATION vibration;
 
-public:
+private:
 	static Gamepad* GetInstans();
 
 
 public:
 	// 入力関数
-	void Input();
+	static void Input();
 
 	// 押し込みのボタンの状態を取得
-	bool getButton(Button type);
+	static bool GetButton(Button type);
 
 	// 押し込みのボタンの前フレームの状態を取得
-	bool getPreButton(Button type);
+	static bool GetPreButton(Button type);
 
 	// 押し込みのボタンを押した瞬間
-	bool Pushed(Button type);
+	static bool Pushed(Button type);
 
 	// 押し込みのボタンを長押し
-	bool LongPush(Button type);
+	static bool LongPush(Button type);
 
 	// 押し込みのボタンを離した瞬間
-	bool Released(Button type);
+	static bool Released(Button type);
 
 	// トリガーのボタンの状態を取得
-	unsigned char getTriger(Triger type);
+	static unsigned char GetTriger(Triger type);
 
 	// スティックのボタン
-	short getStick(Stick type);
+	static short GetStick(Stick type);
 
 	// バイブレーション
-	void isVibration(const int& flag);
+	static void Vibration(uint16_t leftVibIntensity, uint16_t rightVibIntensity);
 
 	// デバッグ用
-	void Draw();
+	static void Draw();
 };

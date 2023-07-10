@@ -1,5 +1,6 @@
 #pragma once
 #include "Engine/Engine.h"
+#include <cassert>
 #include <wrl.h>
 
 // ポインタをテンプレートパラメータに設定してはいけない
@@ -11,6 +12,7 @@ public:
 		cbvDesc(),
 		data(nullptr),
 		isWright(true),
+		isCreateView(false),
 		roootParamater(),
 		shaderVisibility(D3D12_SHADER_VISIBILITY_ALL),
 		shaderRegister(0)
@@ -28,6 +30,43 @@ public:
 
 	inline ~ConstBuffer() noexcept {
 		bufferResource->Release();
+	}
+
+	inline ConstBuffer(const ConstBuffer& right) noexcept :
+		bufferResource(),
+		cbvDesc(),
+		data(nullptr),
+		isWright(true),
+		roootParamater(),
+		shaderVisibility(D3D12_SHADER_VISIBILITY_ALL),
+		shaderRegister(0)
+	{
+		*this = right;
+	}
+
+	inline ConstBuffer<T>& operator=(const ConstBuffer& right) {
+		try {
+			if (bufferResource) {
+				bufferResource->Release();
+				bufferResource.Reset();
+			}
+			bufferResource = Engine::CreateBufferResuorce((sizeof(T) + 0xff) & ~0xff);
+			cbvDesc.BufferLocation = bufferResource->GetGPUVirtualAddress();
+			cbvDesc.SizeInBytes = UINT(bufferResource->GetDesc().Width);
+
+			if (isWright) {
+				bufferResource->Map(0, nullptr, reinterpret_cast<void**>(&data));
+			}
+			roootParamater = right.roootParamater;
+
+			*data = *right.data;
+
+			throw(isCreateView);
+		}
+		catch (bool err)
+		{
+			if(!err)assert(!"created view");
+		}
 	}
 
 public:
@@ -65,6 +104,7 @@ public:
 
 	void CrerateView(D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle) noexcept {
 		Engine::GetDevice()->CreateConstantBufferView(&cbvDesc, descriptorHandle);
+		isCreateView = true;
 	}
 
 private:
@@ -74,6 +114,8 @@ private:
 	T* data;
 
 	bool isWright;
+
+	bool isCreateView;
 
 	D3D12_ROOT_PARAMETER roootParamater;
 public:

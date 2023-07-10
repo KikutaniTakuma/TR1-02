@@ -196,11 +196,6 @@ void PeraRender::PreDraw() {
 }
 
 void PeraRender::Draw() {
-	//ImGui::Begin("Window");
-	ImGui::DragFloat("wipeSize", &cbuffer->wipeSize, 0.1f);
-	ImGui::DragFloat2("wipeCenter", &cbuffer->center.x);
-	//ImGui::End();
-
 	// 描画先をメインレンダーターゲットに変更
 	render.SetMainRenderTarget();
 

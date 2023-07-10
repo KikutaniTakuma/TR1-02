@@ -1,8 +1,9 @@
 #include "Texture2D.h"
 #include "Engine/ShaderManager/ShaderManager.h"
+#include "externals/imgui/imgui.h"
 
 Texture2D::Texture2D():
-	SRVHeap(),
+	SRVHeap(16),
 	vertexView(),
 	vertexResource(nullptr),
 	indexView(),
@@ -44,7 +45,16 @@ void Texture2D::Initialize(const std::string& vsFileName, const std::string& psF
 	}
 	indexResource->Unmap(0, nullptr);
 
+	*colorPibot = 0.6f;
+	colorPibot.OffWright();
+
+	*colorType = 0;
+	colorType.OffWright();
+
 	SRVHeap.CreateConstBufferView(wvpMat);
+	SRVHeap.CreateConstBufferView(colorPibot);
+	SRVHeap.CreateConstBufferView(colorType);
+
 
 	CreateGraphicsPipeline();
 }
