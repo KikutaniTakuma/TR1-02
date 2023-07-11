@@ -211,7 +211,7 @@ private:
 	/// •`‰æŠÖŒW
 	/// 
 public:
-	void InitalizeDraw();
+	void InitializeDraw();
 
 
 private:

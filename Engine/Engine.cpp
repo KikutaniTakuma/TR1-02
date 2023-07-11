@@ -85,7 +85,7 @@ void Engine::Initialize(int windowWidth, int windowHeight, const std::string& wi
 	// InputDevice生成
 	engine->InitializeInput();
 
-	engine->InitalizeDraw();
+	engine->InitializeDraw();
 
 	KeyInput::Initialize();
 	Mouse::Initialize();
@@ -415,7 +415,7 @@ ID3D12Resource* Engine::CreateDepthStencilTextureResource(int32_t width, int32_t
 	return resource;
 }
 
-void Engine::InitalizeDraw() {
+void Engine::InitializeDraw() {
 	// DepthStencilTextureをウィンドウサイズで作成
 	depthStencilResource = CreateDepthStencilTextureResource(clientWidth, clientHeight);
 	assert(depthStencilResource);
