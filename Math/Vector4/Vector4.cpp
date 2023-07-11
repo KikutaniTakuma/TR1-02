@@ -21,7 +21,7 @@ Vector4::Vector4(float x, float y, float z, float w) noexcept :
 {}
 
 Vector4& Vector4::operator=(const Vector4& right) noexcept {
-	std::copy(right.m.begin(), right.m.end(), m.begin());
+	_mm_store_ps(m.data(), *(__m128*)right.m.data());
 
 	return *this;
 }
@@ -105,40 +105,44 @@ Vector4& Vector4::operator*=(float scalar) noexcept {
 
 Vector4 Vector4::operator/(float scalar) const noexcept {
 	Vector4 result;
+	scalar = 1.0f / scalar;
 
 	for (size_t i = 0; i < result.m.size(); i++) {
-		result.m[i] = m[i] / scalar;
+		result.m[i] = m[i] * scalar;
 	}
 
 	return result;
 }
 Vector4& Vector4::operator/=(float scalar) noexcept {
+	scalar = 1.0f / scalar;
 	for (auto& i : m) {
-		i /= scalar;
+		i *= scalar;
 	}
 
 	return *this;
 }
 
-Vector4 Vector4::operator*(const class Mat4x4& mat) const noexcept {
+Vector4 Vector4::operator*(const Mat4x4& mat) const noexcept {
 	Vector4 result;
 
-	for (int y = 0; y < 4; y++) {
-		for (int x = 0; x < 4; x++) {
-			result.m[y] += this->m[x] * mat[y][x];
-		}
+	auto tmp = mat;
+	tmp.Transepose();
+
+	for (int32_t i = 0; i < m.size(); i++) {
+		result.m[i] = Dot(tmp[i]);
 	}
 
 	return result;
 }
 
-Vector4& Vector4::operator*=(const class Mat4x4& mat) noexcept {
+Vector4& Vector4::operator*=(const Mat4x4& mat) noexcept {
 	Vector4 result;
 
-	for (int y = 0; y < 4; y++) {
-		for (int x = 0; x < 4; x++) {
-			result.m[y] += this->m[x] * mat[y][x];
-		}
+	auto tmp = mat;
+	tmp.Transepose();
+
+	for (int32_t i = 0; i < m.size(); i++) {
+		result.m[i] = Dot(tmp[i]);
 	}
 
 	*this = result;
@@ -146,10 +150,10 @@ Vector4& Vector4::operator*=(const class Mat4x4& mat) noexcept {
 	return *this;
 }
 
-Vector4 operator*(const class Mat4x4& left, const Vector4& right) noexcept {
+Vector4 operator*(const Mat4x4& left, const Vector4& right) noexcept {
 	Vector4 result;
 
-	for (int y = 0; y < 4; y++) {
+	for (int32_t y = 0; y < 4; y++) {
 		result.m[y] = left[y].Dot(right);
 	}
 
@@ -185,11 +189,8 @@ Vector4 Vector4::Normalize() const noexcept {
 	return Vector4(*this) * nor;
 }
 
-float Vector4::Dot(const Vector4& right)  const noexcept {
-	__m128 left = *(__m128*)m.data();
-	__m128 rightTmp = *(__m128*)right.m.data();
-
-	return _mm_cvtss_f32(_mm_dp_ps(left, rightTmp, 0xff));
+float Vector4::Dot(const Vector4& right) const noexcept {
+	return _mm_cvtss_f32(_mm_dp_ps(*(__m128*)m.data(), *(__m128*)right.m.data(), 0xff));
 }
 
 Vector3 Vector4::getVector3D() const noexcept {

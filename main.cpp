@@ -142,7 +142,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		///
 		/// •`‰æˆ—
 		/// 
-		//pera->PreDraw();
+		pera->PreDraw();
 
 		model->Draw(modelWorldMat, camera.GetViewProjection(), camera.pos);
 
@@ -150,7 +150,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		//texDefault->Draw(Vector2::identity, texRotate, texDefaultPos, camera2D.GetViewOthographics());
 
-		//pera->Draw();
+		pera->Draw();
 		///
 		/// •`‰æˆ—‚±‚±‚Ü‚Å
 		/// 

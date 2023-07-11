@@ -3,7 +3,7 @@
 #include <cmath>
 #include <algorithm>
 #include <Windows.h>
-
+#include <immintrin.h>
 
 Mat4x4::Mat4x4()
 	:m()
@@ -18,17 +18,17 @@ Mat4x4::Mat4x4(Mat4x4&& mat) noexcept {
 }
 
 Mat4x4 Mat4x4::operator*(const Mat4x4& mat) const{
-	Mat4x4 tmp;
-	Vector4 width;
+	Mat4x4 result;
+	auto tmp = mat;
+	tmp.Transepose();
 
 	for (int y = 0; y < Mat4x4::HEIGHT; y++) {
 		for (int x = 0; x < Mat4x4::WIDTH; x++) {
-			width = { mat[0][x],mat[1][x], mat[2][x], mat[3][x] };
-			tmp.m[y][x] = m[y].Dot(width);
+			result.m[y][x] = m[y].Dot(tmp[x]);
 		}
 	}
 
-	return tmp;
+	return result;
 }
 
 Mat4x4::Mat4x4(const std::array<Vector4, 4>& num) {
@@ -36,7 +36,8 @@ Mat4x4::Mat4x4(const std::array<Vector4, 4>& num) {
 }
 
 Mat4x4& Mat4x4::operator=(const Mat4x4& mat) {
-	std::copy(mat.m.begin(), mat.m.end(), m.begin());
+	_mm256_store_ps(m[0].m.data(), *(__m256*)mat.m[0].m.data());
+	_mm256_store_ps(m[2].m.data(), *(__m256*)mat.m[2].m.data());
 
 	return *this;
 }
@@ -224,8 +225,8 @@ void Mat4x4::HoriAffin(const Vector3& scale, const Vector3& rad, const Vector3& 
 		Vector4{scale.y * rotate.m[1][0], scale.y * rotate.m[1][1],scale.y * rotate.m[1][2], 0.0f },
 		Vector4{scale.z * rotate.m[2][0], scale.z * rotate.m[2][1],scale.z * rotate.m[2][2], 0.0f},
 		Vector4{translate.x, translate.y, translate.z, 1.0f}
-			}
-		};
+		}
+	};
 }
 void Mat4x4::VertAffin(const Vector3& scale, const Vector3& rad, const Vector3& translate) {
 	Mat4x4 rotate = VertMakeMatrixRotateZ(rad.z) * VertMakeMatrixRotateY(rad.y) * VertMakeMatrixRotateX(rad.x);
@@ -246,7 +247,7 @@ void Mat4x4::Inverse() {
 
 	Mat4x4 identity = MakeMatrixIndentity();
 
-	float toOne = *(tmp.m.begin()->m.begin());
+	float toOne = tmp[0][0];
 
 	float tmpNum = 0.0f;
 
