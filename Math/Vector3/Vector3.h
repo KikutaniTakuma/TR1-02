@@ -28,8 +28,10 @@ public:
 	Vector3& operator-=(const Vector3& right) noexcept;
 	Vector3 operator*(float scalar) const noexcept;
 	Vector3& operator*=(float scalar) noexcept;
+
 	Vector3 operator*(const class Mat4x4& mat) const noexcept;
 	Vector3& operator*=(const class Mat4x4& mat) noexcept;
+	friend Vector3 operator*(const class Mat4x4& left, const Vector3& right);
 
 	Vector3& operator=(const class Vector2& right) noexcept;
 

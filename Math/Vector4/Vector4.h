@@ -45,6 +45,7 @@ public:
 
 	Vector4 operator*(const class Mat4x4& mat) const noexcept;
 	Vector4& operator*=(const class Mat4x4& mat) noexcept;
+	friend Vector4 operator*(const class Mat4x4& left, const Vector4& right) noexcept;
 
 	bool operator==(const Vector4& right) const noexcept;
 	bool operator!=(const Vector4& right) const noexcept;

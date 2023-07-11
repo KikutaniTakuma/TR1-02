@@ -81,15 +81,38 @@ Vector3& Vector3::operator*=(float scalar) noexcept {
 
 Vector3 Vector3::operator*(const Mat4x4& mat) const noexcept {
 	Vector3 result;
+	Vector4 vec = { x,y,z,1.0f };
+	Vector4 vec1 = { mat[0][0], mat[1][0], mat[2][0], mat[3][0] };
+	Vector4 vec2 = { mat[0][1], mat[1][1], mat[2][1], mat[3][1] };
+	Vector4 vec3 = { mat[0][2], mat[1][2], mat[2][2], mat[3][2] };
+	Vector4 vec4 = { mat[0][3], mat[1][3], mat[2][3], mat[3][3] };
 
-	result.x = x * mat.get()[0][0] + y * mat.get()[1][0] + z * mat.get()[2][0] + 1.0f * mat.get()[3][0];
-	result.y = x * mat.get()[0][1] + y * mat.get()[1][1] + z * mat.get()[2][1] + 1.0f * mat.get()[3][1];
-	result.z = x * mat.get()[0][2] + y * mat.get()[1][2] + z * mat.get()[2][2] + 1.0f * mat.get()[3][2];
-	const float&& w = x * mat.get()[0][3] + y * mat.get()[1][3] + z * mat.get()[2][3] + 1.0f * mat.get()[3][3];
+	result.x = vec.Dot(vec1);
+	result.y = vec.Dot(vec2);
+	result.z = vec.Dot(vec3);
+	float&& w = vec.Dot(vec4);
 	assert(w != 0.0f);
-	result.x /= w;
-	result.y /= w;
-	result.z /= w;
+	w = 1.0f / w;
+	result.x *= w;
+	result.y *= w;
+	result.z *= w;
+
+	return result;
+}
+
+Vector3 operator*(const Mat4x4& left, const Vector3& right) {
+	Vector3 result;
+	Vector4 vec = { right.x,right.y,right.z,1.0f };
+
+	result.x = left[0].Dot(vec);
+	result.y = left[1].Dot(vec);
+	result.z = left[2].Dot(vec);
+	float&& w = left[3].Dot(vec);
+	assert(w != 0.0f);
+	w = 1.0f / w;
+	result.x *= w;
+	result.y *= w;
+	result.z *= w;
 
 	return result;
 }

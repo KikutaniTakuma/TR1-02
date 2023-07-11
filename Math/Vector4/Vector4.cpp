@@ -125,7 +125,7 @@ Vector4 Vector4::operator*(const class Mat4x4& mat) const noexcept {
 
 	for (int y = 0; y < 4; y++) {
 		for (int x = 0; x < 4; x++) {
-			result.m[y] += this->m[x] * mat.get()[y][x];
+			result.m[y] += this->m[x] * mat[y][x];
 		}
 	}
 
@@ -137,13 +137,23 @@ Vector4& Vector4::operator*=(const class Mat4x4& mat) noexcept {
 
 	for (int y = 0; y < 4; y++) {
 		for (int x = 0; x < 4; x++) {
-			result.m[y] += this->m[x] * mat.get()[y][x];
+			result.m[y] += this->m[x] * mat[y][x];
 		}
 	}
 
 	*this = result;
 
 	return *this;
+}
+
+Vector4 operator*(const class Mat4x4& left, const Vector4& right) noexcept {
+	Vector4 result;
+
+	for (int y = 0; y < 4; y++) {
+		result.m[y] = left[y].Dot(right);
+	}
+
+	return result;
 }
 
 bool Vector4::operator==(const Vector4& right) const noexcept {

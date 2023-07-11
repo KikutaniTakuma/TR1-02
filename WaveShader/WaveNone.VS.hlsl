@@ -15,11 +15,11 @@ VertexShaderOutput main(VertexShaderInput input )
 {
 	VertexShaderOutput output;
 
-	input.position = mul(input.position, worldMat);
+	input.position = mul(worldMat, input.position);
 	output.worldPosition = input.position;
-	output.position = mul(input.position, viewProjectionMat);
+	output.position = mul(viewProjectionMat, input.position);
 	input.normal = normalize(input.normal);
-	output.normal = mul(input.normal, (float32_t3x3)worldMat);
+	output.normal = mul((float32_t3x3)worldMat, input.normal);
 
 	return output;
 }

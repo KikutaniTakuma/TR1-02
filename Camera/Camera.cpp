@@ -34,7 +34,7 @@ Camera::Camera(const Camera& right) noexcept :
 }
 
 Camera::Camera(Camera&& right) noexcept :
-	kNearClip(std::move(right.kNearClip))
+	kNearClip(right.kNearClip)
 {
 	*this = std::move(right);
 }
@@ -69,7 +69,7 @@ Camera& Camera::operator=(Camera&& right) noexcept {
 }
 
 void Camera::Update() {
-	view.Affin(scale, rotate, pos);
+	view.VertAffin(scale, rotate, pos);
 	view.Inverse();
 
 	auto engine = Engine::GetInstance();
@@ -80,18 +80,18 @@ void Camera::Update() {
 	case Camera::Mode::Projecction:
 	default:
 		fov = std::clamp(fov, 0.0f, 1.0f);
-		projection.PerspectiveFov(fov, aspect, kNearClip, farClip);
-		viewProjecction = view * projection;
+		projection.VertPerspectiveFov(fov, aspect, kNearClip, farClip);
+		viewProjecction = projection * view;
 		break;
 
 	case Camera::Mode::Othographic:
-		othograohics.Orthographic(
+		othograohics.VertOrthographic(
 			-static_cast<float>(engine->clientWidth) * 0.5f,
 			static_cast<float>(engine->clientHeight) * 0.5f,
 			static_cast<float>(engine->clientWidth) * 0.5f,
 			-static_cast<float>(engine->clientHeight) * 0.5f,
 			kNearClip, farClip);
-		viewOthograohics = view * othograohics;
+		viewOthograohics = othograohics * view;
 		break;
 	}
 }

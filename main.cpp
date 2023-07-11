@@ -20,35 +20,36 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	Camera camera;
 	camera.fov = 0.45f;
+	//camera.pos = { 0.0f,0.0f,-10.0f };
 	camera.pos = { 8.24f,9.63f,-20.53f };
 	camera.rotate = { 0.44f,-0.4f, 0.0f };
 
 	Camera camera2D(Camera::Mode::Othographic);
 
 
-	/*auto model = std::make_unique<Model>();
+	auto model = std::make_unique<Model>();
 	model->LoadObj("./Resources/cube.obj");
-	model->LoadShader("WaveShader/WaveNone.VS.hlsl", "WaveShader/Wave.PS.hlsl", "WaveShader/Wave.GS.hlsl");*/
+	model->LoadShader("WaveShader/WaveNone.VS.hlsl", "WaveShader/Wave.PS.hlsl", "WaveShader/Wave.GS.hlsl");
 
 
-	Mat4x4 modelWorldMat = MakeMatrixAffin(Vector3::identity, Vector3(), Vector3());
+	Mat4x4 modelWorldMat = VertMakeMatrixAffin(Vector3::identity, Vector3(), Vector3());
 
 	Vector3 cameraMoveRotate{};
 
 	auto tex = std::make_unique<Texture2D>();
-	tex->LoadTexture("./Resources/zeno.png");
+	tex->LoadTexture("./Resources/uvChecker.png");
 	tex->Initialize("Texture2DShader/Texture2D.VS.hlsl", "Texture2DShader/Texture2DNone.PS.hlsl");
 
 	auto texDefault = std::make_unique<Texture2D>();
-	 texDefault->LoadTexture("./Resources/zeno.png");
+	 texDefault->LoadTexture("./Resources/uvChecker.png");
 	 texDefault->Initialize("Texture2DShader/Texture2D.VS.hlsl", "Texture2DShader/Texture2DColorChoose.PS.hlsl");
 
 
 	auto pera = std::make_unique<PeraRender>();
 	pera->Initialize("PostShader/Post.VS.hlsl", "PostShader/PostNone.PS.hlsl");
 
-	Vector2 texPos;
-	Vector2 texDefaultPos;
+	Vector2 texPos = { 312.0f, 0.0f };
+	Vector2 texDefaultPos = { -312.0f, 0.0f };
 	float texRotate = 0.0f;
 
 	/// 
@@ -141,15 +142,15 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		///
 		/// ï`âÊèàóù
 		/// 
-		pera->PreDraw();
+		//pera->PreDraw();
 
-		//model->Draw(modelWorldMat, camera.GetViewProjection(), camera.pos);
+		model->Draw(modelWorldMat, camera.GetViewProjection(), camera.pos);
 
-		tex->Draw(Vector2(0.5f, 0.5f), texRotate, texPos, camera2D.GetViewOthographics());
+		//tex->Draw(Vector2::identity, texRotate, texPos, camera2D.GetViewOthographics());
 
-		texDefault->Draw(Vector2(0.5f,0.5f), texRotate, texDefaultPos, camera2D.GetViewOthographics());
+		//texDefault->Draw(Vector2::identity, texRotate, texDefaultPos, camera2D.GetViewOthographics());
 
-		pera->Draw();
+		//pera->Draw();
 		///
 		/// ï`âÊèàóùÇ±Ç±Ç‹Ç≈
 		/// 

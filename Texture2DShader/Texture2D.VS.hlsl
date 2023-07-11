@@ -7,7 +7,7 @@ cbuffer Matrix : register(b0){
 Output main(float4 pos : POSITION, float2 uv : TEXCOORD){
     Output output;
 
-    output.svPos = mul(pos, mat);
+    output.svPos = mul(mat, pos);
     output.uv = uv;
 
     return output;
