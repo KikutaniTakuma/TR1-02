@@ -26,10 +26,10 @@ Vector3::Vector3(Vector3&& right) noexcept
 	*this = std::move(right);
 }
 
-Vector3 Vector3::identity = {1.0f,1.0f,1.0f};
-Vector3 Vector3::xIdy = { 1.0f,0.0f,0.0f };
-Vector3 Vector3::yIdy = { 0.0f,1.0f,0.0f };
-Vector3 Vector3::zIdy = { 0.0f,0.0f,1.0f };
+Vector3 const Vector3::identity = {1.0f,1.0f,1.0f};
+Vector3 const Vector3::xIdy = { 1.0f,0.0f,0.0f };
+Vector3 const Vector3::yIdy = { 0.0f,1.0f,0.0f };
+Vector3 const Vector3::zIdy = { 0.0f,0.0f,1.0f };
 
 Vector3& Vector3::operator=(const Vector3& right) noexcept {
 	x = right.x;
@@ -81,16 +81,14 @@ Vector3& Vector3::operator*=(float scalar) noexcept {
 
 Vector3 Vector3::operator*(const Mat4x4& mat) const noexcept {
 	Vector3 result;
-	Vector4 vec = { x,y,z,1.0f };
-	Vector4 vec1 = { mat[0][0], mat[1][0], mat[2][0], mat[3][0] };
-	Vector4 vec2 = { mat[0][1], mat[1][1], mat[2][1], mat[3][1] };
-	Vector4 vec3 = { mat[0][2], mat[1][2], mat[2][2], mat[3][2] };
-	Vector4 vec4 = { mat[0][3], mat[1][3], mat[2][3], mat[3][3] };
+	Vector4 vec = { *this,1.0f };
+	auto tmp = mat;
+	tmp.Transepose();
 
-	result.x = vec.Dot(vec1);
-	result.y = vec.Dot(vec2);
-	result.z = vec.Dot(vec3);
-	float&& w = vec.Dot(vec4);
+	result.x = vec.Dot(tmp[0]);
+	result.y = vec.Dot(tmp[1]);
+	result.z = vec.Dot(tmp[2]);
+	float&& w = vec.Dot(tmp[3]);
 	assert(w != 0.0f);
 	w = 1.0f / w;
 	result.x *= w;
@@ -102,7 +100,7 @@ Vector3 Vector3::operator*(const Mat4x4& mat) const noexcept {
 
 Vector3 operator*(const Mat4x4& left, const Vector3& right) {
 	Vector3 result;
-	Vector4 vec = { right.x,right.y,right.z,1.0f };
+	Vector4 vec = { right,1.0f };
 
 	result.x = left[0].Dot(vec);
 	result.y = left[1].Dot(vec);
@@ -139,7 +137,7 @@ bool Vector3::operator!=(const Vector3& right) const noexcept {
 }
 
 float Vector3::Length() const noexcept {
-	return sqrtf(x*x + y*y + z*z);
+	return std::sqrt(x*x + y*y + z*z);
 }
 
 float Vector3::Dot(const Vector3& right) const noexcept {

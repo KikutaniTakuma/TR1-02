@@ -17,20 +17,6 @@ Mat4x4::Mat4x4(Mat4x4&& mat) noexcept {
 	*this = std::move(mat);
 }
 
-Mat4x4 Mat4x4::operator*(const Mat4x4& mat) const{
-	Mat4x4 result;
-	auto tmp = mat;
-	tmp.Transepose();
-
-	for (int y = 0; y < Mat4x4::HEIGHT; y++) {
-		for (int x = 0; x < Mat4x4::WIDTH; x++) {
-			result.m[y][x] = m[y].Dot(tmp[x]);
-		}
-	}
-
-	return result;
-}
-
 Mat4x4::Mat4x4(const std::array<Vector4, 4>& num) {
 	m = num;
 }
@@ -46,6 +32,20 @@ Mat4x4& Mat4x4::operator=(Mat4x4&& mat) noexcept {
 	m = std::move(mat.m);
 
 	return *this;
+}
+
+Mat4x4 Mat4x4::operator*(const Mat4x4& mat) const {
+	Mat4x4 result;
+	auto tmp = mat;
+	tmp.Transepose();
+
+	for (int y = 0; y < Mat4x4::HEIGHT; y++) {
+		for (int x = 0; x < Mat4x4::WIDTH; x++) {
+			result.m[y][x] = m[y].Dot(tmp[x]);
+		}
+	}
+
+	return result;
 }
 
 Mat4x4& Mat4x4::operator*=(const Mat4x4& mat) {

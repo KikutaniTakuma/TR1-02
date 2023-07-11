@@ -19,9 +19,9 @@ Vector2::Vector2(Vector2&& right) noexcept {
 	*this = std::move(right);
 }
 
-Vector2 Vector2::identity = { 1.0f,1.0f };
-Vector2 iHat = { 1.0f,0.0f };
-Vector2 jHat = { 0.0f,1.0f };
+const Vector2 Vector2::identity = { 1.0f,1.0f };
+const Vector2 Vector2::xIdy = { 1.0f,0.0f };
+const Vector2 Vector2::yIdy = { 0.0f,1.0f };
 
 
 Vector2 Vector2::operator+(const Vector2& right) const noexcept {

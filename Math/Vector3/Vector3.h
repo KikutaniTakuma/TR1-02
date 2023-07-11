@@ -2,23 +2,20 @@
 #include <string>
 
 class Vector3 final {
+/// <summary>
+/// コンストラクタ
+/// </summary>
 public:
 	Vector3() noexcept;
 	Vector3(float x, float y, float z) noexcept;
 	Vector3(const Vector3& right) noexcept;
 	Vector3(Vector3&& right) noexcept;
-
 public:
-	static Vector3 identity;
-	static Vector3 xIdy;
-	static Vector3 yIdy;
-	static Vector3 zIdy;
+	~Vector3() = default;
 
-public:
-	float x;
-	float y;
-	float z;
-
+/// <summary>
+/// 演算子のオーバーロード
+/// </summary>
 public:
 	Vector3& operator=(const Vector3& right) noexcept;
 	Vector3& operator=(Vector3&& right) noexcept;
@@ -39,8 +36,38 @@ public:
 	bool operator==(const Vector3& right) const noexcept;
 	bool operator!=(const Vector3& right) const noexcept;
 
+/// <summary>
+/// メンバ関数
+/// </summary>
+public:
 	float Dot(const Vector3& right) const noexcept;
 	Vector3 Cross(const Vector3& right) const noexcept;
 	float Length() const noexcept;
 	Vector3 Normalize() const noexcept;
+
+/// <summary>
+/// 静的定数
+/// </summary>
+public:
+	static const Vector3 identity;
+	static const Vector3 xIdy;
+	static const Vector3 yIdy;
+	static const Vector3 zIdy;
+
+/// <summary>
+/// メンバ関数
+/// </summary>
+public:
+	union {
+		float x;
+		float r;
+	};
+	union {
+		float y;
+		float g;
+	};
+	union {
+		float z;
+		float b;
+	};
 };

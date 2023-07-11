@@ -9,15 +9,24 @@ Vector4::Vector4() noexcept :
 	m{0.0f}
 {}
 
-Vector4::Vector4(const Vector4& right) noexcept :
-	m(right.m)
-{}
+Vector4::Vector4(const Vector4& right) noexcept 
+{
+	*this = right;
+}
 Vector4::Vector4(Vector4&& right)  noexcept :
 	m(std::move(right.m))
 {}
 
 Vector4::Vector4(float x, float y, float z, float w) noexcept :
 	m{x,y,z,w}
+{}
+
+Vector4::Vector4(const Vector3& vec3, float w) noexcept :
+	m{vec3.x,vec3.y,vec3.z,w }
+{}
+
+Vector4::Vector4(const Vector2& vec2, float z, float w) noexcept :
+	m{ vec2.x,vec2.y,z,w }
 {}
 
 Vector4& Vector4::operator=(const Vector4& right) noexcept {
@@ -61,9 +70,7 @@ Vector4 Vector4::operator+(const Vector4& right) const noexcept {
 }
 
 Vector4& Vector4::operator+=(const Vector4& right) noexcept {
-	for (size_t i = 0; i < m.size(); i++) {
-		m[i] += right.m[i];
-	}
+	*this = *this + right;
 
 	return *this;
 }
@@ -79,9 +86,7 @@ Vector4 Vector4::operator-(const Vector4& right) const noexcept {
 }
 
 Vector4& Vector4::operator-=(const Vector4& right) noexcept {
-	for (size_t i = 0; i < m.size(); i++) {
-		m[i] -= right.m[i];
-	}
+	*this = *this - right;
 
 	return *this;
 }
@@ -96,9 +101,7 @@ Vector4 Vector4::operator*(float scalar) const noexcept {
 	return result;
 }
 Vector4& Vector4::operator*=(float scalar) noexcept {
-	for (auto& i : m) {
-		i *= scalar;
-	}
+	*this = *this * scalar;
 
 	return *this;
 }
@@ -114,10 +117,7 @@ Vector4 Vector4::operator/(float scalar) const noexcept {
 	return result;
 }
 Vector4& Vector4::operator/=(float scalar) noexcept {
-	scalar = 1.0f / scalar;
-	for (auto& i : m) {
-		i *= scalar;
-	}
+	*this = *this / scalar;
 
 	return *this;
 }
@@ -136,16 +136,7 @@ Vector4 Vector4::operator*(const Mat4x4& mat) const noexcept {
 }
 
 Vector4& Vector4::operator*=(const Mat4x4& mat) noexcept {
-	Vector4 result;
-
-	auto tmp = mat;
-	tmp.Transepose();
-
-	for (int32_t i = 0; i < m.size(); i++) {
-		result.m[i] = Dot(tmp[i]);
-	}
-
-	*this = result;
+	*this = *this * mat;
 
 	return *this;
 }
@@ -176,7 +167,7 @@ const float& Vector4::operator[](size_t index) const noexcept {
 }
 
 float Vector4::Length() const noexcept {
-	return std::sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z + vec.w * vec.w);
+	return std::sqrt(Dot(*this));
 }
 
 Vector4 Vector4::Normalize() const noexcept {

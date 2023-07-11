@@ -10,23 +10,20 @@ static const int kColumnWidth = 60;
 class Vector3;
 
 class Mat4x4 final {
+/// <summary>
+/// コンストラクタ
+/// </summary>
 public:
 	Mat4x4();
-
 	Mat4x4(const Mat4x4& mat);
 	Mat4x4(Mat4x4&& mat) noexcept;
-
 	Mat4x4(const std::array<Vector4, 4>& num);
-
+public:
 	~Mat4x4() = default;
 
-private:
-	static const int HEIGHT = 4;
-	static const int WIDTH = 4;
-
-private:
-	std::array<Vector4, 4> m;
-
+/// <summary>
+/// 演算子のオーバーロード
+/// </summary>
 public:
 	Mat4x4& operator=(const Mat4x4& mat);
 	Mat4x4& operator=(Mat4x4&& mat) noexcept;
@@ -44,6 +41,9 @@ public:
 	bool operator==(const Mat4x4& mat) const;
 	bool operator!=(const Mat4x4& mat) const;
 
+/// <summary>
+/// メンバ関数
+/// </summary>
 public:
 	void Indentity();
 
@@ -76,6 +76,19 @@ public:
 
 	void HoriViewPort(float left, float top, float width, float height, float minDepth, float maxDepth);
 	void VertViewPort(float left, float top, float width, float height, float minDepth, float maxDepth);
+
+/// <summary>
+/// 静的定数
+/// </summary>
+private:
+	static const int HEIGHT = 4;
+	static const int WIDTH = 4;
+
+/// <summary>
+/// メンバ変数
+/// </summary>
+private:
+	std::array<Vector4, 4> m;
 };
 
 
