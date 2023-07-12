@@ -18,7 +18,7 @@ Audio::~Audio() {
 	wfet = {};
 }
 
-void Audio::Load(const std::string& fileName, bool loopFlg) {
+void Audio::Load(const std::string& fileName, bool loopFlg_) {
 	std::ifstream file(fileName, std::ios::binary);
 	assert(file);
 
@@ -69,7 +69,37 @@ void Audio::Load(const std::string& fileName, bool loopFlg) {
 	buf.pAudioData = pBuffer;
 	buf.AudioBytes = bufferSize;
 	buf.Flags = XAUDIO2_END_OF_STREAM;
-	buf.LoopCount = loopFlg ? XAUDIO2_LOOP_INFINITE : 0;
+	buf.LoopCount = loopFlg_ ? XAUDIO2_LOOP_INFINITE : 0;
 
 	hr = pSourceVoice->SubmitSourceBuffer(&buf);
+
+	loopFlg = loopFlg_;
+}
+
+
+void Audio::Start(float volume) {
+	HRESULT hr;
+	if (!pSourceVoice) {
+		hr = AudioManager::GetInstance()->xAudio2->CreateSourceVoice(&pSourceVoice, &wfet);
+		XAUDIO2_BUFFER buf{};
+		buf.pAudioData = pBuffer;
+		buf.AudioBytes = bufferSize;
+		buf.Flags = XAUDIO2_END_OF_STREAM;
+		buf.LoopCount = loopFlg ? XAUDIO2_LOOP_INFINITE : 0;
+
+		hr = pSourceVoice->SubmitSourceBuffer(&buf);
+		assert(SUCCEEDED(hr));
+	}
+	hr = pSourceVoice->Start();
+	pSourceVoice->SetVolume(volume);
+	assert(SUCCEEDED(hr));
+}
+
+void Audio::Pause() {
+	pSourceVoice->Stop();
+}
+
+void Audio::Stop() {
+	pSourceVoice->DestroyVoice();
+	pSourceVoice = nullptr;
 }

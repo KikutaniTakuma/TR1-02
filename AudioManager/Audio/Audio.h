@@ -27,12 +27,20 @@ public:
 	Audio();
 	~Audio();
 
+public:
+	void Start(float volume);
+
+	void Pause();
+
+	void Stop();
+
 private:
-	void Load(const std::string& fileName, bool loopFlg);
+	void Load(const std::string& fileName, bool loopFlg_);
 
 private:
 	WAVEFORMATEX wfet;
 	BYTE* pBuffer;
 	uint32_t bufferSize;
 	IXAudio2SourceVoice* pSourceVoice;
+	bool loopFlg;
 };

@@ -24,7 +24,7 @@ AudioManager::~AudioManager() {
 	xAudio2.Reset();
 }
 
-void AudioManager::LoadWav(const std::string& fileName, bool flg) {
+std::shared_ptr<class Audio> AudioManager::LoadWav(const std::string& fileName, bool flg) {
 	if (audios.empty()) {
 		auto audio = std::make_unique<Audio>();
 		audio->Load(fileName, flg);
@@ -39,14 +39,6 @@ void AudioManager::LoadWav(const std::string& fileName, bool flg) {
 			audios.insert({ fileName, std::move(audio) });
 		}
 	}
-}
 
-void AudioManager::Start(const std::string& fileName, float volume) {
-	HRESULT hr = audios[fileName]->pSourceVoice->Start();
-	audios[fileName]->pSourceVoice->SetVolume(volume);
-	assert(SUCCEEDED(hr));
-}
-
-void AudioManager::Stop(const std::string& fileName) {
-	audios[fileName]->pSourceVoice->Stop();
+	return audios[fileName];
 }

@@ -52,6 +52,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	Vector2 texDefaultPos = { -312.0f, 0.0f };
 	float texRotate = 0.0f;
 
+	auto testAudio = AudioManager::GetInstance()->LoadWav("Alarm01.wav",true);
+
 	/// 
 	/// メインループ
 	/// 
@@ -74,17 +76,17 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// 
 		/// 更新処理
 		/// 
-		if ((Gamepad::GetStick(Gamepad::Stick::RIGHT_X) > 0.01f)) {
+		if ((Gamepad::GetStick(Gamepad::Stick::RIGHT_X) > 0.1f)) {
 			cameraMoveRotate.y += 0.1f;
 		}
-		else if ((Gamepad::GetStick(Gamepad::Stick::RIGHT_X) < -0.01f)) {
+		else if ((Gamepad::GetStick(Gamepad::Stick::RIGHT_X) < -0.1f)) {
 			cameraMoveRotate.y -= 0.1f;
 		}
 
-		if ((Gamepad::GetStick(Gamepad::Stick::RIGHT_Y) > 0.01f)) {
+		if ((Gamepad::GetStick(Gamepad::Stick::RIGHT_Y) > 0.1f)) {
 			cameraMoveRotate.x += 0.1f;
 		}
-		else if ((Gamepad::GetStick(Gamepad::Stick::RIGHT_Y) < -0.01f)) {
+		else if ((Gamepad::GetStick(Gamepad::Stick::RIGHT_Y) < -0.1f)) {
 			cameraMoveRotate.x -= 0.1f;
 		}
 
@@ -112,6 +114,16 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		}
 		if (KeyInput::LongPush(DIK_RIGHT)) {
 			camera.rotate.y += 0.01f;
+		}
+
+		if (Gamepad::Pushed(Gamepad::Button::A)) {
+			testAudio->Start(1.0f);
+		}
+		else if (Gamepad::Pushed(Gamepad::Button::B)) {
+			testAudio->Pause();
+		}
+		else if (Gamepad::Pushed(Gamepad::Button::X)) {
+			testAudio->Stop();
 		}
 
 
