@@ -1,5 +1,5 @@
 #include "GamePad.h"
-#include <iostream>
+#include "externals/imgui/imgui.h"
 #include <limits.h>
 #include <algorithm>
 
@@ -90,25 +90,27 @@ void Gamepad::Vibration(float leftVibIntensity, float rightVibIntensity) {
 	XInputSetState(0, &Gamepad::GetInstans()->vibration);
 }
 
-void Gamepad::Draw() {
-    printf("LeftX = %.2f%%\n", static_cast<float>(GetStick(Stick::LEFT_X)) * 100.0f);
-	printf( "LeftY = %.2f%%\n", static_cast<float>(GetStick(Stick::LEFT_Y)) * 100.0f);
-	printf( "RightX = %.2f%%\n", static_cast<float>(GetStick(Stick::RIGHT_X)) * 100.0f);
-	printf( "RightY = %.2f%%\n", static_cast<float>(GetStick(Stick::RIGHT_Y)) * 100.0f);
-	printf( "UP = %d\n", GetButton(Button::UP));
-	printf("DOWN = %d\n", GetButton(Button::DOWN));
-	printf("LEFT = %d\n", GetButton(Button::LEFT));
-	printf("RIGHT = %d\n", GetButton(Button::RIGHT));
-	printf("START = %d\n", GetButton(Button::START));
-	printf("BACK = %d\n", GetButton(Button::BACK));
-	printf("LEFT_THUMB = %d\n", GetButton(Button::LEFT_THUMB));
-	printf("RIGHT_THUMB = %d\n", GetButton(Button::RIGHT_THUMB));
-	printf("LEFT_SHOULDER = %d\n", GetButton(Button::LEFT_SHOULDER));
-	printf("RIGHT_SHOULDER = %d\n", GetButton(Button::RIGHT_SHOULDER));
-	printf("A = %d\n", GetButton(Button::A));
-	printf("B = %d\n", GetButton(Button::B));
-	printf("X = %d\n", GetButton(Button::X));
-	printf("Y = %d\n", GetButton(Button::Y));
-	printf("LEFT_TRIGER = %f\n", GetTriger(Triger::LEFT));
-	printf("RIGHT_TRIGER = %f\n", GetTriger(Triger::RIGHT));
+void Gamepad::Debug() {
+	ImGui::Begin("Gamepad Debug");
+    ImGui::Text("LeftX          = %.2f%%\n", static_cast<float>(GetStick(Stick::LEFT_X)) * 100.0f);
+	ImGui::Text("LeftY          = %.2f%%\n", static_cast<float>(GetStick(Stick::LEFT_Y)) * 100.0f);
+	ImGui::Text("RightX         = %.2f%%\n", static_cast<float>(GetStick(Stick::RIGHT_X)) * 100.0f);
+	ImGui::Text("RightY         = %.2f%%\n", static_cast<float>(GetStick(Stick::RIGHT_Y)) * 100.0f);
+	ImGui::Text("LEFT_TRIGER    = %.2f%%\n", GetTriger(Triger::LEFT) * 100.0f);
+	ImGui::Text("RIGHT_TRIGER   = %.2f%%\n", GetTriger(Triger::RIGHT) * 100.0f);
+	ImGui::Text("UP             = %d\n", GetButton(Button::UP));
+	ImGui::Text("DOWN           = %d\n", GetButton(Button::DOWN));
+	ImGui::Text("LEFT           = %d\n", GetButton(Button::LEFT));
+	ImGui::Text("RIGHT          = %d\n", GetButton(Button::RIGHT));
+	ImGui::Text("START          = %d\n", GetButton(Button::START));
+	ImGui::Text("BACK           = %d\n", GetButton(Button::BACK));
+	ImGui::Text("LEFT_THUMB     = %d\n", GetButton(Button::LEFT_THUMB));
+	ImGui::Text("RIGHT_THUMB    = %d\n", GetButton(Button::RIGHT_THUMB));
+	ImGui::Text("LEFT_SHOULDER  = %d\n", GetButton(Button::LEFT_SHOULDER));
+	ImGui::Text("RIGHT_SHOULDER = %d\n", GetButton(Button::RIGHT_SHOULDER));
+	ImGui::Text("A              = %d\n", GetButton(Button::A));
+	ImGui::Text("B              = %d\n", GetButton(Button::B));
+	ImGui::Text("X              = %d\n", GetButton(Button::X));
+	ImGui::Text("Y              = %d\n", GetButton(Button::Y));
+	ImGui::End();
 }

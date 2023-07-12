@@ -125,5 +125,5 @@ public:
 	static void Vibration(float leftVibIntensity, float rightVibIntensity);
 
 	// デバッグ用
-	static void Draw();
+	static void Debug();
 };
