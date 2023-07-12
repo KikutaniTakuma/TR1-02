@@ -53,7 +53,7 @@ float Gamepad::GetTriger(Triger type) {
 		break;
 
 	default:
-		return 0;
+		return 0.0f;
 		break;
 	}
 }
@@ -76,7 +76,7 @@ float Gamepad::GetStick(Stick type) {
 		return static_cast<float>(Gamepad::GetInstans()->state.Gamepad.sThumbRY) * kNormal;
 		break;
 	default:
-		return 0;
+		return 0.0f;
 		break;
 	}
 }
@@ -91,10 +91,10 @@ void Gamepad::Vibration(float leftVibIntensity, float rightVibIntensity) {
 }
 
 void Gamepad::Draw() {
-    printf("LeftX = %.2f%%\n", static_cast<float>(GetStick(Stick::LEFT_X)) / SHRT_MAX * 100.0f);
-	printf( "LeftY = %.2f%%\n", static_cast<float>(GetStick(Stick::LEFT_Y)) / SHRT_MAX * 100.0f);
-	printf( "RightX = %.2f%%\n", static_cast<float>(GetStick(Stick::RIGHT_X)) / SHRT_MAX * 100.0f);
-	printf( "RightY = %.2f%%\n", static_cast<float>(GetStick(Stick::RIGHT_Y)) / SHRT_MAX * 100.0f);
+    printf("LeftX = %.2f%%\n", static_cast<float>(GetStick(Stick::LEFT_X)) * 100.0f);
+	printf( "LeftY = %.2f%%\n", static_cast<float>(GetStick(Stick::LEFT_Y)) * 100.0f);
+	printf( "RightX = %.2f%%\n", static_cast<float>(GetStick(Stick::RIGHT_X)) * 100.0f);
+	printf( "RightY = %.2f%%\n", static_cast<float>(GetStick(Stick::RIGHT_Y)) * 100.0f);
 	printf( "UP = %d\n", GetButton(Button::UP));
 	printf("DOWN = %d\n", GetButton(Button::DOWN));
 	printf("LEFT = %d\n", GetButton(Button::LEFT));
@@ -109,6 +109,6 @@ void Gamepad::Draw() {
 	printf("B = %d\n", GetButton(Button::B));
 	printf("X = %d\n", GetButton(Button::X));
 	printf("Y = %d\n", GetButton(Button::Y));
-	printf("LEFT_TRIGER = %d\n", GetTriger(Triger::LEFT));
-	printf("RIGHT_TRIGER = %d\n", GetTriger(Triger::RIGHT));
+	printf("LEFT_TRIGER = %f\n", GetTriger(Triger::LEFT));
+	printf("RIGHT_TRIGER = %f\n", GetTriger(Triger::RIGHT));
 }

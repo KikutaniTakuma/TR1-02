@@ -74,17 +74,17 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// 
 		/// XVˆ—
 		/// 
-		if ((Gamepad::GetStick(Gamepad::Stick::RIGHT_X) > 10000)) {
+		if ((Gamepad::GetStick(Gamepad::Stick::RIGHT_X) > 0.01f)) {
 			cameraMoveRotate.y += 0.1f;
 		}
-		else if ((Gamepad::GetStick(Gamepad::Stick::RIGHT_X) < -10000)) {
+		else if ((Gamepad::GetStick(Gamepad::Stick::RIGHT_X) < -0.01f)) {
 			cameraMoveRotate.y -= 0.1f;
 		}
 
-		if ((Gamepad::GetStick(Gamepad::Stick::RIGHT_Y) > 10000)) {
+		if ((Gamepad::GetStick(Gamepad::Stick::RIGHT_Y) > 0.01f)) {
 			cameraMoveRotate.x += 0.1f;
 		}
-		else if ((Gamepad::GetStick(Gamepad::Stick::RIGHT_Y) < -10000)) {
+		else if ((Gamepad::GetStick(Gamepad::Stick::RIGHT_Y) < -0.01f)) {
 			cameraMoveRotate.x -= 0.1f;
 		}
 
