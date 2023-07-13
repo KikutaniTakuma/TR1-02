@@ -3,7 +3,6 @@
 #include "Math/Vector3/Vector3.h"
 #include "Math/Vector2/Vector2.h"
 #include <cmath>
-#include <immintrin.h>
 
 Vector4::Vector4() noexcept :
 	m{0.0f}
@@ -181,7 +180,7 @@ Vector4 Vector4::Normalize() const noexcept {
 }
 
 float Vector4::Dot(const Vector4& right) const noexcept {
-	return _mm_cvtss_f32(_mm_dp_ps(*(__m128*)m.data(), *(__m128*)right.m.data(), 0xff));
+	return _mm_cvtss_f32(_mm_dp_ps(m128, right.m128, 0xff));
 }
 
 Vector3 Vector4::getVector3D() const noexcept {

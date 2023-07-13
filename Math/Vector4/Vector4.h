@@ -1,5 +1,6 @@
 #pragma once
 #include <array>
+#include <immintrin.h>
 
 class Vector4 final {
 /// <summary>
@@ -84,5 +85,6 @@ public:
 		std::array<float, 4> m;
 		Vector4::Vector vec;
 		Vector4::Color color;
+		__m128 m128;
 	};
 };

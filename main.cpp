@@ -19,8 +19,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	Engine::Initialize(1280, 720, "DirectXGame");
 
 	Camera camera;
-	camera.fov = 0.45f;
-	//camera.pos = { 0.0f,0.0f,-10.0f };
 	camera.pos = { 8.24f,9.63f,-20.53f };
 	camera.rotate = { 0.44f,-0.4f, 0.0f };
 
@@ -41,8 +39,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	tex->Initialize("Texture2DShader/Texture2D.VS.hlsl", "Texture2DShader/Texture2DNone.PS.hlsl");
 
 	auto texDefault = std::make_unique<Texture2D>();
-	 texDefault->LoadTexture("./Resources/uvChecker.png");
-	 texDefault->Initialize("Texture2DShader/Texture2D.VS.hlsl", "Texture2DShader/Texture2DColorChoose.PS.hlsl");
+	texDefault->LoadTexture("./Resources/uvChecker.png");
+	texDefault->Initialize("Texture2DShader/Texture2D.VS.hlsl", "Texture2DShader/Texture2DColorChoose.PS.hlsl");
 
 
 	auto pera = std::make_unique<PeraRender>();
@@ -132,13 +130,12 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		ImGui::DragFloat3("cameraPos", &camera.pos.x, 0.01f);
 		ImGui::DragFloat3("cameraRotate", &camera.rotate.x, 0.01f);
 		ImGui::DragFloat3("cameraScale", &camera.scale.x, 0.01f);
-		ImGui::DragFloat3("cameraMoveRotate", &cameraMoveRotate.x, 0.01f);
+		ImGui::DragFloat("cameraFoV", &camera.fov, 0.01f);
 		ImGui::End();
 
 		ImGui::Begin("Texture");
 		ImGui::DragFloat2("tex pos", &texPos.x, 1.0f);
 		ImGui::DragFloat("tex rotate", &texRotate, 0.01f);
-
 		ImGui::DragFloat2("texDefaultPos", &texDefaultPos.x, 1.0f);
 		ImGui::End();
 
