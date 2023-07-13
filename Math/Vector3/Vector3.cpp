@@ -82,18 +82,14 @@ Vector3& Vector3::operator*=(float scalar) noexcept {
 Vector3 Vector3::operator*(const Mat4x4& mat) const noexcept {
 	Vector3 result;
 	Vector4 vec = { *this,1.0f };
-	auto tmp = mat;
-	tmp.Transepose();
-
-	result.x = vec.Dot(tmp[0]);
-	result.y = vec.Dot(tmp[1]);
-	result.z = vec.Dot(tmp[2]);
-	float&& w = vec.Dot(tmp[3]);
+	result.x = x * mat[0][0] + y * mat[1][0] + z * mat[2][0] + 1.0f * mat[3][0];
+	result.y = x * mat[0][1] + y * mat[1][1] + z * mat[2][1] + 1.0f * mat[3][1];
+	result.z = x * mat[0][2] + y * mat[1][2] + z * mat[2][2] + 1.0f * mat[3][2];
+	const float&& w = x * mat[0][3] + y * mat[1][3] + z * mat[2][3] + 1.0f * mat[3][3];
 	assert(w != 0.0f);
-	w = 1.0f / w;
-	result.x *= w;
-	result.y *= w;
-	result.z *= w;
+	result.x /= w;
+	result.y /= w;
+	result.z /= w;
 
 	return result;
 }

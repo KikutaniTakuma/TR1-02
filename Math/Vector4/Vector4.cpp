@@ -29,7 +29,7 @@ Vector4::Vector4(const Vector2& vec2, float z, float w) noexcept :
 {}
 
 Vector4& Vector4::operator=(const Vector4& right) noexcept {
-	_mm_store_ps(m.data(), *(__m128*)right.m.data());
+	std::copy(right.m.begin(), right.m.end(), m.begin());
 
 	return *this;
 }

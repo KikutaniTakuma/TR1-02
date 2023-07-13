@@ -22,8 +22,7 @@ Mat4x4::Mat4x4(const std::array<Vector4, 4>& num) {
 }
 
 Mat4x4& Mat4x4::operator=(const Mat4x4& mat) {
-	_mm256_store_ps(m[0].m.data(), *(__m256*)mat.m[0].m.data());
-	_mm256_store_ps(m[2].m.data(), *(__m256*)mat.m[2].m.data());
+	std::copy(mat.m.begin(), mat.m.end(), m.begin());
 
 	return *this;
 }
@@ -36,12 +35,12 @@ Mat4x4& Mat4x4::operator=(Mat4x4&& mat) noexcept {
 
 Mat4x4 Mat4x4::operator*(const Mat4x4& mat) const {
 	Mat4x4 result;
-	auto tmp = mat;
-	tmp.Transepose();
 
 	for (int y = 0; y < Mat4x4::HEIGHT; y++) {
 		for (int x = 0; x < Mat4x4::WIDTH; x++) {
-			result.m[y][x] = m[y].Dot(tmp[x]);
+			for (int i = 0; i < Mat4x4::WIDTH; i++) {
+				result.m[y][x] += this->m[y][i] * mat.m[i][x];
+			}
 		}
 	}
 
