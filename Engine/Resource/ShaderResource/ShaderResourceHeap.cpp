@@ -26,9 +26,10 @@ ShaderResourceHeap::~ShaderResourceHeap() {
 }
 
 void ShaderResourceHeap::Use() {
-	Engine::GetCommandList()->SetDescriptorHeaps(1, SRVHeap.GetAddressOf());
+	auto commandlist = Engine::GetCommandList();
+	commandlist->SetDescriptorHeaps(1, SRVHeap.GetAddressOf());
 	auto SrvHandle = SRVHeap->GetGPUDescriptorHandleForHeapStart();
-	Engine::GetCommandList()->SetGraphicsRootDescriptorTable(0, SrvHandle);
+	commandlist->SetGraphicsRootDescriptorTable(0, SrvHandle);
 }
 
 /// 

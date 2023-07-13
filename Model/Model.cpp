@@ -323,17 +323,18 @@ void Model::Draw(const Mat4x4& worldMat, const Mat4x4& viewProjectionMat, const 
 
 	dirLig->eyePos = cameraPos;
 
-	Engine::GetCommandList()->SetGraphicsRootSignature(rootSignature.Get());
+	auto commandlist = Engine::GetCommandList();
+	commandlist->SetGraphicsRootSignature(rootSignature.Get());
 	descHeap.Use();
 
-	Engine::GetCommandList()->SetPipelineState(graphicsPipelineState.Get());
+	commandlist->SetPipelineState(graphicsPipelineState.Get());
 	
-	//Engine::GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
-	Engine::GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	Engine::GetCommandList()->IASetVertexBuffers(0,1,&meshData.vertexView);
-	Engine::GetCommandList()->IASetIndexBuffer(&meshData.indexView);
+	//commandlist->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
+	commandlist->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	commandlist->IASetVertexBuffers(0,1,&meshData.vertexView);
+	commandlist->IASetIndexBuffer(&meshData.indexView);
 	
-	Engine::GetCommandList()->DrawIndexedInstanced(meshData.indexNum, 1, 0, 0, 0);
+	commandlist->DrawIndexedInstanced(meshData.indexNum, 1, 0, 0, 0);
 }
 
 Model::~Model() {

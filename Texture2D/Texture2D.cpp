@@ -256,12 +256,14 @@ void Texture2D::Draw(
 		Vector3(pos.x, pos.y, 0.01f)
 	);
 
+	auto commandlist = Engine::GetCommandList();
+
 	// 各種描画コマンドを積む
-	Engine::GetCommandList()->SetGraphicsRootSignature(rootSignature.Get());
-	Engine::GetCommandList()->SetPipelineState(graphicsPipelineState[size_t(blend)].Get());
-	Engine::GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	Engine::GetCommandList()->IASetVertexBuffers(0, 1, &vertexView);
-	Engine::GetCommandList()->IASetIndexBuffer(&indexView);
+	commandlist->SetGraphicsRootSignature(rootSignature.Get());
+	commandlist->SetPipelineState(graphicsPipelineState[size_t(blend)].Get());
+	commandlist->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	commandlist->IASetVertexBuffers(0, 1, &vertexView);
+	commandlist->IASetIndexBuffer(&indexView);
 	SRVHeap.Use();
-	Engine::GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
+	commandlist->DrawIndexedInstanced(6, 1, 0, 0, 0);
 }
