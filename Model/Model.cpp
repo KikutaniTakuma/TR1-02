@@ -31,7 +31,7 @@ Model::Model() :
 	dirLig->ligDirection = { 1.0f,-1.0f,-1.0f };
 	dirLig->ligDirection = dirLig->ligDirection.Normalize();
 	Vector4 colorTmp = Engine::UintToVector4(0xffffadff);
-	dirLig->ligColor = colorTmp.getVector3D();
+	dirLig->ligColor = colorTmp.GetVector3();
 
 	dirLig->ptPos = { 5.0f,5.0f,5.0f };
 	dirLig->ptColor = { 15.0f,15.0f,15.0f };

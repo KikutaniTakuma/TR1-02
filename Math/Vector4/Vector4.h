@@ -74,8 +74,8 @@ public:
 
 	float Dot(const Vector4& right) const noexcept;
 
-	class Vector3 getVector3D() const noexcept;
-	class Vector2 getVector2D() const noexcept;
+	class Vector3 GetVector3() const noexcept;
+	class Vector2 GetVector2() const noexcept;
 
 /// <summary>
 /// ƒƒ“ƒo•Ï”

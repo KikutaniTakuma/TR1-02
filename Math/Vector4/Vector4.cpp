@@ -183,9 +183,9 @@ float Vector4::Dot(const Vector4& right) const noexcept {
 	return _mm_cvtss_f32(_mm_dp_ps(m128, right.m128, 0xff));
 }
 
-Vector3 Vector4::getVector3D() const noexcept {
+Vector3 Vector4::GetVector3() const noexcept {
 	return Vector3(vec.x, vec.y, vec.z);
 }
-Vector2 Vector4::getVector2D() const noexcept {
+Vector2 Vector4::GetVector2() const noexcept {
 	return Vector2(vec.x, vec.y);
 }
