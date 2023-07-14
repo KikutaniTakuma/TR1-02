@@ -1,4 +1,4 @@
-#include "RootSignature.h"
+﻿#include "RootSignature.h"
 #include <cassert>
 
 void RootSignature::Cretate(const D3D12_ROOT_PARAMETER& rootParamator, bool isTexture) {
