@@ -10,6 +10,8 @@
 #include <string>
 #include "Engine/ConstBuffer/ConstBuffer.h"
 #include "Engine/Resource/ShaderResource/ShaderResourceHeap.h"
+#include "Engine/RootSignature/RootSignature.h"
+#include "PipelineManager/Pipeline/Pipeline.h"
 
 #include <wrl.h>
 
@@ -22,16 +24,16 @@ class Model {
 	struct Mesh {
 		Microsoft::WRL::ComPtr<ID3D12Resource> vertexBuffer = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12Resource> indexBuffer = nullptr;
-		// ’¸“_ƒoƒbƒtƒ@ƒrƒ…[
+		// é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ãƒ“ãƒ¥ãƒ¼
 		D3D12_VERTEX_BUFFER_VIEW vertexView{};
-		// ƒCƒ“ƒfƒbƒNƒXƒoƒbƒtƒ@ƒrƒ…[
+		// ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒãƒƒãƒ•ã‚¡ãƒ“ãƒ¥ãƒ¼
 		D3D12_INDEX_BUFFER_VIEW indexView{};
-		// ’¸“_ƒoƒbƒtƒ@ƒ}ƒbƒv
+		// é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ãƒãƒƒãƒ—
 		VertData* vertexMap = nullptr;
-		// ƒCƒ“ƒfƒbƒNƒXƒoƒbƒtƒ@ƒ}ƒbƒv
+		// ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒãƒƒãƒ•ã‚¡ãƒãƒƒãƒ—
 		uint16_t* indexMap = nullptr;
 
-		// index”
+		// indexæ•°
 		uint32_t indexNum = 0;
 	};
 
@@ -81,8 +83,8 @@ private:
 	IDxcBlob* hullShaderBlob = nullptr;
 	IDxcBlob* domainShaderBlob = nullptr;
 
-	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState = nullptr;
+	RootSignature rootSignature;
+	Pipeline pipeline;
 
 	bool loadObjFlg;
 	bool loadShaderFlg;

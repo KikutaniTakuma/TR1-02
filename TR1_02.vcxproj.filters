@@ -86,6 +86,15 @@
     <ClCompile Include="Engine\Resource\ShaderResource\ShaderResourceHeap.cpp">
       <Filter>Engine\Resource\ShaderResource</Filter>
     </ClCompile>
+    <ClCompile Include="PipelineManager\PipelineManager.cpp">
+      <Filter>PipelineManager</Filter>
+    </ClCompile>
+    <ClCompile Include="PipelineManager\Pipeline\Pipeline.cpp">
+      <Filter>PipelineManager\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\RootSignature\RootSignature.cpp">
+      <Filter>Engine\RootSignature</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -150,6 +159,15 @@
     </Filter>
     <Filter Include="Engine\Resource\ShaderResource">
       <UniqueIdentifier>{5325ce8c-6115-444a-84db-472a18839f17}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PipelineManager">
+      <UniqueIdentifier>{aef4978c-e692-4066-935c-3e9860805d1d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PipelineManager\Pipeline">
+      <UniqueIdentifier>{5aa3bff6-a3f3-4517-bc62-2b54b5734cbd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\RootSignature">
+      <UniqueIdentifier>{e940fd55-6a3e-4764-ba45-668507747c4f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -242,6 +260,15 @@
     </ClInclude>
     <ClInclude Include="Engine\Resource\ShaderResource\ShaderResourceHeap.h">
       <Filter>Engine\Resource\ShaderResource</Filter>
+    </ClInclude>
+    <ClInclude Include="PipelineManager\PipelineManager.h">
+      <Filter>PipelineManager</Filter>
+    </ClInclude>
+    <ClInclude Include="PipelineManager\Pipeline\Pipeline.h">
+      <Filter>PipelineManager\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\RootSignature\RootSignature.h">
+      <Filter>Engine\RootSignature</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

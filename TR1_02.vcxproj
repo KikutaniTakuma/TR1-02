@@ -153,6 +153,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Mouse\Mouse.cpp" />
     <ClCompile Include="Engine\Resource\RenderTarget\RenderTarget.cpp" />
     <ClCompile Include="Engine\Resource\ShaderResource\ShaderResourceHeap.cpp" />
+    <ClCompile Include="Engine\RootSignature\RootSignature.cpp" />
     <ClCompile Include="Engine\ShaderManager\ShaderManager.cpp" />
     <ClCompile Include="Engine\WinApp\WinApp.cpp" />
     <ClCompile Include="externals\imgui\imgui.cpp" />
@@ -169,6 +170,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Math\Vector4\Vector4.cpp" />
     <ClCompile Include="Model\Model.cpp" />
     <ClCompile Include="PeraRender\PeraRender.cpp" />
+    <ClCompile Include="PipelineManager\PipelineManager.cpp" />
+    <ClCompile Include="PipelineManager\Pipeline\Pipeline.cpp" />
     <ClCompile Include="Texture2D\Texture2D.cpp" />
     <ClCompile Include="TextureManager\TextureManager.cpp" />
     <ClCompile Include="TextureManager\Texture\Texture.cpp" />
@@ -185,6 +188,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Mouse\Mouse.h" />
     <ClInclude Include="Engine\Resource\RenderTarget\RenderTarget.h" />
     <ClInclude Include="Engine\Resource\ShaderResource\ShaderResourceHeap.h" />
+    <ClInclude Include="Engine\RootSignature\RootSignature.h" />
     <ClInclude Include="Engine\ShaderManager\ShaderManager.h" />
     <ClInclude Include="Engine\WinApp\WinApp.h" />
     <ClInclude Include="externals\imgui\imconfig.h" />
@@ -201,6 +205,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Math\Vector4\Vector4.h" />
     <ClInclude Include="Model\Model.h" />
     <ClInclude Include="PeraRender\PeraRender.h" />
+    <ClInclude Include="PipelineManager\PipelineManager.h" />
+    <ClInclude Include="PipelineManager\Pipeline\Pipeline.h" />
     <ClInclude Include="Texture2D\Texture2D.h" />
     <ClInclude Include="TextureManager\TextureManager.h" />
     <ClInclude Include="TextureManager\Texture\Texture.h" />

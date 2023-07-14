@@ -14,7 +14,8 @@ Model::Model() :
 	meshData(),
 	vertexShaderBlob(nullptr),
 	pixelShaderBlob(nullptr),
-	graphicsPipelineState(nullptr),
+	rootSignature(),
+	pipeline(),
 	loadObjFlg(false),
 	loadShaderFlg(false),
 	createGPFlg(false),
@@ -24,7 +25,7 @@ Model::Model() :
 	color(),
 	descHeap(16)
 {
-	// íPà çsóÒÇèëÇ´çûÇÒÇ≈Ç®Ç≠
+	// Âçò‰ΩçË°åÂàó„ÇíÊõ∏„ÅçËæº„Çì„Åß„Åä„Åè
 	wvpData->worldMat = MakeMatrixIndentity();
 	wvpData->viewProjectoionMat = MakeMatrixIndentity();
 
@@ -91,23 +92,23 @@ void Model::LoadObj(const std::string& fileName) {
 		assert(meshData.vertexBuffer);
 
 
-		// ÉäÉ\Å[ÉXÇÃêÊì™ÇÃÉAÉhÉåÉXÇ©ÇÁégÇ§
+		// „É™„ÇΩ„Éº„Çπ„ÅÆÂÖàÈ†≠„ÅÆ„Ç¢„Éâ„É¨„Çπ„Åã„Çâ‰Ωø„ÅÜ
 		meshData.vertexView.BufferLocation = meshData.vertexBuffer->GetGPUVirtualAddress();
-		// égópÇ∑ÇÈÉäÉ\Å[ÉXÇÃÉTÉCÉYÇÕí∏ì_3Ç¬ï™ÇÃÉTÉCÉY
+		// ‰ΩøÁî®„Åô„Çã„É™„ÇΩ„Éº„Çπ„ÅÆ„Çµ„Ç§„Ç∫„ÅØÈ†ÇÁÇπ3„Å§ÂàÜ„ÅÆ„Çµ„Ç§„Ç∫
 		meshData.vertexView.SizeInBytes = sizeof(VertData) * vertPositionNum;
-		// 1í∏ì_ìñÇΩÇËÇÃÉTÉCÉY
+		// 1È†ÇÁÇπÂΩì„Åü„Çä„ÅÆ„Çµ„Ç§„Ç∫
 		meshData.vertexView.StrideInBytes = sizeof(VertData);
 
-		// í∏ì_ÉäÉ\Å[ÉXÇ…ÉfÅ[É^ÇèëÇ´çûÇﬁ
+		// È†ÇÁÇπ„É™„ÇΩ„Éº„Çπ„Å´„Éá„Éº„Çø„ÇíÊõ∏„ÅçËæº„ÇÄ
 		meshData.vertexMap = nullptr;
-		// èëÇ´çûÇﬁÇΩÇﬂÇÃÉAÉhÉåÉXÇéÊìæ
+		// Êõ∏„ÅçËæº„ÇÄ„Åü„ÇÅ„ÅÆ„Ç¢„Éâ„É¨„Çπ„ÇíÂèñÂæó
 		meshData.vertexBuffer->Map(0, nullptr, reinterpret_cast<void**>(&meshData.vertexMap));
 
 
-		// indexBUfferê∂ê¨
+		// indexBUfferÁîüÊàê
 		meshData.indexBuffer = Engine::CreateBufferResuorce(sizeof(uint16_t) * meshData.indexNum);
 		assert(meshData.indexBuffer);
-		// ÉäÉ\Å[ÉXÇÃêÊì™ÇÃÉAÉhÉåÉXÇ©ÇÁégÇ§
+		// „É™„ÇΩ„Éº„Çπ„ÅÆÂÖàÈ†≠„ÅÆ„Ç¢„Éâ„É¨„Çπ„Åã„Çâ‰Ωø„ÅÜ
 		meshData.indexView.BufferLocation = meshData.indexBuffer->GetGPUVirtualAddress();
 		meshData.indexView.SizeInBytes = sizeof(uint16_t) * meshData.indexNum;
 		meshData.indexView.Format = DXGI_FORMAT_R16_UINT;
@@ -192,117 +193,14 @@ void Model::LoadShader(const std::string& vertexFileName, const std::string& pix
 
 void Model::CreateGraphicsPipeline() {
 	if (loadShaderFlg && loadObjFlg) {
-		// RootSignatureÇÃê∂ê¨
-		D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
-		descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+		rootSignature.Cretate(descHeap.GetParameter(), false);
+		
+		pipeline.SetShader(vertexShaderBlob, pixelShaderBlob, geometoryShaderBlob);
+		pipeline.SetVertexInput("POSITION", 0u, DXGI_FORMAT_R32G32B32A32_FLOAT);
+		pipeline.SetVertexInput("NORMAL", 0u, DXGI_FORMAT_R32G32B32_FLOAT);
+		pipeline.SetVertexInput("POSITION", 1u, DXGI_FORMAT_R32G32B32A32_FLOAT);
 
-		// RootParamaterçÏê¨ÅBï°êîê›íËèoóàÇÈÇÃÇ≈îzóÒ
-		D3D12_ROOT_PARAMETER roootParamaters = descHeap.GetParameter();
-		descriptionRootSignature.pParameters = &roootParamaters;
-		descriptionRootSignature.NumParameters = 1;
-
-		// ÉVÉäÉAÉâÉCÉYÇµÇƒÉoÉCÉiÉäÇ…Ç∑ÇÈ
-		ID3DBlob* signatureBlob = nullptr;
-		ID3DBlob* errorBlob = nullptr;
-		HRESULT  hr = D3D12SerializeRootSignature(&descriptionRootSignature, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
-		if (FAILED(hr)) {
-			OutputDebugStringA(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
-			assert(false);
-		}
-		// ÉoÉCÉiÉäÇÇ‡Ç∆Ç…ê∂ê¨
-		rootSignature = nullptr;
-		hr = Engine::GetDevice()->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(rootSignature.GetAddressOf()));
-		assert(SUCCEEDED(hr));
-		if (errorBlob) { errorBlob->Release(); }
-		signatureBlob->Release();
-
-
-		D3D12_INPUT_ELEMENT_DESC inputElementDescs[3] = {};
-		inputElementDescs[0].SemanticName = "POSITION";
-		inputElementDescs[0].SemanticIndex = 0;
-		inputElementDescs[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-		inputElementDescs[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-		inputElementDescs[1].SemanticName = "NORMAL";
-		inputElementDescs[1].SemanticIndex = 0;
-		inputElementDescs[1].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-		inputElementDescs[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-		inputElementDescs[2].SemanticName = "POSITION";
-		inputElementDescs[2].SemanticIndex = 1;
-		inputElementDescs[2].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-		inputElementDescs[2].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-		D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
-		inputLayoutDesc.pInputElementDescs = inputElementDescs;
-		inputLayoutDesc.NumElements = _countof(inputElementDescs);
-
-		// BlendStateÇÃê›íË
-		D3D12_BLEND_DESC blendDec{};
-		// ëSÇƒÇÃêFóvëfÇèëÇ´çûÇﬁ
-		blendDec.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
-
-		// RasterizerStateÇÃê›íË
-		D3D12_RASTERIZER_DESC rasterizerDesc{};
-		// ó†ñ (éûåvâÒÇË)Çï\é¶ÇµÇ»Ç¢
-		rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
-		// éOäpå`ÇÃíÜÇìhÇËÇ¬Ç‘Ç∑
-		rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
-		rasterizerDesc.DepthClipEnable = true;
-
-
-		// psoê∂ê¨
-		D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
-		graphicsPipelineStateDesc.pRootSignature = rootSignature.Get();
-		graphicsPipelineStateDesc.InputLayout = inputLayoutDesc;
-		graphicsPipelineStateDesc.VS = {
-			vertexShaderBlob->GetBufferPointer(),
-			vertexShaderBlob->GetBufferSize()
-		};
-		graphicsPipelineStateDesc.GS = {
-			geometoryShaderBlob->GetBufferPointer(),
-			geometoryShaderBlob->GetBufferSize()
-		};
-		graphicsPipelineStateDesc.PS = {
-			pixelShaderBlob->GetBufferPointer(),
-			pixelShaderBlob->GetBufferSize()
-		};
-		/*graphicsPipelineStateDesc.HS = {
-			hullShaderBlob->GetBufferPointer(),
-			hullShaderBlob->GetBufferSize()
-		};
-		graphicsPipelineStateDesc.DS = {
-			domainShaderBlob->GetBufferPointer(),
-			domainShaderBlob->GetBufferSize()
-		};*/
-
-		graphicsPipelineStateDesc.BlendState = blendDec;
-		graphicsPipelineStateDesc.RasterizerState = rasterizerDesc;
-		// èëÇ´çûÇﬁRTVÇÃèÓïÒ
-		graphicsPipelineStateDesc.NumRenderTargets = 1;
-		graphicsPipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-		// óòópÇ∑ÇÈÉgÉ|ÉçÉW(å`èÛ)ÇÃÉ^ÉCÉv
-		//graphicsPipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_PATCH;
-		graphicsPipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-		// Ç«ÇÃÇÊÇ§Ç…âÊñ Ç…ë≈ÇøçûÇﬁÇ©ÇÃê›íË
-		graphicsPipelineStateDesc.SampleDesc.Count = 1;
-		graphicsPipelineStateDesc.SampleDesc.Quality = 0;
-		graphicsPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
-		// 
-		graphicsPipelineStateDesc.DepthStencilState.DepthEnable = true;
-		graphicsPipelineStateDesc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-		graphicsPipelineStateDesc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
-		graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
-
-		graphicsPipelineStateDesc.BlendState.RenderTarget[0].BlendEnable = true;
-		graphicsPipelineStateDesc.BlendState.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;  // D3D12_BLEND_ZERO;
-		graphicsPipelineStateDesc.BlendState.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;  // D3D12_BLEND_SRC_COLOR;
-		graphicsPipelineStateDesc.BlendState.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
-		graphicsPipelineStateDesc.BlendState.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
-		graphicsPipelineStateDesc.BlendState.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
-		graphicsPipelineStateDesc.BlendState.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
-
-		// é¿ç€Ç…ê∂ê¨
-		graphicsPipelineState = nullptr;
-		hr = Engine::GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(graphicsPipelineState.GetAddressOf()));
-		assert(SUCCEEDED(hr));
+		pipeline.Create(rootSignature.get(), Pipeline::Blend::None, Pipeline::CullMode::Back, Pipeline::SolidState::Solid);
 
 		createGPFlg = true;
 	}
@@ -324,10 +222,8 @@ void Model::Draw(const Mat4x4& worldMat, const Mat4x4& viewProjectionMat, const 
 	dirLig->eyePos = cameraPos;
 
 	auto commandlist = Engine::GetCommandList();
-	commandlist->SetGraphicsRootSignature(rootSignature.Get());
+	pipeline.Use();
 	descHeap.Use();
-
-	commandlist->SetPipelineState(graphicsPipelineState.Get());
 	
 	//commandlist->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
 	commandlist->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
