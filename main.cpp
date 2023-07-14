@@ -26,7 +26,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 
 	auto model = std::make_unique<Model>();
-	model->LoadObj("./Resources/cube.obj");
+	model->LoadObj("./Resources/Cube.obj");
 	model->LoadShader("WaveShader/WaveNone.VS.hlsl", "WaveShader/Wave.PS.hlsl", "WaveShader/Wave.GS.hlsl");
 
 
@@ -158,8 +158,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		//tex->Draw(Vector2::identity, texRotate, texPos, camera2D.GetViewOthographics());
 
 		//texDefault->Draw(Vector2::identity, texRotate, texDefaultPos, camera2D.GetViewOthographics());
-
-		Gamepad::Debug();
 
 		pera->Draw();
 		///
