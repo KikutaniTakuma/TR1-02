@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "Engine/Engine.h"
 #include "Engine/RootSignature/RootSignature.h"
@@ -13,7 +13,9 @@ public:
 		None,
 		Noaml,
 		Add,
+		Sub,
 		Mul,
+		Transparent,
 
 		BlendTypeNum
 	};

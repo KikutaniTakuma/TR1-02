@@ -1,4 +1,4 @@
-﻿#include "Texture2D.h"
+#include "Texture2D.h"
 #include "Engine/ShaderManager/ShaderManager.h"
 #include "externals/imgui/imgui.h"
 
@@ -69,18 +69,22 @@ void Texture2D::CreateGraphicsPipeline() {
 	PipelineManager::SetVertexInput("TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT);
 
 	PipelineManager::SetState(Pipeline::Blend::None, Pipeline::CullMode::Back, Pipeline::SolidState::Solid);
-	graphicsPipelineState[0] = PipelineManager::Create();
+	graphicsPipelineState[(int)Pipeline::Blend::None] = PipelineManager::Create();
 
 	PipelineManager::SetState(Pipeline::Blend::Noaml, Pipeline::CullMode::Back, Pipeline::SolidState::Solid);
-	graphicsPipelineState[1] = PipelineManager::Create();
-
-
+	graphicsPipelineState[(int)Pipeline::Blend::Noaml] = PipelineManager::Create();
 
 	PipelineManager::SetState(Pipeline::Blend::Add, Pipeline::CullMode::Back, Pipeline::SolidState::Solid);
-	graphicsPipelineState[2] = PipelineManager::Create();
+	graphicsPipelineState[(int)Pipeline::Blend::Add] = PipelineManager::Create();
+
+	PipelineManager::SetState(Pipeline::Blend::Sub, Pipeline::CullMode::Back, Pipeline::SolidState::Solid);
+	graphicsPipelineState[(int)Pipeline::Blend::Sub] = PipelineManager::Create();
 
 	PipelineManager::SetState(Pipeline::Blend::Mul, Pipeline::CullMode::Back, Pipeline::SolidState::Solid);
-	graphicsPipelineState[3] = PipelineManager::Create();
+	graphicsPipelineState[(int)Pipeline::Blend::Mul] = PipelineManager::Create();
+
+	PipelineManager::SetState(Pipeline::Blend::Transparent, Pipeline::CullMode::Back, Pipeline::SolidState::Solid);
+	graphicsPipelineState[(int)Pipeline::Blend::Transparent] = PipelineManager::Create();
 
 	PipelineManager::StateReset();
 }
@@ -135,8 +139,8 @@ void Texture2D::Draw(
 
 	// 各種描画コマンドを積む
 	graphicsPipelineState[size_t(blend)]->Use();
+	SRVHeap.Use();
 	commandlist->IASetVertexBuffers(0, 1, &vertexView);
 	commandlist->IASetIndexBuffer(&indexView);
-	SRVHeap.Use();
 	commandlist->DrawIndexedInstanced(6, 1, 0, 0, 0);
 }

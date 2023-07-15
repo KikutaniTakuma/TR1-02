@@ -1,4 +1,4 @@
-﻿#include "Engine/Engine.h"
+#include "Engine/Engine.h"
 #include "externals/imgui/imgui.h"
 #include <chrono>
 #include <thread>
@@ -61,7 +61,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		// fps
 		ImGui::SetNextWindowPos({});
-		ImGui::SetNextWindowSize({150,50});
+		ImGui::SetNextWindowSizeConstraints({ 150,50 }, { 150,50 });
+		ImGui::SetNextWindowCollapsed(false);
 		ImGui::Begin("fps");
 		ImGui::Text("Frame rate: %3.0f fps", ImGui::GetIO().Framerate);
 		ImGui::End();
