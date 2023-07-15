@@ -18,6 +18,8 @@ void PipelineManager::CreateRootSgnature(const D3D12_ROOT_PARAMETER& rootParamat
 
 		rootSignature->Create(rootParamater_, isTexture_);
 
+		instance->rootSignature = rootSignature.get();
+
 		instance->rootSignatures.push_back(std::move(rootSignature));
 	}
 	else {
@@ -32,7 +34,12 @@ void PipelineManager::CreateRootSgnature(const D3D12_ROOT_PARAMETER& rootParamat
 
 			rootSignature->Create(rootParamater_, isTexture_);
 
+			instance->rootSignature = rootSignature.get();
+
 			instance->rootSignatures.push_back(std::move(rootSignature));
+		}
+		else {
+			instance->rootSignature = rootSignatureItr->get();
 		}
 	}
 }
@@ -56,8 +63,6 @@ void PipelineManager::SetState(
 }
 
 Pipeline* PipelineManager::Create() {
-	auto& rootSignature = (instance->rootSignatures.back());
-
 	if (instance->pipelines.empty()) {
 		auto pipeline = std::make_unique<Pipeline>();
 		pipeline->SetShader(instance->shader);
@@ -65,7 +70,7 @@ Pipeline* PipelineManager::Create() {
 			pipeline->SetVertexInput(std::get<0>(i), std::get<1>(i), std::get<2>(i));
 		}
 		pipeline->Create(
-			*rootSignature,
+			*instance->rootSignature,
 			instance->blend,
 			instance->cullMode,
 			instance->solidState,
@@ -84,7 +89,7 @@ Pipeline* PipelineManager::Create() {
 				instance->cullMode,
 				instance->solidState,
 				instance->numRenderTarget,
-				rootSignature->Get()
+				instance->rootSignature->Get()
 			);
 		};
 
@@ -97,7 +102,7 @@ Pipeline* PipelineManager::Create() {
 				pipeline->SetVertexInput(std::get<0>(i), std::get<1>(i), std::get<2>(i));
 			}
 			pipeline->Create(
-				*rootSignature,
+				*instance->rootSignature,
 				instance->blend,
 				instance->cullMode,
 				instance->solidState,
@@ -115,6 +120,7 @@ Pipeline* PipelineManager::Create() {
 }
 
 void PipelineManager::StateReset() {
+	instance->rootSignature = nullptr;
 	instance->shader = { nullptr };
 	instance->vertexInputStates.clear();
 	instance->blend = {};
@@ -125,6 +131,8 @@ void PipelineManager::StateReset() {
 
 PipelineManager::PipelineManager() :
 	pipelines(),
+	rootSignatures(),
+	rootSignature(nullptr),
 	shader{},
 	blend(),
 	cullMode(),

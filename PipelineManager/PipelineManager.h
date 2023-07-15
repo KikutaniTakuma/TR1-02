@@ -46,6 +46,8 @@ private:
 	std::list<std::unique_ptr<Pipeline>> pipelines;
 	std::list<std::unique_ptr<RootSignature>> rootSignatures;
 
+	RootSignature* rootSignature;
+
 	Shader shader;
 	Pipeline::Blend blend;
 	Pipeline::CullMode cullMode;
