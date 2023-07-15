@@ -1,4 +1,4 @@
-#include "Engine/Engine.h"
+ï»¿#include "Engine/Engine.h"
 #include "externals/imgui/imgui.h"
 #include <chrono>
 #include <thread>
@@ -15,7 +15,7 @@
 #include "Camera/Camera.h"
 
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
-	// ƒ‰ƒCƒuƒ‰ƒŠ‰Šú‰»
+	// ãƒ©ã‚¤ãƒ–ãƒ©ãƒªåˆæœŸåŒ–
 	Engine::Initialize(1280, 720, "DirectXGame");
 
 	Camera camera;
@@ -28,9 +28,16 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	auto model = std::make_unique<Model>();
 	model->LoadObj("./Resources/Cube.obj");
 	model->LoadShader("WaveShader/WaveNone.VS.hlsl", "WaveShader/Wave.PS.hlsl", "WaveShader/Wave.GS.hlsl");
+	model->CreateGraphicsPipeline();
 
+	auto model2 = std::make_unique<Model>();
+	model2->LoadObj("./Resources/Cube.obj");
+	model2->LoadShader("WaveShader/WaveNone.VS.hlsl", "WaveShader/Wave.PS.hlsl", "WaveShader/Wave.GS.hlsl");
+	model2->CreateGraphicsPipeline();
 
 	Mat4x4 modelWorldMat = VertMakeMatrixAffin(Vector3::identity, Vector3(), Vector3());
+	Vector3 model2Pos;
+	Mat4x4 modelWorldMat2 = VertMakeMatrixAffin(Vector3::identity, Vector3(), model2Pos);
 
 	Vector3 cameraMoveRotate{};
 
@@ -46,17 +53,17 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	auto pera = std::make_unique<PeraRender>();
 	pera->Initialize("PostShader/Post.VS.hlsl", "PostShader/PostNone.PS.hlsl");
 
-	Vector2 texPos = { 312.0f, 0.0f };
+	/*Vector2 texPos = { 312.0f, 0.0f };
 	Vector2 texDefaultPos = { -312.0f, 0.0f };
-	float texRotate = 0.0f;
+	float texRotate = 0.0f;*/
 
 	auto testAudio = AudioManager::GetInstance()->LoadWav("Alarm01.wav",true);
 
 	/// 
-	/// ƒƒCƒ“ƒ‹[ƒv
+	/// ãƒ¡ã‚¤ãƒ³ãƒ«ãƒ¼ãƒ—
 	/// 
 	while (Engine::WindowMassage()) {
-		// •`‰æŠJnˆ—
+		// æç”»é–‹å§‹å‡¦ç†
 		Engine::FrameStart();
 
 		// fps
@@ -66,13 +73,13 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		ImGui::Text("Frame rate: %3.0f fps", ImGui::GetIO().Framerate);
 		ImGui::End();
 
-		// “ü—Íˆ—
+		// å…¥åŠ›å‡¦ç†
 		Gamepad::Input();
 		KeyInput::Input();
 		Mouse::Input();
 
 		/// 
-		/// XVˆ—
+		/// æ›´æ–°å‡¦ç†
 		/// 
 		if ((Gamepad::GetStick(Gamepad::Stick::RIGHT_X) > 0.1f)) {
 			cameraMoveRotate.y += 0.1f;
@@ -133,27 +140,28 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		ImGui::DragFloat("cameraFoV", &camera.fov, 0.01f);
 		ImGui::End();
 
-		ImGui::Begin("Texture");
-		ImGui::DragFloat2("tex pos", &texPos.x, 1.0f);
-		ImGui::DragFloat("tex rotate", &texRotate, 0.01f);
-		ImGui::DragFloat2("texDefaultPos", &texDefaultPos.x, 1.0f);
+		ImGui::Begin("Model2Pos");
+		ImGui::DragFloat3("tex pos", &model2Pos.x, 0.1f);
 		ImGui::End();
 
 		camera.Update();
 		camera2D.Update();
 
+		modelWorldMat2 = VertMakeMatrixAffin(Vector3::identity, Vector3(), model2Pos);
+
 		//model->Update();
 
 		///
-		/// XVˆ—‚±‚±‚Ü‚Å
+		/// æ›´æ–°å‡¦ç†ã“ã“ã¾ã§
 		/// 
 
 		///
-		/// •`‰æˆ—
+		/// æç”»å‡¦ç†
 		/// 
 		pera->PreDraw();
 
 		model->Draw(modelWorldMat, camera.GetViewProjection(), camera.pos);
+		model2->Draw(modelWorldMat2, camera.GetViewProjection(), camera.pos);
 
 		//tex->Draw(Vector2::identity, texRotate, texPos, camera2D.GetViewOthographics());
 
@@ -161,14 +169,14 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		pera->Draw();
 		///
-		/// •`‰æˆ—‚±‚±‚Ü‚Å
+		/// æç”»å‡¦ç†ã“ã“ã¾ã§
 		/// 
 
 
-		// ƒtƒŒ[ƒ€I—¹ˆ—
+		// ãƒ•ãƒ¬ãƒ¼ãƒ çµ‚äº†å‡¦ç†
 		Engine::FrameEnd();
 
-		// Escape‚ª‰Ÿ‚³‚ê‚½‚çI—¹
+		// EscapeãŒæŠ¼ã•ã‚ŒãŸã‚‰çµ‚äº†
 		if (KeyInput::Releaed(DIK_ESCAPE)) {
 			break;
 		}

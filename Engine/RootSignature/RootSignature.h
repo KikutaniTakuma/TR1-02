@@ -3,21 +3,30 @@
 
 class RootSignature {
 public:
-	RootSignature() = default;
+	RootSignature();
 	~RootSignature() = default;
 
-	RootSignature(const RootSignature&) = delete;
-	RootSignature(RootSignature&&) = delete;
-	RootSignature& operator=(const RootSignature&) = delete;
-	RootSignature& operator=(RootSignature&&) = delete;
+	RootSignature(const RootSignature& right);
+	RootSignature(RootSignature&& right) noexcept;
 
 public:
-	void Cretate(const D3D12_ROOT_PARAMETER& rootParamator, bool isTexture = false);
+	RootSignature& operator=(const RootSignature& right);
+	RootSignature& operator=(RootSignature&& right) noexcept;
 
-	inline ID3D12RootSignature* get(){
+	bool operator==(const RootSignature& right) const;
+	bool operator!=(const RootSignature& right) const;
+
+public:
+	void Create(const D3D12_ROOT_PARAMETER& rootParamater_, bool isTexture_ = false);
+
+	inline ID3D12RootSignature* Get() {
 		return rootSignature.Get();
 	}
 
+	bool IsSame(const D3D12_ROOT_PARAMETER& rootParamater_, bool isTexture_) const;
+
 private:
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature;
+	D3D12_ROOT_PARAMETER rootParamater;
+	bool isTexture;
 };

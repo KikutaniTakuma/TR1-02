@@ -11,7 +11,7 @@
 #include "Engine/ConstBuffer/ConstBuffer.h"
 #include "Engine/Resource/ShaderResource/ShaderResourceHeap.h"
 #include "Engine/RootSignature/RootSignature.h"
-#include "PipelineManager/Pipeline/Pipeline.h"
+#include "PipelineManager/PipelineManager.h"
 
 #include <wrl.h>
 
@@ -69,7 +69,7 @@ public:
 	void Update();
 
 	void Draw(const Mat4x4& worldMat, const Mat4x4& viewProjectionMat, const Vector3& cameraPos);
-private:
+
 	void CreateGraphicsPipeline();
 
 
@@ -77,14 +77,9 @@ private:
 	ShaderResourceHeap descHeap;
 
 	Mesh meshData;
-	IDxcBlob* vertexShaderBlob = nullptr;
-	IDxcBlob* pixelShaderBlob = nullptr;
-	IDxcBlob* geometoryShaderBlob = nullptr;
-	IDxcBlob* hullShaderBlob = nullptr;
-	IDxcBlob* domainShaderBlob = nullptr;
+	Shader shader;
 
-	RootSignature rootSignature;
-	Pipeline pipeline;
+	Pipeline* pipeline;
 
 	bool loadObjFlg;
 	bool loadShaderFlg;

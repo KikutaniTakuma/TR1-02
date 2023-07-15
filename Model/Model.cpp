@@ -12,10 +12,8 @@
 
 Model::Model() :
 	meshData(),
-	vertexShaderBlob(nullptr),
-	pixelShaderBlob(nullptr),
-	rootSignature(),
-	pipeline(),
+	shader(),
+	pipeline(nullptr),
 	loadObjFlg(false),
 	loadShaderFlg(false),
 	createGPFlg(false),
@@ -176,12 +174,12 @@ void Model::LoadObj(const std::string& fileName) {
 
 void Model::LoadShader(const std::string& vertexFileName, const std::string& pixelFileName, const std::string& geometoryFileName) {
 	if (!loadShaderFlg) {
-		vertexShaderBlob = ShaderManager::GetInstance()->LoadVertexShader(vertexFileName);
-		assert(vertexShaderBlob != nullptr);
-		pixelShaderBlob = ShaderManager::GetInstance()->LoadPixelShader(pixelFileName);
-		assert(pixelShaderBlob != nullptr);
-		geometoryShaderBlob = ShaderManager::GetInstance()->LoadGeometoryShader(geometoryFileName);
-		assert(geometoryShaderBlob != nullptr);
+		shader.vertex = ShaderManager::GetInstance()->LoadVertexShader(vertexFileName);
+		assert(shader.vertex != nullptr);
+		shader.pixel = ShaderManager::GetInstance()->LoadPixelShader(pixelFileName);
+		assert(shader.pixel != nullptr);
+		shader.geometory = ShaderManager::GetInstance()->LoadGeometoryShader(geometoryFileName);
+		assert(shader.geometory != nullptr);
 	/*	hullShaderBlob = Engine::CompilerShader(ConvertString("WaveShader/Wave.HS.hlsl"), L"hs_6_0");
 		assert(hullShaderBlob != nullptr);
 		domainShaderBlob = Engine::CompilerShader(ConvertString("WaveShader/Wave.DS.hlsl"), L"ds_6_0");
@@ -193,14 +191,21 @@ void Model::LoadShader(const std::string& vertexFileName, const std::string& pix
 
 void Model::CreateGraphicsPipeline() {
 	if (loadShaderFlg && loadObjFlg) {
-		rootSignature.Cretate(descHeap.GetParameter(), false);
-		
-		pipeline.SetShader(vertexShaderBlob, pixelShaderBlob, geometoryShaderBlob);
-		pipeline.SetVertexInput("POSITION", 0u, DXGI_FORMAT_R32G32B32A32_FLOAT);
-		pipeline.SetVertexInput("NORMAL", 0u, DXGI_FORMAT_R32G32B32_FLOAT);
-		pipeline.SetVertexInput("POSITION", 1u, DXGI_FORMAT_R32G32B32A32_FLOAT);
+		PipelineManager::CreateRootSgnature(descHeap.GetParameter(), false);
 
-		pipeline.Create(rootSignature.get(), Pipeline::Blend::None, Pipeline::CullMode::Back, Pipeline::SolidState::Solid);
+		PipelineManager::SetShader(shader);
+		
+		PipelineManager::SetVertexInput("POSITION", 0u, DXGI_FORMAT_R32G32B32A32_FLOAT);
+		PipelineManager::SetVertexInput("NORMAL", 0u, DXGI_FORMAT_R32G32B32_FLOAT);
+		PipelineManager::SetVertexInput("POSITION", 1u, DXGI_FORMAT_R32G32B32A32_FLOAT);
+
+		PipelineManager::SetState(
+			Pipeline::Blend::None, 
+			Pipeline::CullMode::Back, 
+			Pipeline::SolidState::Solid
+		);
+
+		pipeline = PipelineManager::Create();
 
 		createGPFlg = true;
 	}
@@ -211,9 +216,6 @@ void Model::Update() {
 }
 
 void Model::Draw(const Mat4x4& worldMat, const Mat4x4& viewProjectionMat, const Vector3& cameraPos) {
-	if (!createGPFlg) {
-		CreateGraphicsPipeline();
-	}
 	assert(createGPFlg);
 
 	wvpData->worldMat = worldMat;
@@ -222,7 +224,7 @@ void Model::Draw(const Mat4x4& worldMat, const Mat4x4& viewProjectionMat, const 
 	dirLig->eyePos = cameraPos;
 
 	auto commandlist = Engine::GetCommandList();
-	pipeline.Use();
+	pipeline->Use();
 	descHeap.Use();
 	
 	//commandlist->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);

@@ -11,6 +11,14 @@
 #include <string>
 #include <wrl.h>
 
+struct Shader {
+	IDxcBlob* vertex = nullptr;
+	IDxcBlob* hull = nullptr;
+	IDxcBlob* domain = nullptr;
+	IDxcBlob* geometory = nullptr;
+	IDxcBlob* pixel = nullptr;
+};
+
 class ShaderManager {
 private:
 	ShaderManager();
@@ -38,9 +46,9 @@ public:
 
 private:
 	IDxcBlob* CompilerShader(
-		// CompilerするShaderファイルへのパス
+		// Compiler縺吶ｋShader繝輔ぃ繧､繝ｫ縺ｸ縺ｮ繝代せ
 		const std::wstring& filePath,
-		// Compilerに使用するProfile
+		// Compiler縺ｫ菴ｿ逕ｨ縺吶ｋProfile
 		const wchar_t* profile);
 
 private:

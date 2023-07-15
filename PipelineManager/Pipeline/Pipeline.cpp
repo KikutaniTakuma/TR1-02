@@ -4,13 +4,9 @@
 
 Pipeline::Pipeline():
 	graphicsPipelineState(),
-	vertex(nullptr),
-	pixel(nullptr),
-	hull(nullptr),
-	domain(nullptr),
-	geometory(nullptr),
+	shader(),
 	vertexInput(0),
-	rootSignature(nullptr),
+	rootSignature(),
 	blend(),
 	cullMode(),
 	solidState(),
@@ -26,28 +22,29 @@ Pipeline::Pipeline(Pipeline&& right) noexcept {
 
 Pipeline& Pipeline::operator=(Pipeline&& right) noexcept {
 	graphicsPipelineState = std::move(right.graphicsPipelineState);
-	vertex = std::move(right.vertex);
-	pixel = std::move(right.pixel);
-	hull = std::move(right.hull);
-	domain = std::move(right.domain);
-	geometory = std::move(right.geometory);
+	shader = std::move(right.shader);
 
 	return *this;
 }
 
 bool Pipeline::operator==(const Pipeline& right) const {
-	return vertex == right.vertex
-		&& pixel == right.pixel
-		&& hull == right.hull
-		&& domain == right.domain
-		&& geometory == right.geometory
+	return shader.vertex == right.shader.vertex
+		&& shader.pixel == right.shader.pixel
+		&& shader.hull == right.shader.hull
+		&& shader.domain == right.shader.domain
+		&& shader.geometory == right.shader.geometory
 		&& blend == right.blend
 		&& cullMode == right.cullMode
 		&& solidState == right.solidState
-		&& numRenderTarget && right.numRenderTarget;
+		&& numRenderTarget && right.numRenderTarget
+		&& rootSignature == right.rootSignature;
 }
 bool Pipeline::operator!=(const Pipeline& right) const {
 	return !this->operator==(right);
+}
+
+void Pipeline::CreateRootSgnature(const D3D12_ROOT_PARAMETER& rootParamater_, bool isTexture_) {
+	rootSignature.Create(rootParamater_, isTexture_);
 }
 
 void Pipeline::SetVertexInput(std::string semanticName, uint32_t semanticIndex, DXGI_FORMAT format) {
@@ -61,31 +58,18 @@ void Pipeline::SetVertexInput(std::string semanticName, uint32_t semanticIndex, 
 	semanticNames.push_back(semanticName);
 }
 
-void Pipeline::SetShader(
-	IDxcBlob* vertexShader, 
-	IDxcBlob* pixelShader,
-	IDxcBlob* geometoryShader,
-	IDxcBlob* hullShader, 
-	IDxcBlob* domainShader
-) {
-	vertex = vertexShader;
-	pixel = pixelShader;
-	hull = hullShader;
-	domain = domainShader;
-	geometory = geometoryShader;
+void Pipeline::SetShader(const Shader& shader_) {
+	shader = shader_;
 
-	assert(hull == domain || hull != nullptr && domain != nullptr);
+	assert(shader.hull == shader.domain || shader.hull != nullptr && shader.domain != nullptr);
 }
 
 void Pipeline::Create(
-	ID3D12RootSignature* rootSignature_,
 	Pipeline::Blend blend_,
 	Pipeline::CullMode cullMode_,
 	Pipeline::SolidState solidState_,
 	uint32_t numRenderTarget_
 ) {
-	rootSignature = rootSignature_;
-
 	blend = blend_;
 	cullMode = cullMode_;
 	solidState = solidState_;
@@ -118,31 +102,31 @@ void Pipeline::Create(
 
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
 
-	graphicsPipelineStateDesc.pRootSignature = rootSignature;
+	graphicsPipelineStateDesc.pRootSignature = rootSignature.Get();
 	graphicsPipelineStateDesc.InputLayout = inputLayoutDesc;
 
 	graphicsPipelineStateDesc.VS = {
-			vertex->GetBufferPointer(),
-			vertex->GetBufferSize()
+			shader.vertex->GetBufferPointer(),
+			shader.vertex->GetBufferSize()
 	};
 	graphicsPipelineStateDesc.PS = {
-			pixel->GetBufferPointer(),
-			pixel->GetBufferSize()
+			shader.pixel->GetBufferPointer(),
+			shader.pixel->GetBufferSize()
 	};
-	if (hull && domain) {
+	if (shader.hull && shader.domain) {
 		graphicsPipelineStateDesc.HS = {
-				hull->GetBufferPointer(),
-				hull->GetBufferSize()
+				shader.hull->GetBufferPointer(),
+				shader.hull->GetBufferSize()
 		};
 		graphicsPipelineStateDesc.DS = {
-				domain->GetBufferPointer(),
-				domain->GetBufferSize()
+				shader.domain->GetBufferPointer(),
+				shader.domain->GetBufferSize()
 		};
 	}
-	if (geometory) {
+	if (shader.geometory) {
 		graphicsPipelineStateDesc.GS = {
-				geometory->GetBufferPointer(),
-				geometory->GetBufferSize()
+				shader.geometory->GetBufferPointer(),
+				shader.geometory->GetBufferSize()
 		};
 	}
 
@@ -153,7 +137,7 @@ void Pipeline::Create(
 	graphicsPipelineStateDesc.NumRenderTargets = numRenderTarget;
 	graphicsPipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 	// 利用するトポロジ(形状)のタイプ
-	if (hull && domain) {
+	if (shader.hull && shader.domain) {
 		graphicsPipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_PATCH;
 	}
 	else {
@@ -213,12 +197,32 @@ void Pipeline::Create(
 void Pipeline::Use() {
 	assert(graphicsPipelineState);
 	auto commandlist = Engine::GetCommandList();
-	commandlist->SetGraphicsRootSignature(rootSignature);
+	commandlist->SetGraphicsRootSignature(rootSignature.Get());
 	commandlist->SetPipelineState(graphicsPipelineState.Get());
-	if (hull && domain) {
+	if (shader.hull && shader.domain) {
 		commandlist->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
 	}
 	else {
 		commandlist->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	}
+}
+
+bool Pipeline::IsSame(
+	const D3D12_ROOT_PARAMETER& rootParamater_, bool isTexture_,
+	const Shader& shader_,
+	Pipeline::Blend blend_,
+	Pipeline::CullMode cullMode_,
+	Pipeline::SolidState solidState_,
+	uint32_t numRenderTarget_
+) {
+	return shader.vertex == shader_.vertex
+		&& shader.pixel == shader_.pixel
+		&& shader.hull == shader_.hull
+		&& shader.domain == shader_.domain
+		&& shader.geometory == shader_.geometory
+		&& blend == blend_
+		&& cullMode == cullMode_
+		&& solidState == solidState_
+		&& numRenderTarget && numRenderTarget_
+		&& rootSignature.IsSame(rootParamater_, isTexture_);
 }
