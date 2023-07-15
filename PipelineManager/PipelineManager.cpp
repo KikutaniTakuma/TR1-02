@@ -23,7 +23,7 @@ void PipelineManager::CreateRootSgnature(const D3D12_ROOT_PARAMETER& rootParamat
 		instance->rootSignatures.push_back(std::move(rootSignature));
 	}
 	else {
-		auto IsSame = [&](const std::unique_ptr<RootSignature>& rootSignature_) {
+		auto IsSame = [&rootParamater_, &isTexture_](const std::unique_ptr<RootSignature>& rootSignature_) {
 			return rootSignature_->IsSame(rootParamater_, isTexture_);
 		};
 
@@ -82,7 +82,7 @@ Pipeline* PipelineManager::Create() {
 		return instance->pipelines.rbegin()->get();
 	}
 	else {
-		auto IsSmae = [&](const std::unique_ptr<Pipeline>& pipeline) {
+		auto IsSmae = [](const std::unique_ptr<Pipeline>& pipeline) {
 			return pipeline->IsSame(
 				instance->shader,
 				instance->blend,
