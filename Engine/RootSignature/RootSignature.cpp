@@ -1,4 +1,4 @@
-﻿#include "RootSignature.h"
+#include "RootSignature.h"
 #include <cassert>
 
 
@@ -15,11 +15,15 @@ RootSignature::RootSignature(RootSignature&& right) noexcept {
 }
 RootSignature& RootSignature::operator=(const RootSignature& right) {
 	rootSignature = right.rootSignature;
+	rootParamater = right.rootParamater;
+	isTexture = right.isTexture;
 
 	return *this;
 }
 RootSignature& RootSignature::operator=(RootSignature&& right) noexcept {
 	rootSignature = std::move(right.rootSignature);
+	rootParamater = std::move(right.rootParamater);
+	isTexture = std::move(right.isTexture);
 
 	return *this;
 }

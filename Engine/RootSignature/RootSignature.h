@@ -19,7 +19,7 @@ public:
 public:
 	void Create(const D3D12_ROOT_PARAMETER& rootParamater_, bool isTexture_ = false);
 
-	inline ID3D12RootSignature* Get() {
+	inline ID3D12RootSignature* Get() const {
 		return rootSignature.Get();
 	}
 

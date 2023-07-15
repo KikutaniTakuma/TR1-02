@@ -1,4 +1,4 @@
-﻿#include "Pipeline.h"
+#include "Pipeline.h"
 #include <cassert>
 #include <algorithm>
 
@@ -6,12 +6,12 @@ Pipeline::Pipeline():
 	graphicsPipelineState(),
 	shader(),
 	vertexInput(0),
-	rootSignature(),
 	blend(),
 	cullMode(),
 	solidState(),
 	numRenderTarget(1u),
-	semanticNames(0)
+	semanticNames(0),
+	rootSignature(nullptr)
 {
 	vertexInput.reserve(0);
 }
@@ -36,15 +36,10 @@ bool Pipeline::operator==(const Pipeline& right) const {
 		&& blend == right.blend
 		&& cullMode == right.cullMode
 		&& solidState == right.solidState
-		&& numRenderTarget && right.numRenderTarget
-		&& rootSignature == right.rootSignature;
+		&& numRenderTarget && right.numRenderTarget;
 }
 bool Pipeline::operator!=(const Pipeline& right) const {
 	return !this->operator==(right);
-}
-
-void Pipeline::CreateRootSgnature(const D3D12_ROOT_PARAMETER& rootParamater_, bool isTexture_) {
-	rootSignature.Create(rootParamater_, isTexture_);
 }
 
 void Pipeline::SetVertexInput(std::string semanticName, uint32_t semanticIndex, DXGI_FORMAT format) {
@@ -65,6 +60,7 @@ void Pipeline::SetShader(const Shader& shader_) {
 }
 
 void Pipeline::Create(
+	const RootSignature& rootSignature_,
 	Pipeline::Blend blend_,
 	Pipeline::CullMode cullMode_,
 	Pipeline::SolidState solidState_,
@@ -74,6 +70,8 @@ void Pipeline::Create(
 	cullMode = cullMode_;
 	solidState = solidState_;
 	numRenderTarget = numRenderTarget_;
+
+	rootSignature = rootSignature_.Get();
 
 
 	numRenderTarget = std::clamp(numRenderTarget, 1u, 8u);
@@ -102,7 +100,7 @@ void Pipeline::Create(
 
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
 
-	graphicsPipelineStateDesc.pRootSignature = rootSignature.Get();
+	graphicsPipelineStateDesc.pRootSignature = rootSignature;
 	graphicsPipelineStateDesc.InputLayout = inputLayoutDesc;
 
 	graphicsPipelineStateDesc.VS = {
@@ -197,7 +195,7 @@ void Pipeline::Create(
 void Pipeline::Use() {
 	assert(graphicsPipelineState);
 	auto commandlist = Engine::GetCommandList();
-	commandlist->SetGraphicsRootSignature(rootSignature.Get());
+	commandlist->SetGraphicsRootSignature(rootSignature);
 	commandlist->SetPipelineState(graphicsPipelineState.Get());
 	if (shader.hull && shader.domain) {
 		commandlist->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
@@ -208,12 +206,12 @@ void Pipeline::Use() {
 }
 
 bool Pipeline::IsSame(
-	const D3D12_ROOT_PARAMETER& rootParamater_, bool isTexture_,
 	const Shader& shader_,
 	Pipeline::Blend blend_,
 	Pipeline::CullMode cullMode_,
 	Pipeline::SolidState solidState_,
-	uint32_t numRenderTarget_
+	uint32_t numRenderTarget_,
+	ID3D12RootSignature* rootSignature_
 ) {
 	return shader.vertex == shader_.vertex
 		&& shader.pixel == shader_.pixel
@@ -223,6 +221,6 @@ bool Pipeline::IsSame(
 		&& blend == blend_
 		&& cullMode == cullMode_
 		&& solidState == solidState_
-		&& numRenderTarget && numRenderTarget_
-		&& rootSignature.IsSame(rootParamater_, isTexture_);
+		&& numRenderTarget == numRenderTarget_
+		&& rootSignature == rootSignature_;
 }

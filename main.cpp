@@ -30,14 +30,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	model->LoadShader("WaveShader/WaveNone.VS.hlsl", "WaveShader/Wave.PS.hlsl", "WaveShader/Wave.GS.hlsl");
 	model->CreateGraphicsPipeline();
 
-	auto model2 = std::make_unique<Model>();
-	model2->LoadObj("./Resources/Cube.obj");
-	model2->LoadShader("WaveShader/WaveNone.VS.hlsl", "WaveShader/Wave.PS.hlsl", "WaveShader/Wave.GS.hlsl");
-	model2->CreateGraphicsPipeline();
-
 	Mat4x4 modelWorldMat = VertMakeMatrixAffin(Vector3::identity, Vector3(), Vector3());
-	Vector3 model2Pos;
-	Mat4x4 modelWorldMat2 = VertMakeMatrixAffin(Vector3::identity, Vector3(), model2Pos);
 
 	Vector3 cameraMoveRotate{};
 
@@ -53,9 +46,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	auto pera = std::make_unique<PeraRender>();
 	pera->Initialize("PostShader/Post.VS.hlsl", "PostShader/PostNone.PS.hlsl");
 
-	/*Vector2 texPos = { 312.0f, 0.0f };
+	Vector2 texPos = { 312.0f, 0.0f };
 	Vector2 texDefaultPos = { -312.0f, 0.0f };
-	float texRotate = 0.0f;*/
+	float texRotate = 0.0f;
 
 	auto testAudio = AudioManager::GetInstance()->LoadWav("Alarm01.wav",true);
 
@@ -140,14 +133,14 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		ImGui::DragFloat("cameraFoV", &camera.fov, 0.01f);
 		ImGui::End();
 
-		ImGui::Begin("Model2Pos");
-		ImGui::DragFloat3("tex pos", &model2Pos.x, 0.1f);
+		ImGui::Begin("Texture");
+		ImGui::DragFloat2("tex pos", &texPos.x, 1.0f);
+		ImGui::DragFloat("tex rotate", &texRotate, 0.01f);
+		ImGui::DragFloat2("texDefaultPos", &texDefaultPos.x, 1.0f);
 		ImGui::End();
 
 		camera.Update();
 		camera2D.Update();
-
-		modelWorldMat2 = VertMakeMatrixAffin(Vector3::identity, Vector3(), model2Pos);
 
 		//model->Update();
 
@@ -161,11 +154,10 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		pera->PreDraw();
 
 		model->Draw(modelWorldMat, camera.GetViewProjection(), camera.pos);
-		model2->Draw(modelWorldMat2, camera.GetViewProjection(), camera.pos);
 
-		//tex->Draw(Vector2::identity, texRotate, texPos, camera2D.GetViewOthographics());
+		tex->Draw(Vector2::identity, texRotate, texPos, camera2D.GetViewOthographics());
 
-		//texDefault->Draw(Vector2::identity, texRotate, texDefaultPos, camera2D.GetViewOthographics());
+		texDefault->Draw(Vector2::identity, texRotate, texDefaultPos, camera2D.GetViewOthographics());
 
 		pera->Draw();
 		///

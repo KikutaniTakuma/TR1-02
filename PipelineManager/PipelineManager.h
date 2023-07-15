@@ -1,5 +1,6 @@
-﻿#pragma once
+#pragma once
 #include "Pipeline/Pipeline.h"
+#include "Engine/RootSignature/RootSignature.h"
 #include "Engine/ShaderManager/ShaderManager.h"
 #include <list>
 #include <vector>
@@ -35,14 +36,16 @@ public:
 
 	static Pipeline* Create();
 
+	/// 基本的にCreateした後に使う
+	static void StateReset();
+
 private:
 	static PipelineManager* instance;
 
 private:
 	std::list<std::unique_ptr<Pipeline>> pipelines;
+	std::list<std::unique_ptr<RootSignature>> rootSignatures;
 
-	D3D12_ROOT_PARAMETER rootParamater; 
-	bool isTexture;
 	Shader shader;
 	Pipeline::Blend blend;
 	Pipeline::CullMode cullMode;

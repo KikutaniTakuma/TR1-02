@@ -13,7 +13,9 @@ public:
 		None,
 		Noaml,
 		Add,
-		Mul
+		Mul,
+
+		BlendTypeNum
 	};
 	enum class CullMode {
 		None = D3D12_CULL_MODE_NONE,
@@ -47,8 +49,6 @@ public:
 /// メンバ関数
 /// </summary>
 public:
-	void CreateRootSgnature(const D3D12_ROOT_PARAMETER& rootParamater_, bool isTexture_);
-
 	void SetVertexInput(
 		std::string semanticName, 
 		uint32_t semanticIndex, 
@@ -58,6 +58,7 @@ public:
 	void SetShader(const Shader& shader_);
 
 	void Create(
+		const RootSignature& rootSignature,
 		Pipeline::Blend blend_,
 		Pipeline::CullMode cullMode_,
 		Pipeline::SolidState solidState_,
@@ -67,12 +68,13 @@ public:
 	void Use();
 
 	bool IsSame(
-		const D3D12_ROOT_PARAMETER& rootParamater_, bool isTexture_,
 		const Shader& shader_,
 		Pipeline::Blend blend_,
 		Pipeline::CullMode cullMode_,
 		Pipeline::SolidState solidState_,
-		uint32_t numRenderTarget_);
+		uint32_t numRenderTarget_,
+		ID3D12RootSignature* rootSignature_
+	);
 
 /// <summary>
 /// メンバ変数
@@ -85,9 +87,10 @@ private:
 	std::vector<D3D12_INPUT_ELEMENT_DESC> vertexInput;
 	std::vector<std::string> semanticNames;
 
-	RootSignature rootSignature;
 	Pipeline::Blend blend;
 	Pipeline::CullMode cullMode;
 	Pipeline::SolidState solidState;
 	uint32_t numRenderTarget;
+
+	ID3D12RootSignature* rootSignature;
 };

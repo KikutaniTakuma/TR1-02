@@ -1,4 +1,4 @@
-﻿#include "Model.h"
+#include "Model.h"
 #include "Engine/Engine.h"
 #include <fstream>
 #include <sstream>
@@ -206,6 +206,8 @@ void Model::CreateGraphicsPipeline() {
 		);
 
 		pipeline = PipelineManager::Create();
+
+		PipelineManager::StateReset();
 
 		createGPFlg = true;
 	}
