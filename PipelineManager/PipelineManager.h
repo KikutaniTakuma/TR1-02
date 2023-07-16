@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Pipeline/Pipeline.h"
 #include "Engine/RootSignature/RootSignature.h"
 #include "Engine/ShaderManager/ShaderManager.h"
@@ -34,6 +34,10 @@ public:
 		uint32_t numRenderTarget_ = 1u
 	);
 
+	/// <summary>
+	/// 設定したものでPSOの生成
+	/// </summary>
+	/// <returns>psoのポインタ(勝手にdeleteしてはいけない)</returns>
 	static Pipeline* Create();
 
 	/// 基本的にCreateした後に使う
