@@ -56,9 +56,9 @@ void Texture2D::Initialize(const std::string& vsFileName, const std::string& psF
 }
 
 void Texture2D::CreateShader(const std::string& vsFileName, const std::string& psFileName) {
-	shader.vertex = ShaderManager::GetInstance()->LoadVertexShader(vsFileName);
+	shader.vertex = ShaderManager::LoadVertexShader(vsFileName);
 	assert(shader.vertex);
-	shader.pixel = ShaderManager::GetInstance()->LoadPixelShader(psFileName);
+	shader.pixel = ShaderManager::LoadPixelShader(psFileName);
 	assert(shader.pixel);
 }
 
@@ -68,23 +68,23 @@ void Texture2D::CreateGraphicsPipeline() {
 	PipelineManager::SetVertexInput("POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT);
 	PipelineManager::SetVertexInput("TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT);
 
-	PipelineManager::SetState(Pipeline::Blend::None, Pipeline::CullMode::Back, Pipeline::SolidState::Solid);
-	graphicsPipelineState[(int)Pipeline::Blend::None] = PipelineManager::Create();
+	PipelineManager::SetState(Pipeline::Blend::None,Pipeline::SolidState::Solid);
+	graphicsPipelineState[Pipeline::Blend::None] = PipelineManager::Create();
 
-	PipelineManager::SetState(Pipeline::Blend::Noaml, Pipeline::CullMode::Back, Pipeline::SolidState::Solid);
-	graphicsPipelineState[(int)Pipeline::Blend::Noaml] = PipelineManager::Create();
+	PipelineManager::SetState(Pipeline::Blend::Noaml, Pipeline::SolidState::Solid);
+	graphicsPipelineState[Pipeline::Blend::Noaml] = PipelineManager::Create();
 
-	PipelineManager::SetState(Pipeline::Blend::Add, Pipeline::CullMode::Back, Pipeline::SolidState::Solid);
-	graphicsPipelineState[(int)Pipeline::Blend::Add] = PipelineManager::Create();
+	PipelineManager::SetState(Pipeline::Blend::Add, Pipeline::SolidState::Solid);
+	graphicsPipelineState[Pipeline::Blend::Add] = PipelineManager::Create();
 
-	PipelineManager::SetState(Pipeline::Blend::Sub, Pipeline::CullMode::Back, Pipeline::SolidState::Solid);
-	graphicsPipelineState[(int)Pipeline::Blend::Sub] = PipelineManager::Create();
+	PipelineManager::SetState(Pipeline::Blend::Sub, Pipeline::SolidState::Solid);
+	graphicsPipelineState[Pipeline::Blend::Sub] = PipelineManager::Create();
 
-	PipelineManager::SetState(Pipeline::Blend::Mul, Pipeline::CullMode::Back, Pipeline::SolidState::Solid);
-	graphicsPipelineState[(int)Pipeline::Blend::Mul] = PipelineManager::Create();
+	PipelineManager::SetState(Pipeline::Blend::Mul, Pipeline::SolidState::Solid);
+	graphicsPipelineState[Pipeline::Blend::Mul] = PipelineManager::Create();
 
-	PipelineManager::SetState(Pipeline::Blend::Transparent, Pipeline::CullMode::Back, Pipeline::SolidState::Solid);
-	graphicsPipelineState[(int)Pipeline::Blend::Transparent] = PipelineManager::Create();
+	PipelineManager::SetState(Pipeline::Blend::Transparent, Pipeline::SolidState::Solid);
+	graphicsPipelineState[Pipeline::Blend::Transparent] = PipelineManager::Create();
 
 	PipelineManager::StateReset();
 }

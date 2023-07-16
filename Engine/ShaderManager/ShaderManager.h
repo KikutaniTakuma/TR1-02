@@ -33,16 +33,15 @@ public:
 		return instance;
 	}
 
+public:
+	static IDxcBlob* LoadVertexShader(const std::string& fileName);
+	static IDxcBlob* LoadHullShader(const std::string& fileName);
+	static IDxcBlob* LoadDomainShader(const std::string& fileName);
+	static IDxcBlob* LoadGeometoryShader(const std::string& fileName);
+	static IDxcBlob* LoadPixelShader(const std::string& fileName);
+
 private:
 	static ShaderManager* instance;
-
-
-public:
-	IDxcBlob* LoadVertexShader(const std::string& fileName);
-	IDxcBlob* LoadHullShader(const std::string& fileName);
-	IDxcBlob* LoadDomainShader(const std::string& fileName);
-	IDxcBlob* LoadGeometoryShader(const std::string& fileName);
-	IDxcBlob* LoadPixelShader(const std::string& fileName);
 
 private:
 	IDxcBlob* CompilerShader(

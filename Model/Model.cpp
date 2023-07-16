@@ -174,13 +174,13 @@ void Model::LoadObj(const std::string& fileName) {
 
 void Model::LoadShader(const std::string& vertexFileName, const std::string& pixelFileName, const std::string& geometoryFileName) {
 	if (!loadShaderFlg) {
-		shader.vertex = ShaderManager::GetInstance()->LoadVertexShader(vertexFileName);
+		shader.vertex = ShaderManager::LoadVertexShader(vertexFileName);
 		assert(shader.vertex != nullptr);
-		shader.pixel = ShaderManager::GetInstance()->LoadPixelShader(pixelFileName);
+		shader.pixel = ShaderManager::LoadPixelShader(pixelFileName);
 		assert(shader.pixel != nullptr);
-		shader.geometory = ShaderManager::GetInstance()->LoadGeometoryShader(geometoryFileName);
+		shader.geometory = ShaderManager::LoadGeometoryShader(geometoryFileName);
 		assert(shader.geometory != nullptr);
-	/*	hullShaderBlob = Engine::CompilerShader(ConvertString("WaveShader/Wave.HS.hlsl"), L"hs_6_0");
+		/*hullShaderBlob = Engine::CompilerShader(ConvertString("WaveShader/Wave.HS.hlsl"), L"hs_6_0");
 		assert(hullShaderBlob != nullptr);
 		domainShaderBlob = Engine::CompilerShader(ConvertString("WaveShader/Wave.DS.hlsl"), L"ds_6_0");
 		assert(domainShaderBlob != nullptr);*/
@@ -199,11 +199,7 @@ void Model::CreateGraphicsPipeline() {
 		PipelineManager::SetVertexInput("NORMAL", 0u, DXGI_FORMAT_R32G32B32_FLOAT);
 		PipelineManager::SetVertexInput("POSITION", 1u, DXGI_FORMAT_R32G32B32A32_FLOAT);
 
-		PipelineManager::SetState(
-			Pipeline::Blend::None, 
-			Pipeline::CullMode::Back, 
-			Pipeline::SolidState::Solid
-		);
+		PipelineManager::SetState(Pipeline::Blend::None,  Pipeline::SolidState::Solid);
 
 		pipeline = PipelineManager::Create();
 

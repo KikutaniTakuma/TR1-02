@@ -1,4 +1,4 @@
-#include "ShaderManager.h"
+ï»¿#include "ShaderManager.h"
 #include "Engine/Engine.h"
 #include "Engine/ConvertString/ConvertString.h"
 #include <cassert>
@@ -13,7 +13,7 @@ ShaderManager::ShaderManager() {
 	geometoryShader.reserve(0);
 	pixelShader.reserve(0);
 
-	// dxcCompiler‚ğ‰Šú‰»
+	// dxcCompilerã‚’åˆæœŸåŒ–
 	dxcUtils = nullptr;
 	dxcCompiler = nullptr;
 	HRESULT hr = DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(dxcUtils.GetAddressOf()));
@@ -58,146 +58,146 @@ void ShaderManager::Finalize() {
 }
 
 IDxcBlob* ShaderManager::CompilerShader(
-	// Compiler‚·‚éShaderƒtƒ@ƒCƒ‹‚Ö‚ÌƒpƒX
+	// Compilerã™ã‚‹Shaderãƒ•ã‚¡ã‚¤ãƒ«ã¸ã®ãƒ‘ã‚¹
 	const std::wstring& filePath,
-	// Compiler‚Ég—p‚·‚éProfile
+	// Compilerã«ä½¿ç”¨ã™ã‚‹Profile
 	const wchar_t* profile)
 {
-	// 1. hlslƒtƒ@ƒCƒ‹‚ğ“Ç‚Ş
-	// ‚±‚ê‚©‚çƒVƒF[ƒ_[‚ğƒRƒ“ƒpƒCƒ‹‚·‚é|‚ğƒƒO‚Éo‚·
+	// 1. hlslãƒ•ã‚¡ã‚¤ãƒ«ã‚’èª­ã‚€
+	// ã“ã‚Œã‹ã‚‰ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã‚’ã‚³ãƒ³ãƒ‘ã‚¤ãƒ«ã™ã‚‹æ—¨ã‚’ãƒ­ã‚°ã«å‡ºã™
 	Log(ConvertString(std::format(L"Begin CompilerShader, path:{}, profile:{}\n", filePath, profile)));
-	// hlslƒtƒ@ƒCƒ‹‚ğ“Ç‚Ş
+	// hlslãƒ•ã‚¡ã‚¤ãƒ«ã‚’èª­ã‚€
 	Microsoft::WRL::ComPtr<IDxcBlobEncoding> shaderSource;
 	HRESULT hr = dxcUtils->LoadFile(filePath.c_str(), nullptr, shaderSource.GetAddressOf());
-	// “Ç‚ß‚È‚©‚Á‚½‚ç~‚ß‚é
+	// èª­ã‚ãªã‹ã£ãŸã‚‰æ­¢ã‚ã‚‹
 	assert(SUCCEEDED(hr));
-	// “Ç‚İ‚ñ‚¾ƒtƒ@ƒCƒ‹‚Ì“à—e‚ğİ’è‚·‚é
+	// èª­ã¿è¾¼ã‚“ã ãƒ•ã‚¡ã‚¤ãƒ«ã®å†…å®¹ã‚’è¨­å®šã™ã‚‹
 	DxcBuffer shaderSourceBuffer;
 	shaderSourceBuffer.Ptr = shaderSource->GetBufferPointer();
 	shaderSourceBuffer.Size = shaderSource->GetBufferSize();
 	shaderSourceBuffer.Encoding = DXC_CP_UTF8;
 
 
-	// 2. Compile‚·‚é
+	// 2. Compileã™ã‚‹
 	LPCWSTR arguments[] = {
-		filePath.c_str(), // ƒRƒ“ƒpƒCƒ‹‘ÎÛ‚Ìhlslƒtƒ@ƒCƒ‹–¼
-		L"-E", L"main", // ƒGƒ“ƒgƒŠ[ƒ|ƒCƒ“ƒg‚Ìw’èBŠî–{“I‚ÉmainˆÈŠO‚É‚Í‚µ‚È‚¢
-		L"-T", profile, // ShaderProfile‚Ìİ’è
-		L"-Zi", L"-Qembed_debug", // ƒfƒoƒbƒO—p‚Ìî•ñ‚ğ–„‚ß‚Ş
-		L"-Od", // Å“K‰»‚ğŠO‚µ‚Ä‚¨‚­
-		L"-Zpr" // ƒƒ‚ƒŠƒŒƒCƒAƒEƒg‚ğ—Dæ
+		filePath.c_str(), // ã‚³ãƒ³ãƒ‘ã‚¤ãƒ«å¯¾è±¡ã®hlslãƒ•ã‚¡ã‚¤ãƒ«å
+		L"-E", L"main", // ã‚¨ãƒ³ãƒˆãƒªãƒ¼ãƒã‚¤ãƒ³ãƒˆã®æŒ‡å®šã€‚åŸºæœ¬çš„ã«mainä»¥å¤–ã«ã¯ã—ãªã„
+		L"-T", profile, // ShaderProfileã®è¨­å®š
+		L"-Zi", L"-Qembed_debug", // ãƒ‡ãƒãƒƒã‚°ç”¨ã®æƒ…å ±ã‚’åŸ‹ã‚è¾¼ã‚€
+		L"-Od", // æœ€é©åŒ–ã‚’å¤–ã—ã¦ãŠã
+		L"-Zpr" // ãƒ¡ãƒ¢ãƒªãƒ¬ã‚¤ã‚¢ã‚¦ãƒˆã‚’å„ªå…ˆ
 	};
-	// ÀÛ‚ÉShader‚ğƒRƒ“ƒpƒCƒ‹‚·‚é
+	// å®Ÿéš›ã«Shaderã‚’ã‚³ãƒ³ãƒ‘ã‚¤ãƒ«ã™ã‚‹
 	Microsoft::WRL::ComPtr<IDxcResult> shaderResult;
 	hr = dxcCompiler->Compile(
-		&shaderSourceBuffer, // “Ç‚İ‚±‚ñ‚¾ƒtƒ@ƒCƒ‹
-		arguments,           // ƒRƒ“ƒpƒCƒ‹ƒIƒvƒVƒ‡ƒ“
-		_countof(arguments), // ƒRƒ“ƒpƒCƒ‹ƒIƒvƒVƒ‡ƒ“‚Ì”
-		includeHandler.Get(),      // include‚ªŠÜ‚Ü‚ê‚½”X
-		IID_PPV_ARGS(shaderResult.GetAddressOf()) // ƒRƒ“ƒpƒCƒ‹Œ‹‰Ê
+		&shaderSourceBuffer, // èª­ã¿ã“ã‚“ã ãƒ•ã‚¡ã‚¤ãƒ«
+		arguments,           // ã‚³ãƒ³ãƒ‘ã‚¤ãƒ«ã‚ªãƒ—ã‚·ãƒ§ãƒ³
+		_countof(arguments), // ã‚³ãƒ³ãƒ‘ã‚¤ãƒ«ã‚ªãƒ—ã‚·ãƒ§ãƒ³ã®æ•°
+		includeHandler.Get(),      // includeãŒå«ã¾ã‚ŒãŸè«¸ã€…
+		IID_PPV_ARGS(shaderResult.GetAddressOf()) // ã‚³ãƒ³ãƒ‘ã‚¤ãƒ«çµæœ
 	);
 
-	// ƒRƒ“ƒpƒCƒ‹ƒGƒ‰[‚Å‚Í‚È‚­dxc‚ª‹N“®‚Å‚«‚È‚¢‚È‚Ç’v–½“I‚Èó‹µ
+	// ã‚³ãƒ³ãƒ‘ã‚¤ãƒ«ã‚¨ãƒ©ãƒ¼ã§ã¯ãªãdxcãŒèµ·å‹•ã§ããªã„ãªã©è‡´å‘½çš„ãªçŠ¶æ³
 	assert(SUCCEEDED(hr));
 
-	// 3. ŒxEƒGƒ‰[‚ªo‚Ä‚È‚¢‚©Šm”F‚·‚é
+	// 3. è­¦å‘Šãƒ»ã‚¨ãƒ©ãƒ¼ãŒå‡ºã¦ãªã„ã‹ç¢ºèªã™ã‚‹
 	Microsoft::WRL::ComPtr<IDxcBlobUtf8> shaderError;
 	shaderResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(shaderError.GetAddressOf()), nullptr);
 	if (shaderError != nullptr && shaderError->GetStringLength() != 0) {
 		Log(shaderError->GetStringPointer());
-		// ŒxEƒGƒ‰[ƒ_ƒƒ[ƒbƒ^ƒC
+		// è­¦å‘Šãƒ»ã‚¨ãƒ©ãƒ¼ãƒ€ãƒ¡ã‚¼ãƒƒã‚¿ã‚¤
 		assert(false);
 	}
 
-	// 4. Compile‚ğó‚¯æ‚Á‚Ä•Ô‚·
+	// 4. Compileã‚’å—ã‘å–ã£ã¦è¿”ã™
 	IDxcBlob* shaderBlob = nullptr;
 	hr = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), nullptr);
 	assert(SUCCEEDED(hr));
-	// ¬Œ÷‚µ‚½ƒƒO‚ğo‚·
+	// æˆåŠŸã—ãŸãƒ­ã‚°ã‚’å‡ºã™
 	Log(ConvertString(std::format(L"Compile Succeeded, path:{}, profile:{}\n", filePath, profile)));
 
-	// Às—pƒoƒCƒiƒŠ‚ğƒŠƒ^[ƒ“
+	// å®Ÿè¡Œç”¨ãƒã‚¤ãƒŠãƒªã‚’ãƒªã‚¿ãƒ¼ãƒ³
 	return shaderBlob;
 }
 
 IDxcBlob* ShaderManager::LoadVertexShader(const std::string& fileName) {
-	if (vertexShader.empty()) {
-		IDxcBlob* shader = CompilerShader(ConvertString(fileName), L"vs_6_0");
+	if (instance->vertexShader.empty()) {
+		IDxcBlob* shader = instance->CompilerShader(ConvertString(fileName), L"vs_6_0");
 		assert(shader);
-		vertexShader.insert(std::make_pair(fileName, shader));
+		instance->vertexShader.insert(std::make_pair(fileName, shader));
 	}
 	else {
-		auto itr = vertexShader.find(fileName);
-		if (itr == vertexShader.end()) {
-			IDxcBlob* shader = CompilerShader(ConvertString(fileName), L"vs_6_0");
+		auto itr = instance->vertexShader.find(fileName);
+		if (itr == instance->vertexShader.end()) {
+			IDxcBlob* shader = instance->CompilerShader(ConvertString(fileName), L"vs_6_0");
 			assert(shader);
-			vertexShader.insert(std::make_pair(fileName, shader));
+			instance->vertexShader.insert(std::make_pair(fileName, shader));
 		}
 	}
-	return vertexShader[fileName].Get();
+	return instance->vertexShader[fileName].Get();
 }
 IDxcBlob* ShaderManager::LoadHullShader(const std::string& fileName) {
-	if (hullShader.empty()) {
-		IDxcBlob* shader = CompilerShader(ConvertString(fileName), L"hs_6_0");
+	if (instance->hullShader.empty()) {
+		IDxcBlob* shader = instance->CompilerShader(ConvertString(fileName), L"hs_6_0");
 		assert(shader);
-		hullShader.insert(std::make_pair(fileName, shader));
+		instance->hullShader.insert(std::make_pair(fileName, shader));
 	}
 	else {
-		auto itr = hullShader.find(fileName);
-		if (itr == hullShader.end()) {
-			IDxcBlob* shader = CompilerShader(ConvertString(fileName), L"hs_6_0");
+		auto itr = instance->hullShader.find(fileName);
+		if (itr == instance->hullShader.end()) {
+			IDxcBlob* shader = instance->CompilerShader(ConvertString(fileName), L"hs_6_0");
 			assert(shader);
-			hullShader.insert(std::make_pair(fileName, shader));
+			instance->hullShader.insert(std::make_pair(fileName, shader));
 		}
 	}
 
-	return hullShader[fileName].Get();
+	return instance->hullShader[fileName].Get();
 }
 IDxcBlob* ShaderManager::LoadDomainShader(const std::string& fileName) {
-	if (domainShader.empty()) {
-		IDxcBlob* shader = CompilerShader(ConvertString(fileName), L"ds_6_0");
+	if (instance->domainShader.empty()) {
+		IDxcBlob* shader = instance->CompilerShader(ConvertString(fileName), L"ds_6_0");
 		assert(shader);
-		domainShader.insert(std::make_pair(fileName, shader));
+		instance->domainShader.insert(std::make_pair(fileName, shader));
 	}
 	else {
-		auto itr = domainShader.find(fileName);
-		if (itr == domainShader.end()) {
-			IDxcBlob* shader = CompilerShader(ConvertString(fileName), L"ds_6_0");
+		auto itr = instance->domainShader.find(fileName);
+		if (itr == instance->domainShader.end()) {
+			IDxcBlob* shader = instance->CompilerShader(ConvertString(fileName), L"ds_6_0");
 			assert(shader);
-			domainShader.insert(std::make_pair(fileName, shader));
+			instance->domainShader.insert(std::make_pair(fileName, shader));
 		}
 	}
-	return domainShader[fileName].Get();
+	return instance->domainShader[fileName].Get();
 }
 IDxcBlob* ShaderManager::LoadGeometoryShader(const std::string& fileName) {
-	if (geometoryShader.empty()) {
-		IDxcBlob* shader = CompilerShader(ConvertString(fileName), L"gs_6_0");
+	if (instance->geometoryShader.empty()) {
+		IDxcBlob* shader = instance->CompilerShader(ConvertString(fileName), L"gs_6_0");
 		assert(shader);
-		geometoryShader.insert(std::make_pair(fileName, shader));
+		instance->geometoryShader.insert(std::make_pair(fileName, shader));
 	}
 	else {
-		auto itr = geometoryShader.find(fileName);
-		if (itr == geometoryShader.end()) {
-			IDxcBlob* shader = CompilerShader(ConvertString(fileName), L"gs_6_0");
+		auto itr = instance->geometoryShader.find(fileName);
+		if (itr == instance->geometoryShader.end()) {
+			IDxcBlob* shader = instance->CompilerShader(ConvertString(fileName), L"gs_6_0");
 			assert(shader);
-			geometoryShader.insert(std::make_pair(fileName, shader));
+			instance->geometoryShader.insert(std::make_pair(fileName, shader));
 		}
 	}
-	return geometoryShader[fileName].Get();
+	return instance->geometoryShader[fileName].Get();
 }
 IDxcBlob* ShaderManager::LoadPixelShader(const std::string& fileName) {
-	if (!pixelShader.empty()) {
-		IDxcBlob* shader = CompilerShader(ConvertString(fileName), L"ps_6_0");
+	if (instance->pixelShader.empty()) {
+		IDxcBlob* shader = instance->CompilerShader(ConvertString(fileName), L"ps_6_0");
 		assert(shader);
-		pixelShader.insert(std::make_pair(fileName, shader));
+		instance->pixelShader.insert(std::make_pair(fileName, shader));
 	}
 	else {
-		auto itr = pixelShader.find(fileName);
-		if (itr == pixelShader.end()) {
-			IDxcBlob* shader = CompilerShader(ConvertString(fileName), L"ps_6_0");
+		auto itr = instance->pixelShader.find(fileName);
+		if (itr == instance->pixelShader.end()) {
+			IDxcBlob* shader = instance->CompilerShader(ConvertString(fileName), L"ps_6_0");
 			assert(shader);
-			pixelShader.insert(std::make_pair(fileName, shader));
+			instance->pixelShader.insert(std::make_pair(fileName, shader));
 		}
 	}
-	return pixelShader[fileName].Get();
+	return instance->pixelShader[fileName].Get();
 }

@@ -1,5 +1,6 @@
 #include "PipelineManager.h"
 #include <cassert>
+#include <algorithm>
 
 PipelineManager* PipelineManager::instance = nullptr;
 
@@ -52,11 +53,11 @@ void PipelineManager::SetShader(const Shader& shader_) {
 
 void PipelineManager::SetState(
 	Pipeline::Blend blend_,
-	Pipeline::CullMode cullMode_,
 	Pipeline::SolidState solidState_,
+	Pipeline::CullMode cullMode_,
 	uint32_t numRenderTarget_
 ) {
-	instance->blend = blend_;
+	instance->blend = std::clamp(blend_, Pipeline::Blend::None, Pipeline::Blend(Pipeline::Blend::BlendTypeNum - 1));
 	instance->cullMode = cullMode_;
 	instance->solidState = solidState_;
 	instance->numRenderTarget = numRenderTarget_;

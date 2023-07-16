@@ -9,7 +9,7 @@ class Pipeline {
 /// サブクラス
 /// </summary>
 public:
-	enum class Blend {
+	enum Blend : uint16_t {
 		None,
 		Noaml,
 		Add,
@@ -17,8 +17,9 @@ public:
 		Mul,
 		Transparent,
 
-		BlendTypeNum
+		BlendTypeNum,
 	};
+
 	enum class CullMode {
 		None = D3D12_CULL_MODE_NONE,
 		Back = D3D12_CULL_MODE_BACK,
