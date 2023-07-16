@@ -66,20 +66,18 @@ void RootSignature::Create(const D3D12_ROOT_PARAMETER& rootParamater_, bool isTe
 
 	isTexture = isTexture_;
 
-	if (isTexture) {
-		// sampler
-		D3D12_STATIC_SAMPLER_DESC staticSamplers{};
-		staticSamplers.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
-		staticSamplers.AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-		staticSamplers.AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-		staticSamplers.AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-		staticSamplers.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
-		staticSamplers.MaxLOD = D3D12_FLOAT32_MAX;
-		staticSamplers.ShaderRegister = 0;
-		staticSamplers.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-		descriptionRootSignature.pStaticSamplers = &staticSamplers;
-		descriptionRootSignature.NumStaticSamplers = 1;
-	}
+	D3D12_STATIC_SAMPLER_DESC staticSamplers{};
+	staticSamplers.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+	staticSamplers.AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	staticSamplers.AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	staticSamplers.AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	staticSamplers.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
+	staticSamplers.MaxLOD = D3D12_FLOAT32_MAX;
+	staticSamplers.ShaderRegister = 0;
+	staticSamplers.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+
+	descriptionRootSignature.pStaticSamplers = isTexture ? &staticSamplers : nullptr;
+	descriptionRootSignature.NumStaticSamplers = isTexture ? 1u : 0u;
 
 	// シリアライズしてバイナリにする
 	Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob;
