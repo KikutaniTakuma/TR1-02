@@ -6,19 +6,19 @@
 
 class RenderTarget {
 public:
-	// ƒfƒBƒXƒNƒŠƒvƒ^‚Ì‘å‚«‚³‚ÍƒfƒtƒHƒ‹ƒgƒRƒ“ƒXƒgƒ‰ƒNƒ^‚Å4
+	// ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ã®å¤§ãã•ã¯ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã§4
 	RenderTarget();
 	RenderTarget(uint16_t numDescriptor);
 	~RenderTarget();
 
 public:
-	// ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚Éİ’è‚·‚é
-	void SetThisTarget();
+	// ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã«è¨­å®šã™ã‚‹
+	void SetThisRenderTarget();
 
-	// ƒƒCƒ“ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚É•ÏX(RenderTarget::SetThisTarget()‚ğg‚Á‚½‚ç•K‚¸ŒÄ‚Î‚È‚¯‚ê‚Î‚È‚ç‚È‚¢)
+	// ãƒ¡ã‚¤ãƒ³ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã«å¤‰æ›´(RenderTarget::SetThisTarget()ã‚’ä½¿ã£ãŸã‚‰å¿…ãšå‘¼ã°ãªã‘ã‚Œã°ãªã‚‰ãªã„)
 	void SetMainRenderTarget();
 
-	// ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚Éİ’è‚µ‚½Resource‚ğShaderResource‚Æ‚µ‚Äg‚¤
+	// ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã«è¨­å®šã—ãŸResourceã‚’ShaderResourceã¨ã—ã¦ä½¿ã†
 	void UseThisRenderTargetShaderResource();
 
 	template<class T>

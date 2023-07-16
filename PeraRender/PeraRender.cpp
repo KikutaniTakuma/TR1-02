@@ -62,7 +62,7 @@ void PeraRender::CreateGraphicsPipeline() {
 	cbuffer->center.y = 360.0f;
 	cbuffer->wipeSize = 300.0f;
 
-	// RootSignature‚Ì¶¬
+	// RootSignatureã®ç”Ÿæˆ
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
 	descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
@@ -99,7 +99,7 @@ void PeraRender::CreateGraphicsPipeline() {
 	descriptionRootSignature.pStaticSamplers = &staticSamplers;
 	descriptionRootSignature.NumStaticSamplers = 1;
 
-	// ƒVƒŠƒAƒ‰ƒCƒY‚µ‚ÄƒoƒCƒiƒŠ‚É‚·‚é
+	// ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºã—ã¦ãƒã‚¤ãƒŠãƒªã«ã™ã‚‹
 	ID3DBlob* signatureBlob = nullptr;
 	ID3DBlob* errorBlob = nullptr;
 	HRESULT  hr = D3D12SerializeRootSignature(&descriptionRootSignature, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
@@ -107,7 +107,7 @@ void PeraRender::CreateGraphicsPipeline() {
 		OutputDebugStringA(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
 		assert(false);
 	}
-	// ƒoƒCƒiƒŠ‚ğ‚à‚Æ‚É¶¬
+	// ãƒã‚¤ãƒŠãƒªã‚’ã‚‚ã¨ã«ç”Ÿæˆ
 	if (rootSignature) {
 		rootSignature.Reset();
 	}
@@ -118,7 +118,7 @@ void PeraRender::CreateGraphicsPipeline() {
 	signatureBlob->Release();
 
 
-	// pso¶¬
+	// psoç”Ÿæˆ
 	D3D12_INPUT_ELEMENT_DESC inputElementDescs[2] = {};
 	inputElementDescs[0].SemanticName = "POSITION";
 	inputElementDescs[0].SemanticIndex = 0;
@@ -134,16 +134,16 @@ void PeraRender::CreateGraphicsPipeline() {
 	inputLayoutDesc.pInputElementDescs = inputElementDescs;
 	inputLayoutDesc.NumElements = _countof(inputElementDescs);
 
-	// BlendState‚Ìİ’è
+	// BlendStateã®è¨­å®š
 	D3D12_BLEND_DESC blendDec{};
-	// ‘S‚Ä‚ÌF—v‘f‚ğ‘‚«‚Ş
+	// å…¨ã¦ã®è‰²è¦ç´ ã‚’æ›¸ãè¾¼ã‚€
 	blendDec.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
 
-	// RasterizerState‚Ìİ’è
+	// RasterizerStateã®è¨­å®š
 	D3D12_RASTERIZER_DESC rasterizerDesc{};
-	// — –Ê(Œv‰ñ‚è)‚ğ•\¦‚µ‚È‚¢
+	// è£é¢(æ™‚è¨ˆå›ã‚Š)ã‚’è¡¨ç¤ºã—ãªã„
 	rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
-	// OŠpŒ`‚Ì’†‚ğ“h‚è‚Â‚Ô‚·
+	// ä¸‰è§’å½¢ã®ä¸­ã‚’å¡—ã‚Šã¤ã¶ã™
 	rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
 	rasterizerDesc.DepthClipEnable = true;
 
@@ -164,12 +164,12 @@ void PeraRender::CreateGraphicsPipeline() {
 
 	graphicsPipelineStateDesc.BlendState = blendDec;
 	graphicsPipelineStateDesc.RasterizerState = rasterizerDesc;
-	// ‘‚«‚ŞRTV‚Ìî•ñ
+	// æ›¸ãè¾¼ã‚€RTVã®æƒ…å ±
 	graphicsPipelineStateDesc.NumRenderTargets = 1;
 	graphicsPipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-	// —˜—p‚·‚éƒgƒ|ƒƒW(Œ`ó)‚Ìƒ^ƒCƒv
+	// åˆ©ç”¨ã™ã‚‹ãƒˆãƒãƒ­ã‚¸(å½¢çŠ¶)ã®ã‚¿ã‚¤ãƒ—
 	graphicsPipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-	// ‚Ç‚Ì‚æ‚¤‚É‰æ–Ê‚É‘Å‚¿‚Ş‚©‚Ìİ’è
+	// ã©ã®ã‚ˆã†ã«ç”»é¢ã«æ‰“ã¡è¾¼ã‚€ã‹ã®è¨­å®š
 	graphicsPipelineStateDesc.SampleDesc.Count = 1;
 	graphicsPipelineStateDesc.SampleDesc.Quality = 0;
 	graphicsPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
@@ -182,7 +182,7 @@ void PeraRender::CreateGraphicsPipeline() {
 	graphicsPipelineStateDesc.BlendState.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
 	graphicsPipelineStateDesc.BlendState.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
 
-	// ÀÛ‚É¶¬
+	// å®Ÿéš›ã«ç”Ÿæˆ
 	if (graphicsPipelineState) {
 		graphicsPipelineState.Reset();
 	}
@@ -192,14 +192,14 @@ void PeraRender::CreateGraphicsPipeline() {
 }
 
 void PeraRender::PreDraw() {
-	render.SetThisTarget();
+	render.SetThisRenderTarget();
 }
 
 void PeraRender::Draw() {
-	// •`‰ææ‚ğƒƒCƒ“ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚É•ÏX
+	// æç”»å…ˆã‚’ãƒ¡ã‚¤ãƒ³ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã«å¤‰æ›´
 	render.SetMainRenderTarget();
 
-	// Šeí•`‰æƒRƒ}ƒ“ƒh‚ğÏ‚Ş
+	// å„ç¨®æç”»ã‚³ãƒãƒ³ãƒ‰ã‚’ç©ã‚€
 	Engine::GetCommandList()->SetGraphicsRootSignature(rootSignature.Get());
 	Engine::GetCommandList()->SetPipelineState(graphicsPipelineState.Get());
 	Engine::GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
