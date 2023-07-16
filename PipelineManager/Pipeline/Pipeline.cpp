@@ -197,6 +197,9 @@ void Pipeline::Create(
 
 	HRESULT hr = Engine::GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(graphicsPipelineState.GetAddressOf()));
 	assert(SUCCEEDED(hr));
+	if (!SUCCEEDED(hr)) {
+		return;
+	}
 }
 
 void Pipeline::Use() {

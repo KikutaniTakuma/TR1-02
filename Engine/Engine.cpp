@@ -127,7 +127,7 @@ void Engine::InitializeDirect3D() {
 	// IDXGIFactory生成
 	auto hr = CreateDXGIFactory(IID_PPV_ARGS(dxgiFactory.GetAddressOf()));
 	assert(SUCCEEDED(hr));
-	if (hr != S_OK) {
+	if (!SUCCEEDED(hr)) {
 		return;
 	}
 
@@ -339,6 +339,9 @@ void Engine::InitializeInput() {
 	HRESULT hr = DirectInput8Create(WinApp::GetInstance()->getWNDCLASSEX().hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8,
 		reinterpret_cast<void**>(directInput.GetAddressOf()), nullptr);
 	assert(SUCCEEDED(hr));
+	if (hr != S_OK) {
+		return;
+	}
 }
 
 

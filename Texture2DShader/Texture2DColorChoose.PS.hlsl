@@ -32,13 +32,15 @@ float4 main(Output input) : SV_TARGET{
         s = texColor.y;
     }
     else   if(colorType == 2){
-         texColor.z -= pibot;
+        texColor.z -= pibot;
         texColor.z = (texColor.z + abs(texColor.z)) * 0.5f;
         texColor.z = ceil(texColor.z);
         s = texColor.z;
     }
     else {
-        return texColor;
+       s = pibot;
+       float4 finalColor = lerp(texColor, monochro, s);
+       return finalColor;
     }
    
 

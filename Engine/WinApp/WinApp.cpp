@@ -32,8 +32,7 @@ LRESULT WinApp::WindowProcedure(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 }
 
 void WinApp::Create(const std::wstring& windowTitle, int32_t width, int32_t height) {
-	HRESULT hr =  CoInitializeEx(nullptr, COINIT_MULTITHREADED);
-	assert(SUCCEEDED(hr));
+	CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 
 	windowName = windowTitle;
 
