@@ -1,4 +1,4 @@
-﻿#include "Engine.h"
+#include "Engine.h"
 #include <cassert>
 #include <format>
 #include <filesystem>
@@ -87,6 +87,8 @@ void Engine::Initialize(int windowWidth, int windowHeight, const std::string& wi
 	engine->InitializeInput();
 
 	engine->InitializeDraw();
+
+	engine->InitializeSprite();
 
 	KeyInput::Initialize();
 	Mouse::Initialize();
@@ -348,6 +350,90 @@ void Engine::InitializeInput() {
 
 
 
+/// <summary>
+/// 文字表示関係
+/// </summary>
+void Engine::InitializeSprite() {
+	fontHeap = Engine::CreateDescriptorHeap(
+		D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 16, true
+	);
+
+	// GraphicsMemory初期化
+	gmemory.reset(new DirectX::GraphicsMemory(device.Get()));
+
+	DirectX::ResourceUploadBatch resUploadBach(device.Get());
+	resUploadBach.Begin();
+	DirectX::RenderTargetState rtState(
+		DXGI_FORMAT_R8G8B8A8_UNORM_SRGB,
+		DXGI_FORMAT_D32_FLOAT
+	);
+
+	DirectX::SpriteBatchPipelineStateDescription pd(rtState);
+
+	// SpriteFontオブジェクトの初期化
+	spriteBatch.reset(new DirectX::SpriteBatch(device.Get(), resUploadBach, pd));
+	// ビューポート
+	D3D12_VIEWPORT viewport{};
+	// クライアント領域のサイズと一緒にして画面全体に表示
+	viewport.Width = static_cast<float>(engine->clientWidth);
+	viewport.Height = static_cast<float>(engine->clientHeight);
+	viewport.TopLeftX = 0;
+	viewport.TopLeftY = 0;
+	viewport.MinDepth = 0.0f;
+	viewport.MaxDepth = 1.0f;
+	spriteBatch->SetViewport(viewport);
+
+	spriteFont.reset(new DirectX::SpriteFont(
+		device.Get(),
+		resUploadBach,
+		L"Font/fonttest.spritefont",
+		fontHeap->GetCPUDescriptorHandleForHeapStart(),
+		fontHeap->GetGPUDescriptorHandleForHeapStart()
+	));
+
+	auto future = resUploadBach.End(commandQueue.Get());
+
+	// Fenceの値を更新
+	engine->fenceVal++;
+	// GPUがここまでたどり着いたときに、Fenceの値を指定した値に代入するようにSignalを送る
+	engine->commandQueue->Signal(engine->fence.Get(), engine->fenceVal);
+
+	// Fenceの値が指定したSigna値にたどり着いているか確認する
+	// GetCompletedValueの初期値はFence作成時に渡した初期値
+	if (engine->fence->GetCompletedValue() < engine->fenceVal) {
+		// 指定したSignal値にたどり着いていないので、たどり着くまで待つようにイベントを設定する
+		engine->fence->SetEventOnCompletion(engine->fenceVal, engine->fenceEvent);
+		// イベントを待つ
+		WaitForSingleObject(engine->fenceEvent, INFINITE);
+	}
+
+	future.wait();
+}
+
+void Engine::StringDraw(
+	const std::string& str,
+	const Vector2& pos,
+	float rotation,
+	Vector2 scale,
+	uint32_t color) {
+	engine->commandList->SetDescriptorHeaps(1, engine->fontHeap.GetAddressOf());
+
+	engine->spriteBatch->Begin(engine->commandList.Get());
+	engine->spriteFont->DrawString(
+		engine->spriteBatch.get(),
+		str.c_str(),
+		DirectX::XMFLOAT2(pos.x, pos.y),
+		UintToVector4(color).m128,
+		rotation,
+		DirectX::XMFLOAT2(static_cast<float>(0), static_cast<float>(0)),
+		DirectX::XMFLOAT2(scale.x, scale.y)
+	);
+	engine->spriteBatch->End();
+}
+
+
+
+
 
 
 
@@ -572,6 +658,7 @@ void Engine::FrameEnd() {
 
 	// GPUとOSに画面の交換を行うように通知する
 	engine->swapChain->Present(1, 0);
+	engine->gmemory->Commit(engine->commandQueue.Get());
 
 	// Fenceの値を更新
 	engine->fenceVal++;
@@ -610,6 +697,7 @@ Engine::~Engine() {
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
 
+	fontHeap->Release();
 	dsvHeap->Release();
 	depthStencilResource->Release();
 	CloseHandle(fenceEvent);

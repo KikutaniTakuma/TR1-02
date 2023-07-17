@@ -52,6 +52,13 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	auto testAudio = AudioManager::GetInstance()->LoadWav("Alarm01.wav",true);
 
+	std::string text;
+	text.reserve(32);
+	text.resize(32);
+	Vector2 textPos;
+	float textRotation = 0.0f;
+	Vector2 textScale = Vector2::identity;
+
 	/// 
 	/// メインループ
 	/// 
@@ -89,7 +96,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			cameraMoveRotate.x -= 0.1f;
 		}
 
-		if (KeyInput::LongPush(DIK_W)) {
+		/*if (KeyInput::LongPush(DIK_W)) {
 			camera.pos.z += 0.1f;
 		}
 		if (KeyInput::LongPush(DIK_S)) {
@@ -113,7 +120,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		}
 		if (KeyInput::LongPush(DIK_RIGHT)) {
 			camera.rotate.y += 0.01f;
-		}
+		}*/
 
 		if (Gamepad::Pushed(Gamepad::Button::A)) {
 			testAudio->Start(1.0f);
@@ -143,6 +150,13 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		camera.Update();
 		camera2D.Update();
 
+		ImGui::Begin("Text");
+		ImGui::InputText("DrawText", text.data(), text.size());
+		ImGui::DragFloat2("TextPos", &textPos.x);
+		ImGui::DragFloat("TextRotate", &textRotation, 0.01f);
+		ImGui::DragFloat2("TextScale", &textScale.x, 0.01f);
+		ImGui::End();
+
 		//model->Update();
 
 		///
@@ -156,11 +170,13 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		model->Draw(modelWorldMat, camera.GetViewProjection(), camera.pos);
 
-		tex->Draw(Vector2::identity, texRotate, texPos, camera2D.GetViewOthographics(), Pipeline::Blend::Noaml);
+		//tex->Draw(Vector2::identity, texRotate, texPos, camera2D.GetViewOthographics(), Pipeline::Blend::Noaml);
 
-		texDefault->Draw(Vector2::identity, texRotate, texDefaultPos, camera2D.GetViewOthographics(), Pipeline::Blend::Noaml);
+		//texDefault->Draw(Vector2::identity, texRotate, texDefaultPos, camera2D.GetViewOthographics(), Pipeline::Blend::Noaml);
 
 		pera->Draw();
+
+		Engine::StringDraw(text, textPos, textRotation, textScale);
 		///
 		/// 描画処理ここまで
 		/// 

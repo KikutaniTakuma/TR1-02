@@ -14,10 +14,14 @@
 #endif
 #include <dinput.h>
 #pragma comment(lib, "dinput8.lib")
+#include <SpriteFont.h>
+#include <ResourceUploadBatch.h>
+#pragma comment(lib, "DirectXTK12.lib")
 
 #include <string>
 #include <vector>
 #include <chrono>
+#include <memory>
 
 #include "Math/Vector3/Vector3.h"
 #include "Math/Mat4x4/Mat4x4.h"
@@ -71,6 +75,10 @@ public:
 		return engine->commandList.Get();
 	}
 
+	static ID3D12CommandQueue* GetCommandQueue() {
+		return engine->commandQueue.Get();
+	}
+
 	static inline ID3D12Device* GetDevice() {
 		return engine->device.Get();
 	}
@@ -98,6 +106,18 @@ public:
 
 	static inline IDirectInput8* GetDirectInput() {
 		return engine->directInput.Get();
+	}
+
+	static inline DirectX::SpriteFont* GetFont() {
+		return engine->spriteFont.get();
+	}
+
+	static inline DirectX::SpriteBatch* GetSpriteBatch() {
+		return engine->spriteBatch.get();
+	}
+
+	static inline  Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetFontHeap() {
+		return engine->fontHeap;
 	}
 
 	///
@@ -203,6 +223,28 @@ private:
 private:
 	Microsoft::WRL::ComPtr<IDirectInput8> directInput;
 
+
+
+/// <summary>
+/// 文字表示関係
+/// </summary>
+private:
+	void InitializeSprite();
+public:
+	static void StringDraw(
+		const std::string& str, 
+		const Vector2& pos,
+		float rotation = 0.0f,
+		Vector2 scale = Vector2::identity, 
+		uint32_t color = 0xffffffff
+	);
+
+private:
+	std::unique_ptr<DirectX::GraphicsMemory> gmemory;
+	std::unique_ptr<DirectX::SpriteFont> spriteFont;
+	std::unique_ptr<DirectX::SpriteBatch> spriteBatch;
+
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> fontHeap;
 
 
 
