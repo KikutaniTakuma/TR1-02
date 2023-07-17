@@ -1,10 +1,10 @@
 #include "Texture2D.hlsli"
 
-cbuffer ColorPibot :register(b1){
+cbuffer ColorPibot :register(b2){
     float pibot;
 }
 
-cbuffer ColorPibot :register(b2){
+cbuffer ColorPibot :register(b3){
     int colorType;
 }
 
@@ -42,7 +42,7 @@ float4 main(Output input) : SV_TARGET{
     }
    
 
-    float4 finalColor = lerp(monochro, texColor, s);
+    float4 finalColor = lerp(monochro, texColor, s) * color;
 
     return finalColor;
 }

@@ -73,6 +73,7 @@ private:
 	std::array<Microsoft::WRL::ComPtr<ID3D12PipelineState>, size_t(Blend::BlendModeNum)> graphicsPipelineState;
 
 	ConstBuffer<Mat4x4> wvpMat;
+	ConstBuffer<Vector4> color;
 	ConstBuffer<float> colorPibot;
 	ConstBuffer<int> colorType;
 

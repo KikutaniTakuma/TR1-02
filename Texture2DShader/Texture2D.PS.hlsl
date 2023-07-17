@@ -1,5 +1,13 @@
 #include "Texture2D.hlsli"
 
+cbuffer ColorPibot :register(b2){
+    float pibot;
+}
+
+cbuffer ColorPibot :register(b3){
+    int colorType;
+}
+
 float4 main(Output input) : SV_TARGET{
     float w, h, levels;
     tex.GetDimensions(0, w,h,levels);
@@ -43,5 +51,5 @@ float4 main(Output input) : SV_TARGET{
     ret += tex.Sample(smp, input.uv + float2( 1.0f * dx, -2.0f * dy)) * 4.0f;
     ret += tex.Sample(smp, input.uv + float2( 2.0f * dx, -2.0f * dy)) * 1.0f;
 
-    return ret / 256.0f;
+    return (ret / 256.0f) * color;
 }

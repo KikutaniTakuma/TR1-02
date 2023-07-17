@@ -13,8 +13,7 @@ Texture2D::Texture2D():
 	rootSignature(nullptr),
 	graphicsPipelineState(),
 	tex()
-{
-}
+{}
 
 Texture2D::~Texture2D() {
 	if(indexResource)indexResource->Release();
@@ -49,7 +48,10 @@ void Texture2D::Initialize(const std::string& vsFileName, const std::string& psF
 
 	*colorType = 0;
 
+	*color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+
 	SRVHeap.CreateConstBufferView(wvpMat);
+	SRVHeap.CreateConstBufferView(color);
 	SRVHeap.CreateConstBufferView(colorPibot);
 	SRVHeap.CreateConstBufferView(colorType);
 
