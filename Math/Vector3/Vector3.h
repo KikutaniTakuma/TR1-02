@@ -3,7 +3,7 @@
 
 class Vector3 final {
 /// <summary>
-/// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+/// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 /// </summary>
 public:
 	Vector3() noexcept;
@@ -14,7 +14,7 @@ public:
 	~Vector3() = default;
 
 /// <summary>
-/// ‰‰Zq‚ÌƒI[ƒo[ƒ[ƒh
+/// æ¼”ç®—å­ã®ã‚ªãƒ¼ãƒãƒ¼ãƒ­ãƒ¼ãƒ‰
 /// </summary>
 public:
 	Vector3& operator=(const Vector3& right) noexcept;
@@ -37,7 +37,7 @@ public:
 	bool operator!=(const Vector3& right) const noexcept;
 
 /// <summary>
-/// ƒƒ“ƒoŠÖ”
+/// ãƒ¡ãƒ³ãƒé–¢æ•°
 /// </summary>
 public:
 	float Dot(const Vector3& right) const noexcept;
@@ -46,7 +46,7 @@ public:
 	Vector3 Normalize() const noexcept;
 
 /// <summary>
-/// Ã“I’è”
+/// é™çš„å®šæ•°
 /// </summary>
 public:
 	static const Vector3 identity;
@@ -55,7 +55,7 @@ public:
 	static const Vector3 zIdy;
 
 /// <summary>
-/// ƒƒ“ƒoŠÖ”
+/// ãƒ¡ãƒ³ãƒé–¢æ•°
 /// </summary>
 public:
 	union {

@@ -6,10 +6,10 @@
 void KeyInput::Input() {
 	std::copy(instance->key.begin(), instance->key.end(), instance->preKey.begin());
 	
-	// ƒL[ƒ{[ƒhî•ñæ“¾ŠJn
+	// ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰æƒ…å ±å–å¾—é–‹å§‹
 	instance->keyBoard->Acquire();
 
-	// ƒL[“ü—Í
+	// ã‚­ãƒ¼å…¥åŠ›
 	instance->key = { 0 };
 	instance->keyBoard->GetDeviceState(DWORD(instance->key.size()), instance->key.data());
 }

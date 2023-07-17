@@ -31,7 +31,7 @@ public:
 
 private:
 	/// <summary>
-	/// Texture‚ÌƒRƒ“ƒeƒi(ƒL[’l: ƒtƒ@ƒCƒ‹ƒl[ƒ€  ƒRƒ“ƒeƒiƒf[ƒ^Œ^: Texture*)
+	/// Textureã®ã‚³ãƒ³ãƒ†ãƒŠ(ã‚­ãƒ¼å€¤: ãƒ•ã‚¡ã‚¤ãƒ«ãƒãƒ¼ãƒ   ã‚³ãƒ³ãƒ†ãƒŠãƒ‡ãƒ¼ã‚¿å‹: Texture*)
 	/// </summary>
 	std::unordered_map<std::string, std::shared_ptr<Texture>> textures;
 

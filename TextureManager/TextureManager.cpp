@@ -59,7 +59,7 @@ void TextureManager::UnloadTexture(std::shared_ptr<Texture>& tex) {
 	tex.reset();
 
 	if (itr->second.use_count() == 1) {
-		// 参照カウントが1の場合コンテナから削除
+		// 蜿ら�ｧ繧ｫ繧ｦ繝ｳ繝医′1縺ｮ蝣ｴ蜷医さ繝ｳ繝�繝翫°繧牙炎髯､
 		textures.erase(itr);
 	}
 }

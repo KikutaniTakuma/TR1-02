@@ -15,7 +15,6 @@ public:
 		Add,
 		Sub,
 		Mul,
-		Transparent,
 
 		BlendTypeNum,
 	};

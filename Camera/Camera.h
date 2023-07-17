@@ -25,11 +25,11 @@ public:
 public:
 	void Update();
 
-	// “§‹“Š‰e
+	// é€è¦–æŠ•å½±
 	inline const Mat4x4& GetViewProjection() noexcept {
 		return viewProjecction;
 	}
-	// •½t“Š‰e
+	// å¹³è¡¡æŠ•å½±
 	inline const Mat4x4& GetViewOthographics() noexcept {
 		return viewOthograohics;
 	}

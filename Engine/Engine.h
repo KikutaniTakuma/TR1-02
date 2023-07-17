@@ -27,7 +27,7 @@
 class Engine {
 public:
 	/// <summary>
-	/// Ã“IŠÖ”
+	/// é™çš„é–¢æ•°
 	/// </summary>
 	static ID3D12DescriptorHeap* CreateDescriptorHeap(
 		D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderrVisible
@@ -47,18 +47,18 @@ private:
 
 public:
 	/// <summary>
-	/// ¸”s‚µ‚½ê‡“à•”‚Åassert‚Å~‚ß‚ç‚ê‚é
+	/// å¤±æ•—ã—ãŸå ´åˆå†…éƒ¨ã§assertã§æ­¢ã‚ã‚‰ã‚Œã‚‹
 	/// </summary>
-	/// <param name="windowWidth">Window‚Ì‰¡•</param>
-	/// <param name="windowHeight">Window‚Ìc•</param>
-	/// <param name="windowName">Window‚Ì–¼‘O</param>
+	/// <param name="windowWidth">Windowã®æ¨ªå¹…</param>
+	/// <param name="windowHeight">Windowã®ç¸¦å¹…</param>
+	/// <param name="windowName">Windowã®åå‰</param>
 	static void Initialize(int windowWidth, int windowHeight, const std::string& windowName);
 
 	static void Finalize();
 
 private:
 	/// <summary>
-	/// ƒVƒ“ƒOƒ‹ƒgƒ“ƒCƒ“ƒXƒ^ƒ“ƒX
+	/// ã‚·ãƒ³ã‚°ãƒ«ãƒˆãƒ³ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹
 	/// </summary>
 	static Engine* engine;
 
@@ -101,7 +101,7 @@ public:
 	}
 
 	///
-	/// Window¶¬—p
+	/// Windowç”Ÿæˆç”¨
 	/// 
 public:
 	int32_t clientWidth = 0;
@@ -111,7 +111,7 @@ public:
 
 #ifdef _DEBUG
 	///
-	/// Debug—p
+	/// Debugç”¨
 	/// 
 private:
 	class Debug {
@@ -195,7 +195,7 @@ private:
 
 
 /// <summary>
-/// “ü—ÍŠÖŒW
+/// å…¥åŠ›é–¢ä¿‚
 /// </summary>
 private:
 	void InitializeInput();
@@ -208,7 +208,7 @@ private:
 
 
 	/// 
-	/// •`‰æŠÖŒW
+	/// æç”»é–¢ä¿‚
 	/// 
 public:
 	void InitializeDraw();

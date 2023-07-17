@@ -33,7 +33,7 @@ void ShaderResourceHeap::Use() {
 }
 
 /// 
-/// ƒfƒoƒbƒO“r’†Aˆê‰“®‚­
+/// ãƒ‡ãƒãƒƒã‚°é€”ä¸­ã€ä¸€å¿œå‹•ã
 /// 
 D3D12_ROOT_PARAMETER ShaderResourceHeap::GetParameter() {
 	uint32_t descriptorNum = 1u;

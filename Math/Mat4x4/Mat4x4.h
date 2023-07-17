@@ -11,7 +11,7 @@ class Vector3;
 
 class Mat4x4 final {
 /// <summary>
-/// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+/// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 /// </summary>
 public:
 	Mat4x4();
@@ -22,7 +22,7 @@ public:
 	~Mat4x4() = default;
 
 /// <summary>
-/// ‰‰Zq‚ÌƒI[ƒo[ƒ[ƒh
+/// æ¼”ç®—å­ã®ã‚ªãƒ¼ãƒãƒ¼ãƒ­ãƒ¼ãƒ‰
 /// </summary>
 public:
 	Mat4x4& operator=(const Mat4x4& mat);
@@ -42,7 +42,7 @@ public:
 	bool operator!=(const Mat4x4& mat) const;
 
 /// <summary>
-/// ƒƒ“ƒoŠÖ”
+/// ãƒ¡ãƒ³ãƒé–¢æ•°
 /// </summary>
 public:
 	void Indentity();
@@ -78,14 +78,14 @@ public:
 	void VertViewPort(float left, float top, float width, float height, float minDepth, float maxDepth);
 
 /// <summary>
-/// Ã“I’è”
+/// é™çš„å®šæ•°
 /// </summary>
 private:
 	static const int HEIGHT = 4;
 	static const int WIDTH = 4;
 
 /// <summary>
-/// ƒƒ“ƒo•Ï”
+/// ãƒ¡ãƒ³ãƒå¤‰æ•°
 /// </summary>
 private:
 	std::array<Vector4, 4> m;

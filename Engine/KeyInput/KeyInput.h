@@ -31,7 +31,7 @@ private:
 private:
 	Microsoft::WRL::ComPtr<IDirectInputDevice8> keyBoard;
 
-	// キー入力バッファー
+	// 繧ｭ繝ｼ蜈･蜉帙ヰ繝�繝輔ぃ繝ｼ
 	std::array<BYTE, 0x100> key;
 	std::array<BYTE, 0x100> preKey;
 };

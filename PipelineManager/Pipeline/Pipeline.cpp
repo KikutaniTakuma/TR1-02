@@ -160,8 +160,8 @@ void Pipeline::Create(
 			break;
 		case Pipeline::Blend::Noaml:
 			graphicsPipelineStateDesc.BlendState.RenderTarget[i].BlendEnable = true;
-			graphicsPipelineStateDesc.BlendState.RenderTarget[i].SrcBlend = D3D12_BLEND_ONE;
-			graphicsPipelineStateDesc.BlendState.RenderTarget[i].DestBlend = D3D12_BLEND_ZERO;
+			graphicsPipelineStateDesc.BlendState.RenderTarget[i].SrcBlend = D3D12_BLEND_SRC_ALPHA;
+			graphicsPipelineStateDesc.BlendState.RenderTarget[i].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
 			graphicsPipelineStateDesc.BlendState.RenderTarget[i].BlendOp = D3D12_BLEND_OP_ADD;
 			break;
 		case Pipeline::Blend::Add:
@@ -180,12 +180,6 @@ void Pipeline::Create(
 			graphicsPipelineStateDesc.BlendState.RenderTarget[i].BlendEnable = true;
 			graphicsPipelineStateDesc.BlendState.RenderTarget[i].SrcBlend = D3D12_BLEND_ZERO;
 			graphicsPipelineStateDesc.BlendState.RenderTarget[i].DestBlend = D3D12_BLEND_SRC_COLOR;
-			graphicsPipelineStateDesc.BlendState.RenderTarget[i].BlendOp = D3D12_BLEND_OP_ADD;
-			break;
-		case Pipeline::Blend::Transparent:
-			graphicsPipelineStateDesc.BlendState.RenderTarget[i].BlendEnable = true;
-			graphicsPipelineStateDesc.BlendState.RenderTarget[i].SrcBlend = D3D12_BLEND_SRC_ALPHA;
-			graphicsPipelineStateDesc.BlendState.RenderTarget[i].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
 			graphicsPipelineStateDesc.BlendState.RenderTarget[i].BlendOp = D3D12_BLEND_OP_ADD;
 			break;
 		}

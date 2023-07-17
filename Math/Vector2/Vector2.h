@@ -2,7 +2,7 @@
 
 class Vector2 final {
 /// <summary>
-/// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+/// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 /// </summary>
 public:
 	Vector2() noexcept;
@@ -14,7 +14,7 @@ public:
 	~Vector2() = default;
 
 /// <summary>
-/// ‰‰Zq‚ÌƒI[ƒo[ƒ[ƒh
+/// æ¼”ç®—å­ã®ã‚ªãƒ¼ãƒãƒ¼ãƒ­ãƒ¼ãƒ‰
 /// </summary>
 public:
 	Vector2 operator+(const Vector2& right) const noexcept;
@@ -31,7 +31,7 @@ public:
 	bool operator!=(const Vector2& right) const noexcept;
 
 /// <summary>
-/// ƒƒ“ƒoŠÖ”
+/// ãƒ¡ãƒ³ãƒé–¢æ•°
 /// </summary>
 public:
 	void Rotate(float rad) noexcept;
@@ -43,7 +43,7 @@ public:
 	Vector2 Normalize() const noexcept;
 
 /// <summary>
-/// Ã“I’è”
+/// é™çš„å®šæ•°
 /// </summary>
 public:
 	static const Vector2 identity;
@@ -51,7 +51,7 @@ public:
 	static const Vector2 yIdy;
 
 /// <summary>
-/// ƒƒ“ƒo•Ï”
+/// ãƒ¡ãƒ³ãƒå¤‰æ•°
 /// </summary>
 public:
 	float x;

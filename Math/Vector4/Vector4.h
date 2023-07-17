@@ -4,7 +4,7 @@
 
 class Vector4 final {
 /// <summary>
-/// ƒTƒuƒNƒ‰ƒX
+/// ã‚µãƒ–ã‚¯ãƒ©ã‚¹
 /// </summary>
 private:
 	struct Vector {
@@ -22,7 +22,7 @@ private:
 	};
 
 /// <summary>
-/// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+/// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 /// </summary>
 public:
 	Vector4() noexcept;
@@ -35,7 +35,7 @@ public:
 	~Vector4() = default;
 
 /// <summary>
-/// ‰‰Zq‚ÌƒI[ƒo[ƒ[ƒh
+/// æ¼”ç®—å­ã®ã‚ªãƒ¼ãƒãƒ¼ãƒ­ãƒ¼ãƒ‰
 /// </summary>
 public:
 	Vector4& operator=(const Vector4& right) noexcept;
@@ -65,7 +65,7 @@ public:
 	const float& operator[](size_t index) const noexcept;
 
 /// <summary>
-/// ƒƒ“ƒoŠÖ”
+/// ãƒ¡ãƒ³ãƒé–¢æ•°
 /// </summary>
 public:
 	float Length() const noexcept;
@@ -78,7 +78,7 @@ public:
 	class Vector2 GetVector2() const noexcept;
 
 /// <summary>
-/// ƒƒ“ƒo•Ï”
+/// ãƒ¡ãƒ³ãƒå¤‰æ•°
 /// </summary>
 public:
 	union {

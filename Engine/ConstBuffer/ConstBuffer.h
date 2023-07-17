@@ -3,7 +3,7 @@
 #include <cassert>
 #include <wrl.h>
 
-// ƒ|ƒCƒ“ƒ^‚ðƒeƒ“ƒvƒŒ[ƒgƒpƒ‰ƒ[ƒ^‚ÉÝ’è‚µ‚Ä‚Í‚¢‚¯‚È‚¢
+// ãƒã‚¤ãƒ³ã‚¿ã‚’ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã«è¨­å®šã—ã¦ã¯ã„ã‘ãªã„
 template<class T>
 class ConstBuffer {
 public:
@@ -17,7 +17,7 @@ public:
 		shaderVisibility(D3D12_SHADER_VISIBILITY_ALL),
 		shaderRegister(0)
 	{
-		// ƒoƒCƒgƒTƒCƒY‚Í256ƒAƒ‰ƒCƒƒ“ƒg‚·‚é(vram‚ðŒø—¦“I‚ÉŽg‚¤‚½‚ß‚ÌŽd‘g‚Ý)
+		// ãƒã‚¤ãƒˆã‚µã‚¤ã‚ºã¯256ã‚¢ãƒ©ã‚¤ãƒ¡ãƒ³ãƒˆã™ã‚‹(vramã‚’åŠ¹çŽ‡çš„ã«ä½¿ã†ãŸã‚ã®ä»•çµ„ã¿)
 		bufferResource = Engine::CreateBufferResuorce((sizeof(T) + 0xff) & ~0xff);
 		cbvDesc.BufferLocation = bufferResource->GetGPUVirtualAddress();
 		cbvDesc.SizeInBytes = UINT(bufferResource->GetDesc().Width);

@@ -34,7 +34,7 @@ public:
 
 
 /// <summary>
-/// 画像読み込み用
+/// 逕ｻ蜒剰ｪｭ縺ｿ霎ｼ縺ｿ逕ｨ
 /// </summary>
 private:
 	void Load(const std::string& filePath);
@@ -47,20 +47,20 @@ private:
 	ID3D12Resource* UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages);
 
 /// <summary>
-/// View作成関数
+/// View菴懈�宣未謨ｰ
 /// </summary>
 public:
 	void CreateSRVView(D3D12_CPU_DESCRIPTOR_HANDLE descHeapHandle);
 
 /// <summary>
-/// CPU側のリソースを解放
+/// CPU蛛ｴ縺ｮ繝ｪ繧ｽ繝ｼ繧ｹ繧定ｧ｣謾ｾ
 /// </summary>
 private:
 	void ReleaseIntermediateResource();
 
 
 /// <summary>
-/// メンバ関数
+/// 繝｡繝ｳ繝宣未謨ｰ
 /// </summary>
 private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> textureResouce;
