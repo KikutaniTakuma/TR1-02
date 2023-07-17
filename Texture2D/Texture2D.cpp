@@ -70,23 +70,10 @@ void Texture2D::CreateGraphicsPipeline() {
 	PipelineManager::SetVertexInput("POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT);
 	PipelineManager::SetVertexInput("TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT);
 
-	PipelineManager::SetState(Pipeline::Blend::None,Pipeline::SolidState::Solid);
-	graphicsPipelineState[Pipeline::Blend::None] = PipelineManager::Create();
-
-	PipelineManager::SetState(Pipeline::Blend::Noaml, Pipeline::SolidState::Solid);
-	graphicsPipelineState[Pipeline::Blend::Noaml] = PipelineManager::Create();
-
-	PipelineManager::SetState(Pipeline::Blend::Add, Pipeline::SolidState::Solid);
-	graphicsPipelineState[Pipeline::Blend::Add] = PipelineManager::Create();
-
-	PipelineManager::SetState(Pipeline::Blend::Sub, Pipeline::SolidState::Solid);
-	graphicsPipelineState[Pipeline::Blend::Sub] = PipelineManager::Create();
-
-	PipelineManager::SetState(Pipeline::Blend::Mul, Pipeline::SolidState::Solid);
-	graphicsPipelineState[Pipeline::Blend::Mul] = PipelineManager::Create();
-
-	PipelineManager::SetState(Pipeline::Blend::Transparent, Pipeline::SolidState::Solid);
-	graphicsPipelineState[Pipeline::Blend::Transparent] = PipelineManager::Create();
+	for (int32_t i = Pipeline::Blend::None; i < Pipeline::Blend::BlendTypeNum; i++) {
+		PipelineManager::SetState(Pipeline::Blend(i), Pipeline::SolidState::Solid);
+		graphicsPipelineState[i] = PipelineManager::Create();
+	}
 
 	PipelineManager::StateReset();
 }
@@ -137,10 +124,14 @@ void Texture2D::Draw(
 		Vector3(pos.x, pos.y, 0.01f)
 	);
 
+	ImGui::Begin("tex color");
+	ImGui::DragFloat4("Color", color->m.data(), 0.01f, 0.0f, 1.0f);
+	ImGui::End();
+
 	auto commandlist = Engine::GetCommandList();
 
 	// 各種描画コマンドを積む
-	graphicsPipelineState[size_t(blend)]->Use();
+	graphicsPipelineState[blend]->Use();
 	SRVHeap.Use();
 	commandlist->IASetVertexBuffers(0, 1, &vertexView);
 	commandlist->IASetIndexBuffer(&indexView);

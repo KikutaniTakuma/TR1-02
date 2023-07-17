@@ -1,9 +1,12 @@
 #include "Post.hlsli"
-cbuffer Wipe : register(b0){
-    float2 center;
-    float wipeSize;
+cbuffer Alpha : register(b0){
+   float alpha;
 }
 
 float4 main(Output input) : SV_TARGET{
-    return tex.Sample(smp, input.uv);
+    float4 finalColor =  tex.Sample(smp, input.uv);
+
+    finalColor.w *= alpha;
+
+    return finalColor;
 }

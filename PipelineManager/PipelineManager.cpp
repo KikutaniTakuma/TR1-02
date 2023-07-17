@@ -84,7 +84,7 @@ Pipeline* PipelineManager::Create() {
 	}
 	else {
 		auto IsSmae = [](const std::unique_ptr<Pipeline>& pipeline) {
-			return pipeline->IsSame(
+			bool issame = pipeline->IsSame(
 				instance->shader,
 				instance->blend,
 				instance->cullMode,
@@ -92,6 +92,8 @@ Pipeline* PipelineManager::Create() {
 				instance->numRenderTarget,
 				instance->rootSignature->Get()
 			);
+
+			return issame;
 		};
 
 		auto pipelineItr = std::find_if(instance->pipelines.begin(), instance->pipelines.end(),IsSmae);
