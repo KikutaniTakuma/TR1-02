@@ -1,4 +1,4 @@
-#include "Texture.h"
+ï»¿#include "Texture.h"
 #include "Engine/ConvertString/ConvertString.h"
 #include "Engine/Engine.h"
 #include <cassert>
@@ -47,7 +47,7 @@ void Texture::Load(const std::string& filePath) {
 		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 		srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
 
-		// loadÏ‚İ
+		// loadæ¸ˆã¿
 		loadFlg = true;
 	}
 }
@@ -83,31 +83,31 @@ void Texture::Unload() {
 			textureResouce.Reset();
 		}
 
-		// UnloadÏ‚İ
+		// Unloadæ¸ˆã¿
 		loadFlg = false;
 	}
 }
 
 
 DirectX::ScratchImage Texture::LoadTexture(const std::string& filePath) {
-	// ƒeƒNƒXƒ`ƒƒƒtƒ@ƒCƒ‹‚ğ“Ç‚İ‚ñ‚ÅƒvƒƒOƒ‰ƒ€‚ğˆµ‚¦‚é‚æ‚¤‚É‚·‚é
+	// ãƒ†ã‚¯ã‚¹ãƒãƒ£ãƒ•ã‚¡ã‚¤ãƒ«ã‚’èª­ã¿è¾¼ã‚“ã§ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚’æ‰±ãˆã‚‹ã‚ˆã†ã«ã™ã‚‹
 	DirectX::ScratchImage image{};
 	std::wstring filePathW = ConvertString(filePath);
 	HRESULT hr = DirectX::LoadFromWICFile(filePathW.c_str(), DirectX::WIC_FLAGS_FORCE_SRGB, nullptr, image);
 	assert(SUCCEEDED(hr));
 
-	// ƒ~ƒbƒvƒ}ƒbƒv‚Ìì¬
+	// ãƒŸãƒƒãƒ—ãƒãƒƒãƒ—ã®ä½œæˆ
 	DirectX::ScratchImage mipImages{};
 	hr = DirectX::GenerateMipMaps(image.GetImages(), image.GetImageCount(), image.GetMetadata(), DirectX::TEX_FILTER_SRGB, 0, mipImages);
 	assert(SUCCEEDED(hr));
 
 
-	// ƒ~ƒbƒvƒ}ƒbƒv•t‚«‚Ìƒf[ƒ^‚ğ•Ô‚·
+	// ãƒŸãƒƒãƒ—ãƒãƒƒãƒ—ä»˜ãã®ãƒ‡ãƒ¼ã‚¿ã‚’è¿”ã™
 	return mipImages;
 }
 
 ID3D12Resource* Texture::CreateTextureResource(const DirectX::TexMetadata& metaData) {
-	// metadata‚ğŠî‚ÉResource‚Ìİ’è
+	// metadataã‚’åŸºã«Resourceã®è¨­å®š
 	D3D12_RESOURCE_DESC resourceDesc{};
 	resourceDesc.Width = UINT(metaData.width);
 	resourceDesc.Height = UINT(metaData.height);
@@ -117,11 +117,11 @@ ID3D12Resource* Texture::CreateTextureResource(const DirectX::TexMetadata& metaD
 	resourceDesc.SampleDesc.Count = 1;
 	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION(metaData.dimension);
 
-	// —˜—p‚·‚éHeap‚Ìİ’èB”ñí‚É“Áê‚È‰^—p
+	// åˆ©ç”¨ã™ã‚‹Heapã®è¨­å®šã€‚éå¸¸ã«ç‰¹æ®Šãªé‹ç”¨
 	D3D12_HEAP_PROPERTIES heapProperties{};
 	heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
 
-	// Resouce‚Ì¶¬
+	// Resouceã®ç”Ÿæˆ
 	ID3D12Resource* resource = nullptr;
 	HRESULT hr = Engine::GetDevice()->CreateCommittedResource(
 		&heapProperties,
@@ -132,6 +132,9 @@ ID3D12Resource* Texture::CreateTextureResource(const DirectX::TexMetadata& metaD
 		IID_PPV_ARGS(&resource)
 	);
 	assert(SUCCEEDED(hr));
+	if (hr != S_OK) {
+		return nullptr;
+	}
 	return resource;
 }
 
@@ -142,7 +145,7 @@ ID3D12Resource* Texture::UploadTextureData(ID3D12Resource* texture, const Direct
 	uint64_t intermediateSize = GetRequiredIntermediateSize(texture, 0, UINT(subresources.size()));
 	ID3D12Resource* resource = Engine::CreateBufferResuorce(intermediateSize);
 	UpdateSubresources(Engine::GetCommandList(), texture, resource, 0, 0, UINT(subresources.size()), subresources.data());
-	// Texture‚Ö‚Ì“]‘—Œã‚Í—˜—p‚Å‚«‚é‚æ‚¤AD3D12_STATE_COPY_DEST‚©‚çD3D12_RESOURCE_STATE_GENERIC_READ‚ÖResouceState‚ğ•ÏX‚·‚é
+	// Textureã¸ã®è»¢é€å¾Œã¯åˆ©ç”¨ã§ãã‚‹ã‚ˆã†ã€D3D12_STATE_COPY_DESTã‹ã‚‰D3D12_RESOURCE_STATE_GENERIC_READã¸ResouceStateã‚’å¤‰æ›´ã™ã‚‹
 	Engine::Barrier(
 		texture,
 		D3D12_RESOURCE_STATE_COPY_DEST,

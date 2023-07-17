@@ -1,4 +1,4 @@
-#include "RenderTarget.h"
+ï»¿#include "RenderTarget.h"
 #include "Engine/Engine.h"
 #include "Engine/ConvertString/ConvertString.h"
 #include <cassert>
@@ -13,8 +13,8 @@ RenderTarget::RenderTarget():
 
 	auto resDesc = Engine::GetSwapchainBufferDesc();
 
-	// Resource‚ð¶¬‚·‚é
-	// ƒŠƒ\[ƒX—p‚Ìƒq[ƒv‚ÌÝ’è
+	// Resourceã‚’ç”Ÿæˆã™ã‚‹
+	// ãƒªã‚½ãƒ¼ã‚¹ç”¨ã®ãƒ’ãƒ¼ãƒ—ã®è¨­å®š
 	D3D12_HEAP_PROPERTIES heapPropaerties{};
 	heapPropaerties.Type = D3D12_HEAP_TYPE_DEFAULT;
 	float clsValue[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
@@ -24,7 +24,7 @@ RenderTarget::RenderTarget():
 		clearValue.Color[i] = clsValue[i];
 	}
 
-	// ŽÀÛ‚ÉƒŠƒ\[ƒX‚ðì‚é
+	// å®Ÿéš›ã«ãƒªã‚½ãƒ¼ã‚¹ã‚’ä½œã‚‹
 	HRESULT hr = Engine::GetDevice()->
 		CreateCommittedResource(
 			&heapPropaerties, 
@@ -82,8 +82,8 @@ RenderTarget::RenderTarget(uint16_t numDescriptor) :
 
 	auto resDesc = Engine::GetSwapchainBufferDesc();
 
-	// Resource‚ð¶¬‚·‚é
-	// ƒŠƒ\[ƒX—p‚Ìƒq[ƒv‚ÌÝ’è
+	// Resourceã‚’ç”Ÿæˆã™ã‚‹
+	// ãƒªã‚½ãƒ¼ã‚¹ç”¨ã®ãƒ’ãƒ¼ãƒ—ã®è¨­å®š
 	D3D12_HEAP_PROPERTIES heapPropaerties{};
 	heapPropaerties.Type = D3D12_HEAP_TYPE_DEFAULT;
 	float clsValue[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
@@ -93,7 +93,7 @@ RenderTarget::RenderTarget(uint16_t numDescriptor) :
 		clearValue.Color[i] = clsValue[i];
 	}
 
-	// ŽÀÛ‚ÉƒŠƒ\[ƒX‚ðì‚é
+	// å®Ÿéš›ã«ãƒªã‚½ãƒ¼ã‚¹ã‚’ä½œã‚‹
 	HRESULT hr = Engine::GetDevice()->
 		CreateCommittedResource(
 			&heapPropaerties,
@@ -158,7 +158,7 @@ RenderTarget::~RenderTarget() {
 	}
 }
 
-void RenderTarget::SetThisTarget() {
+void RenderTarget::SetThisRenderTarget() {
 	Engine::Barrier(
 		resource.Get(),
 		D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
@@ -180,7 +180,7 @@ void RenderTarget::SetMainRenderTarget() {
 		D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE
 	);
 
-	// •`‰ææ‚ðƒƒCƒ“ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚É•ÏX
+	// æç”»å…ˆã‚’ãƒ¡ã‚¤ãƒ³ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã«å¤‰æ›´
 	auto rtvHeapHandle = Engine::GetMainRendertTargetHandle();
 	auto dsvH = Engine::GetDsvHandle();
 	Engine::GetCommandList()->OMSetRenderTargets(1, &rtvHeapHandle, false, &dsvH);

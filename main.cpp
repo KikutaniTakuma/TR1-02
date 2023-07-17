@@ -1,4 +1,4 @@
-#include "Engine/Engine.h"
+ï»¿#include "Engine/Engine.h"
 #include "externals/imgui/imgui.h"
 #include <chrono>
 #include <thread>
@@ -15,7 +15,7 @@
 #include "Camera/Camera.h"
 
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
-	// ƒ‰ƒCƒuƒ‰ƒŠ‰Šú‰»
+	// ãƒ©ã‚¤ãƒ–ãƒ©ãƒªåˆæœŸåŒ–
 	Engine::Initialize(1280, 720, "DirectXGame");
 
 	Camera camera;
@@ -28,7 +28,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	auto model = std::make_unique<Model>();
 	model->LoadObj("./Resources/Cube.obj");
 	model->LoadShader("WaveShader/WaveNone.VS.hlsl", "WaveShader/Wave.PS.hlsl", "WaveShader/Wave.GS.hlsl");
-
+	model->CreateGraphicsPipeline();
 
 	Mat4x4 modelWorldMat = VertMakeMatrixAffin(Vector3::identity, Vector3(), Vector3());
 
@@ -53,26 +53,27 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	auto testAudio = AudioManager::GetInstance()->LoadWav("Alarm01.wav",true);
 
 	/// 
-	/// ƒƒCƒ“ƒ‹[ƒv
+	/// ãƒ¡ã‚¤ãƒ³ãƒ«ãƒ¼ãƒ—
 	/// 
 	while (Engine::WindowMassage()) {
-		// •`‰æŠJnˆ—
+		// æç”»é–‹å§‹å‡¦ç†
 		Engine::FrameStart();
 
 		// fps
 		ImGui::SetNextWindowPos({});
-		ImGui::SetNextWindowSize({150,50});
+		ImGui::SetNextWindowSizeConstraints({ 150,50 }, { 150,50 });
+		ImGui::SetNextWindowCollapsed(false);
 		ImGui::Begin("fps");
 		ImGui::Text("Frame rate: %3.0f fps", ImGui::GetIO().Framerate);
 		ImGui::End();
 
-		// “ü—Íˆ—
+		// å…¥åŠ›å‡¦ç†
 		Gamepad::Input();
 		KeyInput::Input();
 		Mouse::Input();
 
 		/// 
-		/// XVˆ—
+		/// æ›´æ–°å‡¦ç†
 		/// 
 		if ((Gamepad::GetStick(Gamepad::Stick::RIGHT_X) > 0.1f)) {
 			cameraMoveRotate.y += 0.1f;
@@ -145,30 +146,30 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		//model->Update();
 
 		///
-		/// XVˆ—‚±‚±‚Ü‚Å
+		/// æ›´æ–°å‡¦ç†ã“ã“ã¾ã§
 		/// 
 
 		///
-		/// •`‰æˆ—
+		/// æç”»å‡¦ç†
 		/// 
 		pera->PreDraw();
 
 		model->Draw(modelWorldMat, camera.GetViewProjection(), camera.pos);
 
-		//tex->Draw(Vector2::identity, texRotate, texPos, camera2D.GetViewOthographics());
+		tex->Draw(Vector2::identity, texRotate, texPos, camera2D.GetViewOthographics());
 
-		//texDefault->Draw(Vector2::identity, texRotate, texDefaultPos, camera2D.GetViewOthographics());
+		texDefault->Draw(Vector2::identity, texRotate, texDefaultPos, camera2D.GetViewOthographics());
 
 		pera->Draw();
 		///
-		/// •`‰æˆ—‚±‚±‚Ü‚Å
+		/// æç”»å‡¦ç†ã“ã“ã¾ã§
 		/// 
 
 
-		// ƒtƒŒ[ƒ€I—¹ˆ—
+		// ãƒ•ãƒ¬ãƒ¼ãƒ çµ‚äº†å‡¦ç†
 		Engine::FrameEnd();
 
-		// Escape‚ª‰Ÿ‚³‚ê‚½‚çI—¹
+		// EscapeãŒæŠ¼ã•ã‚ŒãŸã‚‰çµ‚äº†
 		if (KeyInput::Releaed(DIK_ESCAPE)) {
 			break;
 		}

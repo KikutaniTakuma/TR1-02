@@ -3,6 +3,7 @@
 #include "Engine/Engine.h"
 #include "Engine/ConstBuffer/ConstBuffer.h"
 #include "Engine/Resource/ShaderResource/ShaderResourceHeap.h"
+#include "PipelineManager/PipelineManager.h"
 
 #include "Math/Mat4x4/Mat4x4.h"
 #include "Math/Vector2/Vector2.h"
@@ -12,15 +13,6 @@
 #include <array>
 
 class Texture2D {
-public:
-	enum class Blend : uint16_t{
-		None,
-		Add,
-		Multiply,
-
-		BlendModeNum
-	};
-
 public:
 	struct MatrixData {
 		Mat4x4 wvpMat;
@@ -52,7 +44,7 @@ public:
 		float rotate,
 		const Vector2& pos,
 		const Mat4x4& viewProjection,
-		Blend blend = Blend::None,
+		Pipeline::Blend blend = Pipeline::Blend::None,
 		const Vector2& uv0 = {0.0f, 1.0f}, const Vector2& uv1 = {1.0f, 1.0f}, 
 		const Vector2& uv2 = {1.0f, 0.0f}, const Vector2& uv3 = {0.0f, 0.0f}
 	);
@@ -66,11 +58,9 @@ private:
 	D3D12_INDEX_BUFFER_VIEW indexView;
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource;
 
-	IDxcBlob* vertexShader = nullptr;
-	IDxcBlob* pixelShader = nullptr;
+	Shader shader;
 
-	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature;
-	std::array<Microsoft::WRL::ComPtr<ID3D12PipelineState>, size_t(Blend::BlendModeNum)> graphicsPipelineState;
+	std::array<Pipeline*, size_t(Pipeline::Blend::BlendTypeNum)> graphicsPipelineState;
 
 	ConstBuffer<Mat4x4> wvpMat;
 	ConstBuffer<Vector4> color;

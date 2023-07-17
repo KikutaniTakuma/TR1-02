@@ -11,6 +11,14 @@
 #include <string>
 #include <wrl.h>
 
+struct Shader {
+	IDxcBlob* vertex = nullptr;
+	IDxcBlob* hull = nullptr;
+	IDxcBlob* domain = nullptr;
+	IDxcBlob* geometory = nullptr;
+	IDxcBlob* pixel = nullptr;
+};
+
 class ShaderManager {
 private:
 	ShaderManager();
@@ -25,22 +33,21 @@ public:
 		return instance;
 	}
 
+public:
+	static IDxcBlob* LoadVertexShader(const std::string& fileName);
+	static IDxcBlob* LoadHullShader(const std::string& fileName);
+	static IDxcBlob* LoadDomainShader(const std::string& fileName);
+	static IDxcBlob* LoadGeometoryShader(const std::string& fileName);
+	static IDxcBlob* LoadPixelShader(const std::string& fileName);
+
 private:
 	static ShaderManager* instance;
 
-
-public:
-	IDxcBlob* LoadVertexShader(const std::string& fileName);
-	IDxcBlob* LoadHullShader(const std::string& fileName);
-	IDxcBlob* LoadDomainShader(const std::string& fileName);
-	IDxcBlob* LoadGeometoryShader(const std::string& fileName);
-	IDxcBlob* LoadPixelShader(const std::string& fileName);
-
 private:
 	IDxcBlob* CompilerShader(
-		// CompilerするShaderファイルへのパス
+		// Compiler縺吶ｋShader繝輔ぃ繧､繝ｫ縺ｸ縺ｮ繝代せ
 		const std::wstring& filePath,
-		// Compilerに使用するProfile
+		// Compiler縺ｫ菴ｿ逕ｨ縺吶ｋProfile
 		const wchar_t* profile);
 
 private:
