@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "TextureManager/TextureManager.h"
 #include "Engine/Engine.h"
 #include "Engine/ConstBuffer/ConstBuffer.h"
@@ -45,8 +45,16 @@ public:
 		const Vector2& pos,
 		const Mat4x4& viewProjection,
 		Pipeline::Blend blend = Pipeline::Blend::None,
-		const Vector2& uv0 = {0.0f, 1.0f}, const Vector2& uv1 = {1.0f, 1.0f}, 
-		const Vector2& uv2 = {1.0f, 0.0f}, const Vector2& uv3 = {0.0f, 0.0f}
+		const Vector2& pibot = {0.0f, 0.0f}, const Vector2& size = {1.0f, 1.0f}
+	);
+
+	void Draw(
+		const Vector2& scale,
+		const Vector3& rotate,
+		const Vector3& pos,
+		const Mat4x4& viewProjection,
+		Pipeline::Blend blend = Pipeline::Blend::None,
+		const Vector2& pibot = { 0.0f, 0.0f }, const Vector2& size = { 1.0f, 1.0f }
 	);
 
 private:
