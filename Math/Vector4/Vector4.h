@@ -3,9 +3,9 @@
 #include <immintrin.h>
 
 class Vector4 final {
-/// <summary>
-/// サブクラス
-/// </summary>
+	/// <summary>
+	/// サブクラス
+	/// </summary>
 private:
 	struct Vector {
 		float x;
@@ -21,9 +21,9 @@ private:
 		float a;
 	};
 
-/// <summary>
-/// コンストラクタ
-/// </summary>
+	/// <summary>
+	/// コンストラクタ
+	/// </summary>
 public:
 	Vector4() noexcept;
 	Vector4(const Vector4& right) noexcept;
@@ -34,9 +34,9 @@ public:
 public:
 	~Vector4() = default;
 
-/// <summary>
-/// 演算子のオーバーロード
-/// </summary>
+	/// <summary>
+	/// 演算子のオーバーロード
+	/// </summary>
 public:
 	Vector4& operator=(const Vector4& right) noexcept;
 	Vector4& operator=(const class Vector3& right) noexcept;
@@ -64,9 +64,9 @@ public:
 	float& operator[](size_t index) noexcept;
 	const float& operator[](size_t index) const noexcept;
 
-/// <summary>
-/// メンバ関数
-/// </summary>
+	/// <summary>
+	/// メンバ関数
+	/// </summary>
 public:
 	float Length() const noexcept;
 
@@ -77,9 +77,9 @@ public:
 	class Vector3 GetVector3() const noexcept;
 	class Vector2 GetVector2() const noexcept;
 
-/// <summary>
-/// メンバ変数
-/// </summary>
+	/// <summary>
+	/// メンバ変数
+	/// </summary>
 public:
 	union {
 		std::array<float, 4> m;
@@ -87,4 +87,10 @@ public:
 		Vector4::Color color;
 		__m128 m128;
 	};
+
 };
+
+/// <summary>
+/// uint32_tからVector4への変換
+/// </summary>
+Vector4 UintToVector4(uint32_t color);

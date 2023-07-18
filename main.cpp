@@ -1,4 +1,4 @@
-﻿#include "Engine/Engine.h"
+#include "Engine/Engine.h"
 #include "externals/imgui/imgui.h"
 #include <chrono>
 #include <thread>
@@ -13,10 +13,14 @@
 #include "Texture2D/Texture2D.h"
 #include "AudioManager/AudioManager.h"
 #include "Camera/Camera.h"
+#include "StringOut/StringOut.h"
 
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	// ライブラリ初期化
 	Engine::Initialize(1280, 720, "DirectXGame");
+
+	// fontLoad
+	Engine::LoadFont("Font/fonttest.spritefont");
 
 	Camera camera;
 	camera.pos = { 8.24f,9.63f,-20.53f };
@@ -52,12 +56,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	auto testAudio = AudioManager::GetInstance()->LoadWav("Alarm01.wav",true);
 
-	std::string text;
-	text.reserve(32);
-	text.resize(32);
-	Vector2 textPos;
-	float textRotation = 0.0f;
-	Vector2 textScale = Vector2::identity;
+	StringOut text("Font/fonttest.spritefont");
+
 
 	/// 
 	/// メインループ
@@ -151,10 +151,10 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		camera2D.Update();
 
 		ImGui::Begin("Text");
-		ImGui::InputText("DrawText", text.data(), text.size());
-		ImGui::DragFloat2("TextPos", &textPos.x);
-		ImGui::DragFloat("TextRotate", &textRotation, 0.01f);
-		ImGui::DragFloat2("TextScale", &textScale.x, 0.01f);
+		ImGui::InputText("DrawText", text.str.data(), text.str.size());
+		ImGui::DragFloat2("TextPos", &text.pos.x);
+		ImGui::DragFloat("TextRotate", &text.rotation, 0.01f);
+		ImGui::DragFloat2("TextScale", &text.scale.x, 0.01f);
 		ImGui::End();
 
 		//model->Update();
@@ -176,7 +176,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		pera->Draw();
 
-		Engine::StringDraw(text, textPos, textRotation, textScale);
+		text.Draw();
 		///
 		/// 描画処理ここまで
 		/// 

@@ -22,11 +22,12 @@
 #include <vector>
 #include <chrono>
 #include <memory>
+#include <unordered_map>
 
 #include "Math/Vector3/Vector3.h"
 #include "Math/Mat4x4/Mat4x4.h"
 #include "Math/Vector2/Vector2.h"
-#include "Math/Vector4/Vector4.h" 
+#include "Math/Vector4/Vector4.h"
 
 class Engine {
 public:
@@ -40,8 +41,6 @@ public:
 	static ID3D12Resource* CreateBufferResuorce(size_t sizeInBytes);
 
 	static ID3D12Resource* CreateDepthStencilTextureResource(int32_t width, int32_t height);
-
-	static Vector4 UintToVector4(uint32_t color);
 
 	static void Barrier(ID3D12Resource* resource, D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after, UINT subResource = 0);
 
@@ -108,17 +107,18 @@ public:
 		return engine->directInput.Get();
 	}
 
-	static inline DirectX::SpriteFont* GetFont() {
-		return engine->spriteFont.get();
+	static inline DirectX::SpriteFont* GetFont(const std::string& fontName) {
+		return engine->spriteFonts[fontName].get();
 	}
 
-	static inline DirectX::SpriteBatch* GetSpriteBatch() {
-		return engine->spriteBatch.get();
+	static inline DirectX::SpriteBatch* GetBatch(const std::string& fontName) {
+		return engine->spriteBatch[fontName].get();
 	}
 
-	static inline  Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetFontHeap() {
-		return engine->fontHeap;
+	static inline Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> GetFontHeap(const std::string& fontName) {
+		return engine->fontHeap[fontName];
 	}
+
 
 	///
 	/// Window生成用
@@ -230,21 +230,16 @@ private:
 /// </summary>
 private:
 	void InitializeSprite();
+
 public:
-	static void StringDraw(
-		const std::string& str, 
-		const Vector2& pos,
-		float rotation = 0.0f,
-		Vector2 scale = Vector2::identity, 
-		uint32_t color = 0xffffffff
-	);
+	static void LoadFont(const std::string& formatName);
 
 private:
 	std::unique_ptr<DirectX::GraphicsMemory> gmemory;
-	std::unique_ptr<DirectX::SpriteFont> spriteFont;
-	std::unique_ptr<DirectX::SpriteBatch> spriteBatch;
+	std::unordered_map<std::string, std::unique_ptr<DirectX::SpriteFont>> spriteFonts;
+	std::unordered_map<std::string, std::unique_ptr<DirectX::SpriteBatch>> spriteBatch;
 
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> fontHeap;
+	std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>> fontHeap;
 
 
 

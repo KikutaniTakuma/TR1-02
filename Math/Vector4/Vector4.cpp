@@ -3,6 +3,7 @@
 #include "Math/Vector3/Vector3.h"
 #include "Math/Vector2/Vector2.h"
 #include <cmath>
+#include <limits>
 
 Vector4::Vector4() noexcept :
 	m{0.0f}
@@ -188,4 +189,17 @@ Vector3 Vector4::GetVector3() const noexcept {
 }
 Vector2 Vector4::GetVector2() const noexcept {
 	return Vector2(vec.x, vec.y);
+}
+
+Vector4 UintToVector4(uint32_t color) {
+	static constexpr float normal = 1.0f / static_cast<float>(std::numeric_limits<uint8_t>::max());
+	Vector4 result;
+
+	result.color = {
+		static_cast<float>((color & 0xff000000) >> 24) * normal,
+		static_cast<float>((color & 0xff0000  ) >> 16) * normal,
+		static_cast<float>((color & 0xff00    ) >>  8) * normal,
+		static_cast<float>( color & 0xff             ) * normal
+	};
+	return result;
 }

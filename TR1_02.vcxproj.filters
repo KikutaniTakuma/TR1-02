@@ -95,6 +95,9 @@
     <ClCompile Include="Engine\RootSignature\RootSignature.cpp">
       <Filter>Engine\RootSignature</Filter>
     </ClCompile>
+    <ClCompile Include="StringOut\StringOut.cpp">
+      <Filter>StringOut</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -168,6 +171,9 @@
     </Filter>
     <Filter Include="Engine\RootSignature">
       <UniqueIdentifier>{e940fd55-6a3e-4764-ba45-668507747c4f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="StringOut">
+      <UniqueIdentifier>{8f6f9f0d-e177-4c18-b9a0-cab1926af85b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -269,6 +275,9 @@
     </ClInclude>
     <ClInclude Include="Engine\RootSignature\RootSignature.h">
       <Filter>Engine\RootSignature</Filter>
+    </ClInclude>
+    <ClInclude Include="StringOut\StringOut.h">
+      <Filter>StringOut</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

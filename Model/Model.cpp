@@ -29,14 +29,14 @@ Model::Model() :
 
 	dirLig->ligDirection = { 1.0f,-1.0f,-1.0f };
 	dirLig->ligDirection = dirLig->ligDirection.Normalize();
-	Vector4 colorTmp = Engine::UintToVector4(0xffffadff);
+	Vector4 colorTmp = UintToVector4(0xffffadff);
 	dirLig->ligColor = colorTmp.GetVector3();
 
 	dirLig->ptPos = { 5.0f,5.0f,5.0f };
 	dirLig->ptColor = { 15.0f,15.0f,15.0f };
 	dirLig->ptRange = 10.0f;
 
-	*color = Engine::UintToVector4(0xff0000ff);
+	*color = UintToVector4(0xff0000ff);
 	color.OffWright();
 
 	descHeap.CreateConstBufferView(wvpData);

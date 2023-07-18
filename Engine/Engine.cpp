@@ -354,14 +354,21 @@ void Engine::InitializeInput() {
 /// 文字表示関係
 /// </summary>
 void Engine::InitializeSprite() {
-	fontHeap = Engine::CreateDescriptorHeap(
-		D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 16, true
-	);
-
 	// GraphicsMemory初期化
 	gmemory.reset(new DirectX::GraphicsMemory(device.Get()));
+}
 
-	DirectX::ResourceUploadBatch resUploadBach(device.Get());
+void Engine::LoadFont(const std::string& formatName) {
+	engine->fontHeap.insert(
+		std::make_pair(
+			formatName,
+			Engine::CreateDescriptorHeap(
+				D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1, true
+			)
+		)
+	);
+
+	DirectX::ResourceUploadBatch resUploadBach(engine->device.Get());
 	resUploadBach.Begin();
 	DirectX::RenderTargetState rtState(
 		DXGI_FORMAT_R8G8B8A8_UNORM_SRGB,
@@ -371,7 +378,8 @@ void Engine::InitializeSprite() {
 	DirectX::SpriteBatchPipelineStateDescription pd(rtState);
 
 	// SpriteFontオブジェクトの初期化
-	spriteBatch.reset(new DirectX::SpriteBatch(device.Get(), resUploadBach, pd));
+	engine->spriteBatch.insert(
+		std::make_pair(formatName, std::make_unique<DirectX::SpriteBatch>(engine->device.Get(), resUploadBach, pd)));
 	// ビューポート
 	D3D12_VIEWPORT viewport{};
 	// クライアント領域のサイズと一緒にして画面全体に表示
@@ -381,17 +389,22 @@ void Engine::InitializeSprite() {
 	viewport.TopLeftY = 0;
 	viewport.MinDepth = 0.0f;
 	viewport.MaxDepth = 1.0f;
-	spriteBatch->SetViewport(viewport);
+	engine->spriteBatch[formatName]->SetViewport(viewport);
 
-	spriteFont.reset(new DirectX::SpriteFont(
-		device.Get(),
-		resUploadBach,
-		L"Font/fonttest.spritefont",
-		fontHeap->GetCPUDescriptorHandleForHeapStart(),
-		fontHeap->GetGPUDescriptorHandleForHeapStart()
-	));
+	engine->spriteFonts.insert(
+		std::make_pair(
+			formatName,
+			std::make_unique<DirectX::SpriteFont>(
+				engine->device.Get(),
+				resUploadBach,
+				ConvertString(formatName).c_str(),
+				engine->fontHeap[formatName]->GetCPUDescriptorHandleForHeapStart(),
+				engine->fontHeap[formatName]->GetGPUDescriptorHandleForHeapStart()
+			)
+		)
+	);
 
-	auto future = resUploadBach.End(commandQueue.Get());
+	auto future = resUploadBach.End(engine->commandQueue.Get());
 
 	// Fenceの値を更新
 	engine->fenceVal++;
@@ -409,28 +422,6 @@ void Engine::InitializeSprite() {
 
 	future.wait();
 }
-
-void Engine::StringDraw(
-	const std::string& str,
-	const Vector2& pos,
-	float rotation,
-	Vector2 scale,
-	uint32_t color) {
-	engine->commandList->SetDescriptorHeaps(1, engine->fontHeap.GetAddressOf());
-
-	engine->spriteBatch->Begin(engine->commandList.Get());
-	engine->spriteFont->DrawString(
-		engine->spriteBatch.get(),
-		str.c_str(),
-		DirectX::XMFLOAT2(pos.x, pos.y),
-		UintToVector4(color).m128,
-		rotation,
-		DirectX::XMFLOAT2(static_cast<float>(0), static_cast<float>(0)),
-		DirectX::XMFLOAT2(scale.x, scale.y)
-	);
-	engine->spriteBatch->End();
-}
-
 
 
 
@@ -528,19 +519,6 @@ void Engine::InitializeDraw() {
 	dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
 
 	device->CreateDepthStencilView(depthStencilResource.Get(), &dsvDesc, dsvHeap->GetCPUDescriptorHandleForHeapStart());
-}
-
-Vector4 Engine::UintToVector4(uint32_t color) {
-	static const float normal = 1.0f / 255.0f;
-	Vector4 result;
-
-	result.color = {
-		static_cast<float>((color & 0xff000000) >> 24) * normal,
-		static_cast<float>((color & 0xff0000) >> 16) * normal,
-		static_cast<float>((color & 0xff00) >> 8) * normal,
-		static_cast<float>(color & 0xff) * normal
-	};
-	return result;
 }
 
 void Engine::Barrier(ID3D12Resource* resource, D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after, UINT subResource) {
@@ -697,7 +675,9 @@ Engine::~Engine() {
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
 
-	fontHeap->Release();
+	for (auto& i : fontHeap) {
+		i.second->Release();
+	}
 	dsvHeap->Release();
 	depthStencilResource->Release();
 	CloseHandle(fenceEvent);
