@@ -55,11 +55,13 @@ void PipelineManager::SetState(
 	Pipeline::Blend blend_,
 	Pipeline::SolidState solidState_,
 	Pipeline::CullMode cullMode_,
+	bool isLine_,
 	uint32_t numRenderTarget_
 ) {
 	instance->blend = std::clamp(blend_, Pipeline::Blend::None, Pipeline::Blend(Pipeline::Blend::BlendTypeNum - 1));
 	instance->cullMode = cullMode_;
 	instance->solidState = solidState_;
+	instance->isLine = isLine_;
 	instance->numRenderTarget = numRenderTarget_;
 }
 
@@ -75,6 +77,7 @@ Pipeline* PipelineManager::Create() {
 			instance->blend,
 			instance->cullMode,
 			instance->solidState,
+			instance->isLine,
 			instance->numRenderTarget
 		);
 
@@ -89,6 +92,7 @@ Pipeline* PipelineManager::Create() {
 				instance->blend,
 				instance->cullMode,
 				instance->solidState,
+				instance->isLine,
 				instance->numRenderTarget,
 				instance->rootSignature->Get()
 			);
@@ -109,6 +113,7 @@ Pipeline* PipelineManager::Create() {
 				instance->blend,
 				instance->cullMode,
 				instance->solidState,
+				instance->isLine,
 				instance->numRenderTarget
 			);
 
@@ -129,6 +134,7 @@ void PipelineManager::StateReset() {
 	instance->blend = {};
 	instance->cullMode = {};
 	instance->solidState = {};
+	instance->isLine = false;
 	instance->numRenderTarget = 0u;
 }
 
@@ -140,6 +146,7 @@ PipelineManager::PipelineManager() :
 	blend(),
 	cullMode(),
 	solidState(),
+	isLine(false),
 	numRenderTarget(0u),
 	vertexInputStates(0)
 {}

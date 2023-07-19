@@ -187,11 +187,11 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// 
 		pera->PreDraw();
 
-		//model->Draw(camera.GetViewProjection(), camera.pos);
+		model->Draw(camera.GetViewProjection(), camera.pos);
 
-		//tex->Draw(Vector2::identity, texRotate, texPos, camera2D.GetViewOthographics(), Pipeline::Blend::Noaml);
+		tex->Draw(Vector2::identity, texRotate, texPos, camera2D.GetViewOthographics(), Pipeline::Blend::Noaml);
 
-		//texDefault->Draw(Vector2::identity, texRotate, texDefaultPos, camera2D.GetViewOthographics(), Pipeline::Blend::Noaml);
+		texDefault->Draw(Vector2::identity, texRotate, texDefaultPos, camera2D.GetViewOthographics(), Pipeline::Blend::Noaml);
 
 		line.Draw(camera2D.GetViewOthographics(), startPos, endPos, 0xff0000ff);
 

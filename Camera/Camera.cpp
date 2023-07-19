@@ -72,8 +72,8 @@ void Camera::Update() {
 	view.VertAffin(scale, rotate, pos);
 	view.Inverse();
 
-	auto engine = Engine::GetInstance();
-	float aspect = static_cast<float>(engine->clientWidth) / static_cast<float>(engine->clientHeight);
+	static auto engine = Engine::GetInstance();
+	static const float aspect = static_cast<float>(engine->clientWidth) / static_cast<float>(engine->clientHeight);
 
 	switch (mode)
 	{

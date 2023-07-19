@@ -118,6 +118,11 @@ void WinApp::Create(const std::wstring& windowTitle, int32_t width, int32_t heig
 	);
 	SetWindowLongPtr(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
 
+	windowStyle &= ~WS_THICKFRAME;
+
+	SetWindowLong(hwnd, GWL_STYLE, windowStyle);
+	SetWindowPos(
+		hwnd, NULL, 0, 0, 0, 0, (SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED));
 	ShowWindow(hwnd, SW_NORMAL);
 }
 

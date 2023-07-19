@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "Pipeline/Pipeline.h"
 #include "Engine/RootSignature/RootSignature.h"
 #include "Engine/ShaderManager/ShaderManager.h"
@@ -63,6 +63,7 @@ public:
 		Pipeline::Blend blend_,
 		Pipeline::SolidState solidState_,
 		Pipeline::CullMode cullMode_ = Pipeline::CullMode::Back,
+		bool isLine_ = false,
 		uint32_t numRenderTarget_ = 1u
 	);
 
@@ -96,6 +97,7 @@ private:
 	Pipeline::Blend blend;
 	Pipeline::CullMode cullMode;
 	Pipeline::SolidState solidState;
+	bool isLine;
 	uint32_t numRenderTarget;
 
 	std::vector<std::tuple<std::string, uint32_t, DXGI_FORMAT>> vertexInputStates;

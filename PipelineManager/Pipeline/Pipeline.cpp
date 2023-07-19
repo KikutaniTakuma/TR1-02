@@ -1,4 +1,4 @@
-﻿#include "Pipeline.h"
+#include "Pipeline.h"
 #include <cassert>
 #include <algorithm>
 
@@ -11,6 +11,7 @@ Pipeline::Pipeline():
 	solidState(),
 	numRenderTarget(1u),
 	semanticNames(0),
+	isLine(false),
 	rootSignature(nullptr)
 {
 	vertexInput.reserve(0);
@@ -64,12 +65,14 @@ void Pipeline::Create(
 	Pipeline::Blend blend_,
 	Pipeline::CullMode cullMode_,
 	Pipeline::SolidState solidState_,
+	bool isLine_,
 	uint32_t numRenderTarget_
 ) {
 	blend = blend_;
 	cullMode = cullMode_;
 	solidState = solidState_;
 	numRenderTarget = numRenderTarget_;
+	isLine = isLine_;
 
 	rootSignature = rootSignature_.Get();
 
@@ -135,8 +138,11 @@ void Pipeline::Create(
 	graphicsPipelineStateDesc.NumRenderTargets = numRenderTarget;
 	graphicsPipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 	// 利用するトポロジ(形状)のタイプ
-	if (shader.hull && shader.domain) {
+	if (!isLine && shader.hull && shader.domain) {
 		graphicsPipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_PATCH;
+	}
+	else if (isLine) {
+		graphicsPipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
 	}
 	else {
 		graphicsPipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
@@ -201,8 +207,11 @@ void Pipeline::Use() {
 	auto commandlist = Engine::GetCommandList();
 	commandlist->SetGraphicsRootSignature(rootSignature);
 	commandlist->SetPipelineState(graphicsPipelineState.Get());
-	if (shader.hull && shader.domain) {
+	if (!isLine && shader.hull && shader.domain) {
 		commandlist->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
+	}
+	else if (isLine) {
+		commandlist->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
 	}
 	else {
 		commandlist->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -214,6 +223,7 @@ bool Pipeline::IsSame(
 	Pipeline::Blend blend_,
 	Pipeline::CullMode cullMode_,
 	Pipeline::SolidState solidState_,
+	bool isLine_,
 	uint32_t numRenderTarget_,
 	ID3D12RootSignature* rootSignature_
 ) {
@@ -225,6 +235,7 @@ bool Pipeline::IsSame(
 		&& blend == blend_
 		&& cullMode == cullMode_
 		&& solidState == solidState_
+		&& isLine == isLine_
 		&& numRenderTarget == numRenderTarget_
 		&& rootSignature == rootSignature_;
 }

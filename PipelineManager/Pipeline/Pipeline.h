@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "Engine/Engine.h"
 #include "Engine/RootSignature/RootSignature.h"
@@ -64,6 +64,7 @@ public:
 		Pipeline::Blend blend_,
 		Pipeline::CullMode cullMode_,
 		Pipeline::SolidState solidState_,
+		bool isLine_,
 		uint32_t numRenderTarget_ = 1
 	);
 
@@ -74,6 +75,7 @@ public:
 		Pipeline::Blend blend_,
 		Pipeline::CullMode cullMode_,
 		Pipeline::SolidState solidState_,
+		bool isLine_,
 		uint32_t numRenderTarget_,
 		ID3D12RootSignature* rootSignature_
 	);
@@ -93,6 +95,7 @@ private:
 	Pipeline::CullMode cullMode;
 	Pipeline::SolidState solidState;
 	uint32_t numRenderTarget;
+	bool isLine;
 
 	ID3D12RootSignature* rootSignature;
 };

@@ -8,6 +8,11 @@
 #include "Engine/ShaderManager/ShaderManager.h"
 
 class Line {
+private:
+	struct VertexData {
+		Vector4 pos;
+		Vector4 color;
+	};
 public:
 	Line();
 	~Line();
@@ -21,7 +26,7 @@ private:
 	// 頂点バッファビュー
 	D3D12_VERTEX_BUFFER_VIEW vertexView{};
 	// 頂点バッファマップ
-	Vector4* vertexMap = nullptr;
+	VertexData* vertexMap = nullptr;
 
 	ShaderResourceHeap heap;
 	
@@ -30,5 +35,4 @@ private:
 	Pipeline* pipline;
 
 	ConstBuffer<Mat4x4> wvpMat;
-	ConstBuffer<Vector4> colorBuf;
 };
