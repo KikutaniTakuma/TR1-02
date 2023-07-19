@@ -70,7 +70,8 @@ void Engine::Initialize(int windowWidth, int windowHeight, const std::string& wi
 	engine->clientHeight = windowHeight;
 
 	// Window生成
-	WinApp::GetInstance()->Create(ConvertString(windowName), windowWidth, windowHeight);
+	auto&& windowTitle = ConvertString(windowName);
+	WinApp::GetInstance()->Create(windowTitle, windowWidth, windowHeight);
 
 #ifdef _DEBUG
 	// DebugLayer有効化

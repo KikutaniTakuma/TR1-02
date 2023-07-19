@@ -34,8 +34,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	model->LoadShader("WaveShader/WaveNone.VS.hlsl", "WaveShader/Wave.PS.hlsl", "WaveShader/Wave.GS.hlsl");
 	model->CreateGraphicsPipeline();
 
-	Mat4x4 modelWorldMat = VertMakeMatrixAffin(Vector3::identity, Vector3(), Vector3());
-
 	Vector3 cameraMoveRotate{};
 
 	auto tex = std::make_unique<Texture2D>();
@@ -58,6 +56,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	StringOut text("Font/JapaneseGothic.spritefont");
 
+	bool fullscreen = false;
 
 	/// 
 	/// メインループ
@@ -132,6 +131,11 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			testAudio->Stop();
 		}
 
+		if (KeyInput::Releaed(DIK_F11)) {
+			fullscreen = !fullscreen;
+			WinApp::GetInstance()->SetFullscreen(fullscreen);
+		}
+
 
 
 		ImGui::Begin("Camera");
@@ -151,8 +155,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		camera2D.Update();
 
 		ImGui::Begin("Text");
-		ImGui::InputText("DrawText", text.str.data(), text.str.size());
-		text.wstr = L"あいうえおアイウエオ愛宇絵尾";
+		ImGui::InputText("DrawText", ConvertString(text.str).data(), text.str.size());
 		ImGui::DragFloat2("TextPos", &text.pos.x);
 		ImGui::DragFloat("TextRotate", &text.rotation, 0.01f);
 		ImGui::DragFloat2("TextScale", &text.scale.x, 0.01f);
@@ -169,7 +172,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// 
 		pera->PreDraw();
 
-		model->Draw(modelWorldMat, camera.GetViewProjection(), camera.pos);
+		model->Draw(camera.GetViewProjection(), camera.pos);
 
 		//tex->Draw(Vector2::identity, texRotate, texPos, camera2D.GetViewOthographics(), Pipeline::Blend::Noaml);
 

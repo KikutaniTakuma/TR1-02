@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include <d3d12.h>
 #pragma comment(lib, "d3d12.lib")
 #include <dxcapi.h>
@@ -64,19 +64,31 @@ public:
 
 public:
 	void LoadObj(const std::string& fileName);
-	void LoadShader(const std::string& vertexFileName, const std::string& pixelFileNa, const std::string& geometoryFileNameme);
+	void LoadShader(const std::string& vertex,
+		const std::string& pixel,
+		const std::string& geometory = {},
+		const std::string& hull = {},
+		const std::string& domain = {}
+	);
 
 	void Update();
 
-	void Draw(const Mat4x4& worldMat, const Mat4x4& viewProjectionMat, const Vector3& cameraPos);
+	void Draw(const Mat4x4& viewProjectionMat, const Vector3& cameraPos);
 
 	void CreateGraphicsPipeline();
 
+public:
+	Vector3 pos;
+	Vector3 rotate;
+	Vector3 scale;
+
+	uint32_t color;
 
 private:
 	ShaderResourceHeap descHeap;
 
 	Mesh meshData;
+
 	Shader shader;
 
 	Pipeline* pipeline;
@@ -89,7 +101,7 @@ private:
 
 	ConstBuffer<DirectionLight> dirLig;
 
-	ConstBuffer<Vector4> color;
+	ConstBuffer<Vector4> colorBuf;
 
 	float waveCountSpd;
 };
