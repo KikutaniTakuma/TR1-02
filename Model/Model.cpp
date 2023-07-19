@@ -36,7 +36,7 @@ Model::Model() :
 	dirLig->ptColor = { 15.0f,15.0f,15.0f };
 	dirLig->ptRange = 10.0f;
 
-	*color = UintToVector4(0xff0000ff);
+	*color = UintToVector4(0xffffffff);
 	color.OffWright();
 
 	descHeap.CreateConstBufferView(wvpData);

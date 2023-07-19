@@ -20,7 +20,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	Engine::Initialize(1280, 720, "DirectXGame");
 
 	// fontLoad
-	Engine::LoadFont("Font/fonttest.spritefont");
+	Engine::LoadFont("Font/JapaneseGothic.spritefont");
 
 	Camera camera;
 	camera.pos = { 8.24f,9.63f,-20.53f };
@@ -56,7 +56,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	auto testAudio = AudioManager::GetInstance()->LoadWav("Alarm01.wav",true);
 
-	StringOut text("Font/fonttest.spritefont");
+	StringOut text("Font/JapaneseGothic.spritefont");
 
 
 	/// 
@@ -152,6 +152,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		ImGui::Begin("Text");
 		ImGui::InputText("DrawText", text.str.data(), text.str.size());
+		text.wstr = L"あいうえおアイウエオ愛宇絵尾";
 		ImGui::DragFloat2("TextPos", &text.pos.x);
 		ImGui::DragFloat("TextRotate", &text.rotation, 0.01f);
 		ImGui::DragFloat2("TextScale", &text.scale.x, 0.01f);
@@ -177,6 +178,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		pera->Draw();
 
 		text.Draw();
+
+		text.WideDraw();
 		///
 		/// 描画処理ここまで
 		/// 
