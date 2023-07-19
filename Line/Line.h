@@ -13,6 +13,9 @@ private:
 		Vector4 pos;
 		Vector4 color;
 	};
+private:
+	static constexpr uint16_t kVertexNum = 2u;
+
 public:
 	Line();
 	~Line();

@@ -3,9 +3,9 @@
 #include <algorithm>
 
 Line::Line(){
-	vertexBuffer = Engine::CreateBufferResuorce(sizeof(VertexData) * 2);
+	vertexBuffer = Engine::CreateBufferResuorce(sizeof(VertexData) * kVertexNum);
 	vertexView.BufferLocation = vertexBuffer->GetGPUVirtualAddress();
-	vertexView.SizeInBytes = sizeof(VertexData) * 2;
+	vertexView.SizeInBytes = sizeof(VertexData) * kVertexNum;
 	vertexView.StrideInBytes = sizeof(VertexData);
 
 	vertexBuffer->Map(0, nullptr, reinterpret_cast<void**>(&vertexMap));
@@ -38,7 +38,7 @@ void Line::Draw(const Mat4x4& viewProjection, const Vector2& start, const Vector
 	heap.Use();
 	
 	Engine::GetCommandList()->IASetVertexBuffers(0,1,&vertexView);
-	Engine::GetCommandList()->DrawInstanced(2, 1, 0, 0);
+	Engine::GetCommandList()->DrawInstanced(kVertexNum, 1, 0, 0);
 }
 
 void Line::Draw(const Mat4x4& viewProjection, const Vector3& start, const Vector3& end, uint32_t color) {
@@ -50,5 +50,5 @@ void Line::Draw(const Mat4x4& viewProjection, const Vector3& start, const Vector
 	pipline->Use();
 	heap.Use();
 	Engine::GetCommandList()->IASetVertexBuffers(0, 1, &vertexView);
-	Engine::GetCommandList()->DrawInstanced(2, 1, 0, 0);
+	Engine::GetCommandList()->DrawInstanced(kVertexNum, 1, 0, 0);
 }
