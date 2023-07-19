@@ -14,6 +14,7 @@
 #include "AudioManager/AudioManager.h"
 #include "Camera/Camera.h"
 #include "StringOut/StringOut.h"
+#include "Line/Line.h"
 
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	// ライブラリ初期化
@@ -57,6 +58,11 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	StringOut text("Font/fonttest.spritefont");
 
 	bool fullscreen = false;
+
+	Line line;
+
+	Vector2 startPos;
+	Vector2 endPos;
 
 	/// 
 	/// メインループ
@@ -155,10 +161,19 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		camera2D.Update();
 
 		ImGui::Begin("Text");
-		ImGui::InputText("DrawText", ConvertString(text.str).data(), text.str.size());
+		static std::string hoge;
+		hoge.reserve(0x400);
+		hoge.resize(0x400);
+		ImGui::InputText("DrawText", hoge.data(), hoge.size());
+		text.str = ConvertString(hoge);
 		ImGui::DragFloat2("TextPos", &text.pos.x);
 		ImGui::DragFloat("TextRotate", &text.rotation, 0.01f);
 		ImGui::DragFloat2("TextScale", &text.scale.x, 0.01f);
+		ImGui::End();
+
+		ImGui::Begin("Line");
+		ImGui::DragFloat2("start", &startPos.x);
+		ImGui::DragFloat2("end", &endPos.x);
 		ImGui::End();
 
 		//model->Update();
@@ -172,11 +187,13 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// 
 		pera->PreDraw();
 
-		model->Draw(camera.GetViewProjection(), camera.pos);
+		//model->Draw(camera.GetViewProjection(), camera.pos);
 
 		//tex->Draw(Vector2::identity, texRotate, texPos, camera2D.GetViewOthographics(), Pipeline::Blend::Noaml);
 
 		//texDefault->Draw(Vector2::identity, texRotate, texDefaultPos, camera2D.GetViewOthographics(), Pipeline::Blend::Noaml);
+
+		line.Draw(camera2D.GetViewOthographics(), startPos, endPos, 0xff0000ff);
 
 		pera->Draw();
 
