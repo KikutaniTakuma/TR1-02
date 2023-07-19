@@ -58,16 +58,7 @@ public:
 /// メンバ関数
 /// </summary>
 public:
-	union {
-		float x;
-		float r;
-	};
-	union {
-		float y;
-		float g;
-	};
-	union {
-		float z;
-		float b;
-	};
+	float x;
+	float y;
+	float z;
 };

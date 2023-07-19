@@ -98,6 +98,15 @@
     <ClCompile Include="StringOut\StringOut.cpp">
       <Filter>StringOut</Filter>
     </ClCompile>
+    <ClCompile Include="Editor\Editor.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Node\Node.cpp">
+      <Filter>Editor\Node</Filter>
+    </ClCompile>
+    <ClCompile Include="Line\Line.cpp">
+      <Filter>Line</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -174,6 +183,15 @@
     </Filter>
     <Filter Include="StringOut">
       <UniqueIdentifier>{8f6f9f0d-e177-4c18-b9a0-cab1926af85b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Editor">
+      <UniqueIdentifier>{c94e98bb-8531-4999-870a-aede2d08653e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Editor\Node">
+      <UniqueIdentifier>{01d02fd5-d429-4414-a2aa-0d3ac669ea46}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Line">
+      <UniqueIdentifier>{17a37595-e9f9-42e9-9496-d637dc153066}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -278,6 +296,15 @@
     </ClInclude>
     <ClInclude Include="StringOut\StringOut.h">
       <Filter>StringOut</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Editor.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Node\Node.h">
+      <Filter>Editor\Node</Filter>
+    </ClInclude>
+    <ClInclude Include="Line\Line.h">
+      <Filter>Line</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
