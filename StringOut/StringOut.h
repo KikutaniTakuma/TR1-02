@@ -23,19 +23,16 @@ public:
 public:
 	void Draw();
 
-	void WideDraw();
-
 private:
 	std::string format;
 public:
-	std::string str;
-	std::wstring wstr;
+	std::wstring str;
 
 	Vector2 pos;
-	float rotation = 0.0f;
-	Vector2 scale = Vector2::identity;
-	uint32_t color = 0xffffffff;
-	bool isHorizontal = false;
+	float rotation;
+	Vector2 scale;
+	uint32_t color;
+	bool isHorizontal;
 
 public:
 	inline void SetFormat(const std::string& formatName) {

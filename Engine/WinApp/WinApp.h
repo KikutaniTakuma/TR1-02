@@ -34,9 +34,15 @@ public:
 		return windowName;
 	}
 
+	void SetFullscreen(bool isFullscreen_);
+
 
 private:
-	HWND hwnd{};
+	HWND hwnd = nullptr;
 	WNDCLASSEX w{};
+	UINT windowStyle;
+	bool isFullscreen = false;
+	RECT windowRect;
 	std::wstring windowName;
+	float aspectRatio;
 };
