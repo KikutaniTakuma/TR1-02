@@ -58,7 +58,7 @@ void TextureManager::UnloadTexture(std::shared_ptr<Texture>& tex) {
 
 	tex.reset();
 
-	if (itr->second.use_count() == 1) {
+	if (itr->second.use_count() == 1L) {
 		// 参照カウントが1の場合コンテナから削除
 		textures.erase(itr);
 	}

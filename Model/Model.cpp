@@ -11,6 +11,10 @@
 
 
 Model::Model() :
+	pos(),
+	rotate(),
+	scale(Vector3::identity),
+	color(0xffffffff),
 	meshData(),
 	shader(),
 	pipeline(nullptr),
@@ -20,7 +24,7 @@ Model::Model() :
 	waveCountSpd(0.01f),
 	wvpData(),
 	dirLig(),
-	color(),
+	colorBuf(),
 	descHeap(16)
 {
 	// 単位行列を書き込んでおく
@@ -36,12 +40,11 @@ Model::Model() :
 	dirLig->ptColor = { 15.0f,15.0f,15.0f };
 	dirLig->ptRange = 10.0f;
 
-	*color = UintToVector4(0xff0000ff);
-	color.OffWright();
+	*colorBuf = UintToVector4(color);
 
 	descHeap.CreateConstBufferView(wvpData);
 	descHeap.CreateConstBufferView(dirLig);
-	descHeap.CreateConstBufferView(color);
+	descHeap.CreateConstBufferView(colorBuf);
 }
 
 void Model::LoadObj(const std::string& fileName) {
@@ -172,19 +175,23 @@ void Model::LoadObj(const std::string& fileName) {
 	}
 }
 
-void Model::LoadShader(const std::string& vertexFileName, const std::string& pixelFileName, const std::string& geometoryFileName) {
+void Model::LoadShader(
+	const std::string& vertex,
+	const std::string& pixel,
+	const std::string& geometory,
+	const std::string& hull,
+	const std::string& domain
+) {
 	if (!loadShaderFlg) {
-		shader.vertex = ShaderManager::LoadVertexShader(vertexFileName);
-		assert(shader.vertex != nullptr);
-		shader.pixel = ShaderManager::LoadPixelShader(pixelFileName);
-		assert(shader.pixel != nullptr);
-		shader.geometory = ShaderManager::LoadGeometoryShader(geometoryFileName);
-		assert(shader.geometory != nullptr);
-		/*hullShaderBlob = Engine::CompilerShader(ConvertString("WaveShader/Wave.HS.hlsl"), L"hs_6_0");
-		assert(hullShaderBlob != nullptr);
-		domainShaderBlob = Engine::CompilerShader(ConvertString("WaveShader/Wave.DS.hlsl"), L"ds_6_0");
-		assert(domainShaderBlob != nullptr);*/
-
+		shader.vertex = ShaderManager::LoadVertexShader(vertex);
+		shader.pixel = ShaderManager::LoadPixelShader(pixel);
+		if (geometory.size() != 0LLU) {
+			shader.geometory = ShaderManager::LoadGeometoryShader(geometory);
+		}
+		if (hull.size() != 0LLU && geometory.size() != 0LLU) {
+			shader.hull = ShaderManager::LoadHullShader(hull);
+			shader.domain = ShaderManager::LoadHullShader(domain);
+		}
 		loadShaderFlg = true;
 	}
 }
@@ -213,11 +220,13 @@ void Model::Update() {
 	
 }
 
-void Model::Draw(const Mat4x4& worldMat, const Mat4x4& viewProjectionMat, const Vector3& cameraPos) {
+void Model::Draw(const Mat4x4& viewProjectionMat, const Vector3& cameraPos) {
 	assert(createGPFlg);
 
-	wvpData->worldMat = worldMat;
+	wvpData->worldMat.VertAffin(scale, rotate, pos);
 	wvpData->viewProjectoionMat = viewProjectionMat;
+
+	*colorBuf = UintToVector4(color);
 
 	dirLig->eyePos = cameraPos;
 
@@ -225,8 +234,6 @@ void Model::Draw(const Mat4x4& worldMat, const Mat4x4& viewProjectionMat, const 
 	pipeline->Use();
 	descHeap.Use();
 	
-	//commandlist->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
-	commandlist->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	commandlist->IASetVertexBuffers(0,1,&meshData.vertexView);
 	commandlist->IASetIndexBuffer(&meshData.indexView);
 	
