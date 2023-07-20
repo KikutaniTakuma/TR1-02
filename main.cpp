@@ -18,7 +18,7 @@
 
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	// ライブラリ初期化
-	Engine::Initialize(1280, 720, "DirectXGame");
+	Engine::Initialize(1920, 1080, "DirectXGame");
 
 	// fontLoad
 	Engine::LoadFont("Font/JapaneseGothic.spritefont");

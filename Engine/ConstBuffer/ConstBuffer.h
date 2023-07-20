@@ -108,7 +108,7 @@ public:
 	}
 
 private:
-	Microsoft::WRL::ComPtr<ID3D12Resource> bufferResource ;
+	Microsoft::WRL::ComPtr<ID3D12Resource> bufferResource;
 	D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc;
 
 	T* data;

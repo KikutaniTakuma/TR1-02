@@ -25,11 +25,11 @@ public:
 	void Draw(const Mat4x4& viewProjection, const Vector3& start, const Vector3& end, uint32_t color);
 
 private:
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertexBuffer = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> vertexBuffer;
 	// 頂点バッファビュー
-	D3D12_VERTEX_BUFFER_VIEW vertexView{};
+	D3D12_VERTEX_BUFFER_VIEW vertexView;
 	// 頂点バッファマップ
-	VertexData* vertexMap = nullptr;
+	VertexData* vertexMap;
 
 	ShaderResourceHeap heap;
 	

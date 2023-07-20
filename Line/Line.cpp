@@ -2,7 +2,15 @@
 #include "Engine/Engine.h"
 #include <algorithm>
 
-Line::Line(){
+Line::Line() : 
+	vertexBuffer(),
+	vertexView{},
+	vertexMap(nullptr),
+	heap(),
+	shader{},
+	pipline(nullptr),
+	wvpMat()
+{
 	vertexBuffer = Engine::CreateBufferResuorce(sizeof(VertexData) * kVertexNum);
 	vertexView.BufferLocation = vertexBuffer->GetGPUVirtualAddress();
 	vertexView.SizeInBytes = sizeof(VertexData) * kVertexNum;
@@ -29,8 +37,9 @@ Line::~Line() {
 }
 
 void Line::Draw(const Mat4x4& viewProjection, const Vector2& start, const Vector2& end, uint32_t color){
-	vertexMap[0] = { Vector4(start, 0.1f, 1.0f), UintToVector4(color) };
-	vertexMap[1] = { Vector4(end, 0.1f, 1.0f),   UintToVector4(color) };
+	auto&& colorFloat = UintToVector4(color);
+	vertexMap[0] = { Vector4(start, 0.1f, 1.0f), colorFloat };
+	vertexMap[1] = { Vector4(end, 0.1f, 1.0f),   colorFloat };
 
 	*wvpMat = viewProjection;
 
@@ -42,8 +51,9 @@ void Line::Draw(const Mat4x4& viewProjection, const Vector2& start, const Vector
 }
 
 void Line::Draw(const Mat4x4& viewProjection, const Vector3& start, const Vector3& end, uint32_t color) {
-	vertexMap[0] = { Vector4(start, 1.0f), UintToVector4(color) };
-	vertexMap[1] = { Vector4(end, 1.0f),   UintToVector4(color) };
+	auto&& colorFloat = UintToVector4(color);
+	vertexMap[0] = { Vector4(start, 1.0f), colorFloat };
+	vertexMap[1] = { Vector4(end, 1.0f),   colorFloat };
 
 	*wvpMat = viewProjection;
 
