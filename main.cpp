@@ -15,10 +15,11 @@
 #include "Camera/Camera.h"
 #include "StringOut/StringOut.h"
 #include "Line/Line.h"
+#include "Editor/Node/Node.h"
 
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	// ライブラリ初期化
-	Engine::Initialize(1920, 1080, "DirectXGame");
+	Engine::Initialize(1280, 720, "DirectXGame");
 
 	// fontLoad
 	Engine::LoadFont("Font/JapaneseGothic.spritefont");
@@ -57,6 +58,11 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	Vector2 startPos;
 	Vector2 endPos;
+
+	Vector2 imguiPos;
+
+	Node node;
+	node.nodeName = "test";
 
 	/// 
 	/// メインループ
@@ -117,6 +123,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		ImGui::DragFloat2("end", &endPos.x);
 		ImGui::End();
 
+		node.Update();
+
 		//model->Update();
 
 		///
@@ -127,6 +135,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// 描画処理
 		/// 
 		pera->PreDraw();
+
+		node.Draw(camera2D.GetViewOthographics());
 
 		//model->Draw(camera.GetViewProjection(), camera.pos);
 

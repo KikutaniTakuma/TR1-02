@@ -1,13 +1,15 @@
 #pragma once
+#include <vector>
+#include <list>
+#include <functional>
+#include "Node/Node.h"
 
 class Editor {
-private:
+public:
 	Editor();
 	~Editor();
 
-public:
-	static Editor* GetInstance();
-
 private:
-
+	std::list<std::function<void(void)>> functionList;
+	//std::vector<Node> nodes;
 };
