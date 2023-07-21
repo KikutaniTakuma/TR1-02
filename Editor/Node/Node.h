@@ -81,9 +81,9 @@ private:
 	ValueType valueType;
 
 public:
-	void SetType(Type type_);
+	void SetType();
 
-	void SetValueType(ValueType valueType_);
+	void SetValueType();
 
 public:
 	Vector3 pos;

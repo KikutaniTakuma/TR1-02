@@ -73,10 +73,20 @@ void Node::Update() {
 		switch (valueType)
 		{
 		case Node::Int:
-			output = std::get<int>(input["Left"].second) / std::get<int>(input["Right"].second);
+			if (std::get<int>(input["Right"].second) == 0) {
+				output = 0;
+			}
+			else {
+				output = std::get<int>(input["Left"].second) / std::get<int>(input["Right"].second);
+			}
 			break;
 		case Node::Float:
-			output = std::get<float>(input["Left"].second) / std::get<float>(input["Right"].second);
+			if (std::get<float>(input["Right"].second) == 0.0f) {
+				output = 0.0f;
+			}
+			else {
+				output = std::get<float>(input["Left"].second) / std::get<float>(input["Right"].second);
+			}
 			break;
 		case Node::Vec2:
 		case Node::Vec3:
@@ -90,7 +100,12 @@ void Node::Update() {
 		switch (valueType)
 		{
 		case Node::Int:
-			output = std::get<int>(input["Left"].second) % std::get<int>(input["Right"].second);
+			if (std::get<int>(input["Right"].second) == 0) {
+				output = 0;
+			}
+			else {
+				output = std::get<int>(input["Left"].second) % std::get<int>(input["Right"].second);
+			}
 			break;
 		case Node::Float:
 		case Node::Vec2:
@@ -140,7 +155,7 @@ void Node::Update() {
 		break;
 
 	case Type::LoopFor:
-		for (int i = std::get<int>(input["RoopStart"].second); i < std::get<int>(input["RoopCount"].second); i++) {
+		for (int i = std::get<int>(input["LoopStart"].second); i < std::get<int>(input["LoopCount"].second); i++) {
 			for (auto& next : nexts) {
 				if (next) {
 					next->Update();
@@ -149,7 +164,7 @@ void Node::Update() {
 		}
 		break;
 	case Type::LoopWhile:
-		while (loopi < std::get<int>(input["RoopCount"].second)) {
+		while (loopi < std::get<int>(input["LoopCount"].second)) {
 			for (auto& next : nexts) {
 				if (next) {
 					next->Update();
@@ -200,9 +215,8 @@ void Node::Update() {
 	}
 }
 
-void Node::SetType(Type type_) {
+void Node::SetType() {
 	input.clear();
-	type = type_;
 
 	switch (type)
 	{
@@ -214,73 +228,33 @@ void Node::SetType(Type type_) {
 	case Type::OperatorDot:
 	case Type::OperatorCross:
 		input.insert({ "Left",{ valueType,0.0f } });
-		input["Left"].second = false;
-		input["Left"].second = 0;
-		input["Left"].second = 0.0f;
-		input["Left"].second = Vector2();
-		input["Left"].second = Vector3();
 		input.insert({ "Right", { valueType,0.0f } });
-		input["Right"].second = false;
-		input["Right"].second = 0;
-		input["Right"].second = 0.0f;
-		input["Right"].second = Vector2();
-		input["Right"].second = Vector3();
 		break;
 	case Type::LoopFor:
 		// 初期値用
 		input.insert({ "LoopStart", { ValueType::Int,0 } });
-		input["LoopStart"].second = false;
-		input["LoopStart"].second = 0;
-		input["LoopStart"].second = 0.0f;
-		input["LoopStart"].second = Vector2();
-		input["LoopStart"].second = Vector3();
 		// ループ回数
 		input.insert({ "LoopCount", { ValueType::Int,0 } });
-		input["LoopCount"].second = false;
-		input["LoopCount"].second = 0;
-		input["LoopCount"].second = 0.0f;
-		input["LoopCount"].second = Vector2();
-		input["LoopCount"].second = Vector3();
 		break;
 	case Type::LoopWhile:
 	case Type::LoopDoWhile:
 		// ループ回数
 		input.insert({ "LoopCount", { ValueType::Int,0 } });
-		input["LoopStart"].second = false;
-		input["LoopStart"].second = 0;
-		input["LoopStart"].second = 0.0f;
-		input["LoopStart"].second = Vector2();
-		input["LoopStart"].second = Vector3();
 		// ブレイク
 		input.insert({ "Break", { ValueType::Bool,false } });
-		input["Break"].second = false;
-		input["Break"].second = 0;
-		input["Break"].second = 0.0f;
-		input["Break"].second = Vector2();
-		input["Break"].second = Vector3();
 		break;
 	case Type::If:
 	case Type::ElseIf:
 		input.insert({ "Conditions",{ ValueType::Bool,false } });
-		input["Conditions"].second = false;
-		input["Conditions"].second = 0;
-		input["Conditions"].second = 0.0f;
-		input["Conditions"].second = Vector2();
-		input["Conditions"].second = Vector3();
 		input.insert({ "Bool", { ValueType::Bool,true } });
-		input["Bool"].second = true;
-		input["Bool"].second = 0;
-		input["Bool"].second = 0.0f;
-		input["Bool"].second = Vector2();
-		input["Bool"].second = Vector3();
+		break;
 	case Type::TypeNum:
 	default:
 		break;
 	}
 }
 
-void Node::SetValueType(ValueType valueType_) {
-	valueType = valueType_;
+void Node::SetValueType() {
 	switch (valueType)
 	{
 	case Node::Bool:
@@ -302,8 +276,8 @@ void Node::SetValueType(ValueType valueType_) {
 			break;
 		case Node::LoopWhile:
 		case Node::LoopDoWhile:
-			input["LoopStart"].second = false;
-			input["Break"].second = false;
+			input["LoopCount"].second = false;
+			input["Break"].second = true;
 			break;
 		case Node::If:
 		case Node::ElseIf:
@@ -336,8 +310,8 @@ void Node::SetValueType(ValueType valueType_) {
 			break;
 		case Node::LoopWhile:
 		case Node::LoopDoWhile:
-			input["LoopStart"].second = 0;
-			input["Break"].second = 0;
+			input["LoopCount"].second = 0;
+			input["Break"].second = true;
 			break;
 		case Node::If:
 		case Node::ElseIf:
@@ -369,8 +343,8 @@ void Node::SetValueType(ValueType valueType_) {
 			break;
 		case Node::LoopWhile:
 		case Node::LoopDoWhile:
-			input["LoopStart"].second = 0.0f;
-			input["Break"].second = 0.0f;
+			input["LoopCount"].second = 0.0f;
+			input["Break"].second = true;
 			break;
 		case Node::If:
 		case Node::ElseIf:
@@ -402,8 +376,8 @@ void Node::SetValueType(ValueType valueType_) {
 			break;
 		case Node::LoopWhile:
 		case Node::LoopDoWhile:
-			input["LoopStart"].second = Vector2();
-			input["Break"].second = Vector2();
+			input["LoopCount"].second = Vector2();
+			input["Break"].second = true;
 			break;
 		case Node::If:
 		case Node::ElseIf:
@@ -435,7 +409,7 @@ void Node::SetValueType(ValueType valueType_) {
 			break;
 		case Node::LoopWhile:
 		case Node::LoopDoWhile:
-			input["LoopStart"].second = Vector3();
+			input["LoopCount"].second = Vector3();
 			input["Break"].second = Vector3();
 			break;
 		case Node::If:
@@ -462,6 +436,8 @@ void Node::Draw(const Mat4x4& viewProjection) {
 
 	static int typeBuf = static_cast<int>(this->type);
 	static int valueTypeBuf = static_cast<int>(this->valueType);
+	typeBuf = static_cast<int>(this->type);
+	valueTypeBuf = static_cast<int>(this->valueType);
 
 	ImGui::Begin(nodeName.c_str());
 	if (ImGui::TreeNode("Type")) {
@@ -474,13 +450,19 @@ void Node::Draw(const Mat4x4& viewProjection) {
 			}
 			if (valueType == ValueType::Int) {
 				ImGui::RadioButton("OperatorRemainder", &typeBuf, Type::OperatorRemainder);
+				ImGui::RadioButton("LoopFor", &typeBuf, Type::LoopFor);
+				ImGui::RadioButton("LoopWhile", &typeBuf, Type::LoopWhile);
+				ImGui::RadioButton("LoopDoWhile", &typeBuf, Type::LoopDoWhile);
+			}
+			if (valueType == ValueType::Vec2 || valueType == ValueType::Vec3) {
+				ImGui::RadioButton("OperatorDot", &typeBuf, Type::OperatorDot);
+				ImGui::RadioButton("OperatorCross", &typeBuf, Type::OperatorCross);
 			}
 		}
-		ImGui::RadioButton("LoopFor", &typeBuf, Type::LoopFor);
-		ImGui::RadioButton("LoopWhile", &typeBuf, Type::LoopWhile);
-		ImGui::RadioButton("LoopDoWhile", &typeBuf, Type::LoopDoWhile);
-		ImGui::RadioButton("If", &typeBuf, Type::If);
-		ImGui::RadioButton("ElseIf", &typeBuf, Type::ElseIf);
+		else {
+			ImGui::RadioButton("If", &typeBuf, Type::If);
+			ImGui::RadioButton("ElseIf", &typeBuf, Type::ElseIf);
+		}
 		ImGui::TreePop();
 	}
 	if (ImGui::TreeNode("ValueType")) {
@@ -493,11 +475,19 @@ void Node::Draw(const Mat4x4& viewProjection) {
 		ImGui::TreePop();
 	}
 
+	if (static_cast<ValueType>(valueTypeBuf) != this->valueType) {
+		type = Type::TypeNum;
+		typeBuf = static_cast<int>(type);
+	}
+
 	if (static_cast<Type>(typeBuf) != this->type || 
 		static_cast<ValueType>(valueTypeBuf) != this->valueType) {
-		SetType(static_cast<Type>(typeBuf));
-		SetValueType(static_cast<ValueType>(valueTypeBuf));
+		type = static_cast<Type>(typeBuf);
+		valueType = static_cast<ValueType>(valueTypeBuf);
+		SetType();
+		SetValueType();
 	}
+
 
 
 	for (auto& i : input) {
@@ -507,16 +497,16 @@ void Node::Draw(const Mat4x4& viewProjection) {
 			ImGui::Checkbox(i.first.c_str(), &std::get<bool>(i.second.second));
 			break;
 		case Node::ValueType::Int:
-			ImGui::DragInt(i.first.c_str(), &std::get<int>(i.second.second));
+			ImGui::DragInt(i.first.c_str(), &std::get<int>(i.second.second), 0.1f);
 			break;
 		case Node::ValueType::Float:
-			ImGui::DragFloat(i.first.c_str(), &std::get<float>(i.second.second));
+			ImGui::DragFloat(i.first.c_str(), &std::get<float>(i.second.second), 0.01f);
 			break;
 		case Node::ValueType::Vec2:
-			ImGui::DragFloat2(i.first.c_str(), &std::get<Vector2>(i.second.second).x);
+			ImGui::DragFloat2(i.first.c_str(), &std::get<Vector2>(i.second.second).x, 0.01f);
 			break;
 		case Node::ValueType::Vec3:
-			ImGui::DragFloat3(i.first.c_str(), &std::get<Vector3>(i.second.second).x);
+			ImGui::DragFloat3(i.first.c_str(), &std::get<Vector3>(i.second.second).x, 0.01f);
 			break;
 		/*case Node::ValueType::Vec4:
 			ImGui::DragFloat3(i.first.c_str(), std::get<Vector4>(i.second.second).m.data());
@@ -524,6 +514,49 @@ void Node::Draw(const Mat4x4& viewProjection) {
 		default:
 			break;
 		}
+	}
+	switch (valueType)
+	{
+	case Node::ValueType::Bool:
+		if (std::holds_alternative<bool>(output)) {
+			ImGui::Text("Result : %d", std::get<bool>(output));
+		}
+		break;
+	case Node::ValueType::Int:
+		if (std::holds_alternative<int>(output))
+		{
+			ImGui::Text("Result : %d", std::get<int>(output));
+		}
+		break;
+	case Node::ValueType::Float:
+		if (std::holds_alternative<float>(output))
+		{
+			ImGui::Text("Result : %f", std::get<float>(output));
+		}
+		break;
+	case Node::ValueType::Vec2:
+		if (std::holds_alternative<Vector2>(output))
+		{
+			ImGui::Text("Result : %f, %f", std::get<Vector2>(output).x, std::get<Vector2>(output).y);
+		}
+		else if (std::holds_alternative<float>(output)) {
+			ImGui::Text("Result : %f", std::get<float>(output));
+		}
+		break;
+	case Node::ValueType::Vec3:
+		if (std::holds_alternative<Vector3>(output))
+		{
+			ImGui::Text("Result : %f, %f, %f", std::get<Vector3>(output).x, std::get<Vector3>(output).y, std::get<Vector3>(output).z);
+		}
+		else if (std::holds_alternative<float>(output)) {
+			ImGui::Text("Result : %f", std::get<float>(output));
+		}
+		break;
+		/*case Node::ValueType::Vec4:
+			ImGui::DragFloat3(i.first.c_str(), std::get<Vector4>(i.second.second).m.data());
+			break;*/
+	default:
+		break;
 	}
 	ImGui::End();
 }
