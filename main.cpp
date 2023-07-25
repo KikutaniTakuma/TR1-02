@@ -136,9 +136,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// 
 		pera->PreDraw();
 
-		node.Draw(camera2D.GetViewOthographics());
+		//node.Draw(camera2D.GetViewOthographics());
 
-		//model->Draw(camera.GetViewProjection(), camera.pos);
+		model->Draw(camera.GetViewProjection(), camera.pos);
 
 		//tex->Draw(Vector2::identity, texRotate, texPos, camera2D.GetViewOthographics(), Pipeline::Blend::Noaml);
 

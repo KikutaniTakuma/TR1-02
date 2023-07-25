@@ -16,6 +16,7 @@
 #include <wrl.h>
 
 class Model {
+private:
 	struct VertData {
 		Vector4 position;
 		Vector3 normal;
@@ -31,7 +32,7 @@ class Model {
 		// 頂点バッファマップ
 		VertData* vertexMap = nullptr;
 		// インデックスバッファマップ
-		uint16_t* indexMap = nullptr;
+		uint32_t* indexMap = nullptr;
 
 		// index数
 		uint32_t indexNum = 0;

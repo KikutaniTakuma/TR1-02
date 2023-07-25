@@ -59,32 +59,30 @@ void Model::LoadObj(const std::string& fileName) {
 		std::string lineBuf;
 
 		while (std::getline(objFile, lineBuf)) {
+			std::string identifier;
 			std::istringstream line(lineBuf);
-			if (lineBuf.find("#") == std::string::npos && lineBuf.find(".mtl") == std::string::npos) {
-				if (lineBuf.find("f") != std::string::npos) {
-					std::string buff;
-					while (getline(line, buff, ' '))
-					{
-						meshData.indexNum++;
-					}
-				}
-				else if (lineBuf.find("vn") != std::string::npos) {
-					std::string buff;
-					std::vector<float> posBuf(0);
-					while (getline(line, buff, ' '))
-					{
-						if (std::any_of(buff.begin(), buff.end(), isdigit)) {
-							posBuf.push_back(std::stof(buff));
-						}
-					}
-					if (posBuf.size() == 3) {
-						normalPos.push_back({ posBuf[0], posBuf[1], posBuf[2]});
-					}
+			line >> identifier;
+			if (identifier == "v") {
+				vertPositionNum++;
+			}
+			else if (identifier == "vn") {
+				std::string buff;
+				Vector3 posBuf;
+				line >> posBuf.x >> posBuf.y >> posBuf.z;
+				normalPos.push_back(posBuf);
+			}
+			else if (identifier == "vt") {
 
+			}
+			else if (identifier == "f") {
+				std::string buff;
+				while (getline(line, buff, ' '))
+				{
+					meshData.indexNum++;
 				}
-				else if (lineBuf.find("v") != std::string::npos && lineBuf.find("vn") == std::string::npos && lineBuf.find("vt") == std::string::npos) {
-					vertPositionNum++;
-				}
+			}
+			else if (identifier == "mtllib") {
+
 			}
 		}
 		objFile.close();
@@ -107,12 +105,12 @@ void Model::LoadObj(const std::string& fileName) {
 
 
 		// indexBUffer生成
-		meshData.indexBuffer = Engine::CreateBufferResuorce(sizeof(uint16_t) * meshData.indexNum);
+		meshData.indexBuffer = Engine::CreateBufferResuorce(sizeof(uint32_t) * meshData.indexNum);
 		assert(meshData.indexBuffer);
 		// リソースの先頭のアドレスから使う
 		meshData.indexView.BufferLocation = meshData.indexBuffer->GetGPUVirtualAddress();
-		meshData.indexView.SizeInBytes = sizeof(uint16_t) * meshData.indexNum;
-		meshData.indexView.Format = DXGI_FORMAT_R16_UINT;
+		meshData.indexView.SizeInBytes = sizeof(uint32_t) * meshData.indexNum;
+		meshData.indexView.Format = DXGI_FORMAT_R32_UINT;
 
 		meshData.indexMap = nullptr;
 		meshData.indexBuffer->Map(0, nullptr, reinterpret_cast<void**>(&meshData.indexMap));
@@ -122,8 +120,52 @@ void Model::LoadObj(const std::string& fileName) {
 		uint32_t i = 0;
 		meshData.indexNum = 0;
 		while (std::getline(objFile, lineBuf)) {
+			std::string identifier;
 			std::istringstream line(lineBuf);
-			if (lineBuf.find("#") == std::string::npos && lineBuf.find(".mtl") == std::string::npos) {
+			line >> identifier;
+			if (identifier == "v") {
+				Vector3 posBuf;
+				line >> posBuf.x >> posBuf.y >> posBuf.z;
+				meshData.vertexMap[i].position = { posBuf, 1.0f };
+				i++;
+				if (i >= vertPositionNum) {
+					i = 0;
+				}
+			}
+			else if (identifier == "vn") {
+				
+			}
+			else if (identifier == "vt") {
+
+			}
+			else if (identifier == "f") {
+				std::string buff;
+				std::vector<float> posBuf(0);
+				while (getline(line, buff, ' '))
+				{
+					/// 0:vertexNumber 1:textureCoordinate 2:NormalNumber
+					std::string num[3];
+					int32_t count = 0;
+					if (std::any_of(buff.cbegin(), buff.cend(), isdigit)) {
+						for (auto ch = buff.begin(); ch != buff.end(); ch++) {
+							if (*ch == '/') {
+								count++;
+							}
+							else { num[count] += *ch; }
+						}
+					}
+					if (!num[0].empty()) {
+						meshData.indexMap[meshData.indexNum] = std::stoi(num[0]) - 1;
+						meshData.vertexMap[std::stoi(num[0]) - 1].normal = normalPos[std::stoi(num[2]) - 1];
+						meshData.indexNum++;
+					}
+				}
+			}
+			else if (identifier == "mtllib") {
+				
+			}
+
+			/*if (lineBuf.find("#") == std::string::npos && lineBuf.find(".mtl") == std::string::npos) {
 				if (lineBuf.find("v") != std::string::npos && lineBuf.find("vn") == std::string::npos && lineBuf.find("vt") == std::string::npos) {
 					std::string buff;
 					std::vector<float> posBuf(0);
@@ -165,7 +207,7 @@ void Model::LoadObj(const std::string& fileName) {
 						}
 					}
 				}
-			}
+			}*/
 		}
 
 		meshData.vertexBuffer->Unmap(0, nullptr);
