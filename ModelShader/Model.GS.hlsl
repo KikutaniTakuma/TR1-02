@@ -1,4 +1,4 @@
-#include "Wave.hlsli"
+#include "Model.hlsli"
 
 [maxvertexcount(3)]
 void main(triangle VertexShaderOutput input[3], inout TriangleStream<GeometoryOutPut> outStream){

@@ -1,7 +1,8 @@
 #include "GamePad.h"
 #include "externals/imgui/imgui.h"
-#include <limits.h>
+#include <limits>
 #include <algorithm>
+#include "Math/Vector2/Vector2.h"
 
 Gamepad::Gamepad() :
 	preButton(0),
@@ -91,6 +92,7 @@ void Gamepad::Vibration(float leftVibIntensity, float rightVibIntensity) {
 }
 
 void Gamepad::Debug() {
+	ImGui::SetNextWindowSizeConstraints({190.0f, 400.0f}, { 190.0f, 400.0f });
 	ImGui::Begin("Gamepad Debug");
     ImGui::Text("LeftX          = %.2f%%\n", static_cast<float>(GetStick(Stick::LEFT_X)) * 100.0f);
 	ImGui::Text("LeftY          = %.2f%%\n", static_cast<float>(GetStick(Stick::LEFT_Y)) * 100.0f);
@@ -112,5 +114,8 @@ void Gamepad::Debug() {
 	ImGui::Text("B              = %d\n", GetButton(Button::B));
 	ImGui::Text("X              = %d\n", GetButton(Button::X));
 	ImGui::Text("Y              = %d\n", GetButton(Button::Y));
+	static Vector2 vibration;
+	ImGui::DragFloat2("Vib", &vibration.x, 0.01f, 0.0f, 1.0f);
+	Gamepad::Vibration(vibration.x, vibration.y);
 	ImGui::End();
 }

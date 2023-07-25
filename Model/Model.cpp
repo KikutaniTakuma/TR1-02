@@ -52,9 +52,15 @@ void Model::LoadObj(const std::string& fileName) {
 		std::ifstream objFile(fileName);
 		assert(objFile);
 
-		std::vector<Vector3> normalPos(0);
-		uint32_t vertPositionNum = 0;
+		std::vector<Vector4> posDatas(0);
+
+		std::vector<Vector3> normalDatas(0);
+		//uint32_t vertPositionNum = 0;
 		meshData.indexNum = 0;
+
+		std::vector<Vector2> uvDatas(0);
+
+		std::vector<IndexData> indexDatas(0);
 
 		std::string lineBuf;
 
@@ -63,22 +69,49 @@ void Model::LoadObj(const std::string& fileName) {
 			std::istringstream line(lineBuf);
 			line >> identifier;
 			if (identifier == "v") {
-				vertPositionNum++;
+				Vector4 buf;
+				line >> buf.vec.x >> buf.vec.y >> buf.vec.z;
+				buf.vec.w = 1.0f;
+
+				posDatas.push_back(buf);
 			}
 			else if (identifier == "vn") {
-				std::string buff;
-				Vector3 posBuf;
-				line >> posBuf.x >> posBuf.y >> posBuf.z;
-				normalPos.push_back(posBuf);
+				Vector3 buf;
+				line >> buf.x >> buf.y >> buf.z;
+				normalDatas.push_back(buf);
 			}
 			else if (identifier == "vt") {
-
+				Vector2 buf;
+				line >> buf.x >> buf.y;
+				uvDatas.push_back(buf);
 			}
 			else if (identifier == "f") {
-				std::string buff;
-				while (getline(line, buff, ' '))
+				std::string buf;
+				std::vector<float> posBuf(0);
+				while (std::getline(line, buf, ' '))
 				{
-					meshData.indexNum++;
+					/// 0:vertexNumber 1:textureCoordinate 2:NormalNumber
+					std::string num[3];
+					int32_t count = 0;
+					if (std::any_of(buf.cbegin(), buf.cend(), isdigit)) {
+						for (auto ch = buf.begin(); ch != buf.end(); ch++) {
+							if (*ch == '/') {
+								count++;
+							}
+							else { num[count] += *ch; }
+						}
+					}
+					if (!num[0].empty()) {
+						IndexData index;
+
+						index.vertNum = static_cast<uint32_t>(std::stoi(num[0]) - 1);
+						index.texNum = static_cast<uint32_t>(std::stoi(num[1]) - 1);
+						index.normalNum = static_cast<uint32_t>(std::stoi(num[2]) - 1);
+
+						indexDatas.push_back(index);
+
+						meshData.indexNum++;
+					}
 				}
 			}
 			else if (identifier == "mtllib") {
@@ -87,14 +120,14 @@ void Model::LoadObj(const std::string& fileName) {
 		}
 		objFile.close();
 
-		meshData.vertexBuffer = Engine::CreateBufferResuorce(sizeof(VertData) * vertPositionNum);
+		meshData.vertexBuffer = Engine::CreateBufferResuorce(sizeof(VertData) * indexDatas.size());
 		assert(meshData.vertexBuffer);
 
 
 		// リソースの先頭のアドレスから使う
 		meshData.vertexView.BufferLocation = meshData.vertexBuffer->GetGPUVirtualAddress();
 		// 使用するリソースのサイズは頂点3つ分のサイズ
-		meshData.vertexView.SizeInBytes = sizeof(VertData) * vertPositionNum;
+		meshData.vertexView.SizeInBytes = static_cast<UINT>(sizeof(VertData) * indexDatas.size());
 		// 1頂点当たりのサイズ
 		meshData.vertexView.StrideInBytes = sizeof(VertData);
 
@@ -103,115 +136,28 @@ void Model::LoadObj(const std::string& fileName) {
 		// 書き込むためのアドレスを取得
 		meshData.vertexBuffer->Map(0, nullptr, reinterpret_cast<void**>(&meshData.vertexMap));
 
-
-		// indexBUffer生成
-		meshData.indexBuffer = Engine::CreateBufferResuorce(sizeof(uint32_t) * meshData.indexNum);
-		assert(meshData.indexBuffer);
-		// リソースの先頭のアドレスから使う
-		meshData.indexView.BufferLocation = meshData.indexBuffer->GetGPUVirtualAddress();
-		meshData.indexView.SizeInBytes = sizeof(uint32_t) * meshData.indexNum;
-		meshData.indexView.Format = DXGI_FORMAT_R32_UINT;
-
-		meshData.indexMap = nullptr;
-		meshData.indexBuffer->Map(0, nullptr, reinterpret_cast<void**>(&meshData.indexMap));
-
-
-		objFile.open(fileName);
-		uint32_t i = 0;
-		meshData.indexNum = 0;
-		while (std::getline(objFile, lineBuf)) {
-			std::string identifier;
-			std::istringstream line(lineBuf);
-			line >> identifier;
-			if (identifier == "v") {
-				Vector3 posBuf;
-				line >> posBuf.x >> posBuf.y >> posBuf.z;
-				meshData.vertexMap[i].position = { posBuf, 1.0f };
-				i++;
-				if (i >= vertPositionNum) {
-					i = 0;
-				}
-			}
-			else if (identifier == "vn") {
-				
-			}
-			else if (identifier == "vt") {
-
-			}
-			else if (identifier == "f") {
-				std::string buff;
-				std::vector<float> posBuf(0);
-				while (getline(line, buff, ' '))
-				{
-					/// 0:vertexNumber 1:textureCoordinate 2:NormalNumber
-					std::string num[3];
-					int32_t count = 0;
-					if (std::any_of(buff.cbegin(), buff.cend(), isdigit)) {
-						for (auto ch = buff.begin(); ch != buff.end(); ch++) {
-							if (*ch == '/') {
-								count++;
-							}
-							else { num[count] += *ch; }
-						}
-					}
-					if (!num[0].empty()) {
-						meshData.indexMap[meshData.indexNum] = std::stoi(num[0]) - 1;
-						meshData.vertexMap[std::stoi(num[0]) - 1].normal = normalPos[std::stoi(num[2]) - 1];
-						meshData.indexNum++;
-					}
-				}
-			}
-			else if (identifier == "mtllib") {
-				
-			}
-
-			/*if (lineBuf.find("#") == std::string::npos && lineBuf.find(".mtl") == std::string::npos) {
-				if (lineBuf.find("v") != std::string::npos && lineBuf.find("vn") == std::string::npos && lineBuf.find("vt") == std::string::npos) {
-					std::string buff;
-					std::vector<float> posBuf(0);
-					while (getline(line, buff, ' '))
-					{
-						if (std::any_of(buff.cbegin(), buff.cend(), isdigit)) {
-							posBuf.push_back(std::stof(buff));
-						}
-					}
-					if (posBuf.size() == 3) {
-						meshData.vertexMap[i].position = Vector4(posBuf[0], posBuf[1], posBuf[2], 1.0f);
-						meshData.vertexMap[i].normal = Vector3(posBuf[0], posBuf[1], posBuf[2]).Normalize();
-					}
-					i++;
-					if (i >= vertPositionNum) {
-						i = 0;
-					}
-				}
-				else if (lineBuf.find("f") != std::string::npos) {
-					std::string buff;
-					std::vector<float> posBuf(0);
-					while (getline(line, buff, ' '))
-					{
-						/// 0:vertexNumber 1:textureCoordinate 2:NormalNumber
-						std::string num[3];
-						int32_t count = 0;
-						if (std::any_of(buff.cbegin(), buff.cend(), isdigit)) {
-							for (auto ch = buff.begin(); ch != buff.end(); ch++) {
-								if (*ch == '/') {
-									count++;
-								}
-								else { num[count] += *ch; }
-							}
-						}
-						if (!num[0].empty()) {
-							meshData.indexMap[meshData.indexNum] = static_cast<int16_t>(std::stoi(num[0]) - 1);
-							meshData.vertexMap[std::stoi(num[0]) - 1].normal = normalPos[std::stoi(num[2]) - 1];
-							meshData.indexNum++;
-						}
-					}
-				}
-			}*/
+		for (size_t i = 0; i < indexDatas.size(); i++) {
+			meshData.vertexMap[i].position = posDatas[indexDatas[i].vertNum];
+			meshData.vertexMap[i].normal = normalDatas[indexDatas[i].normalNum];
+			meshData.vertexMap[i].uv = uvDatas[indexDatas[i].texNum];
+			meshData.vertexMap[i].pad = 0.0f;
 		}
 
+		meshData.vertNum = static_cast<uint32_t>(indexDatas.size());
+
+		//// indexBUffer生成
+		//meshData.indexBuffer = Engine::CreateBufferResuorce(sizeof(uint32_t) * meshData.indexNum);
+		//assert(meshData.indexBuffer);
+		//// リソースの先頭のアドレスから使う
+		//meshData.indexView.BufferLocation = meshData.indexBuffer->GetGPUVirtualAddress();
+		//meshData.indexView.SizeInBytes = sizeof(uint32_t) * meshData.indexNum;
+		//meshData.indexView.Format = DXGI_FORMAT_R32_UINT;
+
+		//meshData.indexMap = nullptr;
+		//meshData.indexBuffer->Map(0, nullptr, reinterpret_cast<void**>(&meshData.indexMap));
+
 		meshData.vertexBuffer->Unmap(0, nullptr);
-		meshData.indexBuffer->Unmap(0, nullptr);
+		//meshData.indexBuffer->Unmap(0, nullptr);
 
 		loadObjFlg = true;
 	}
@@ -247,6 +193,7 @@ void Model::CreateGraphicsPipeline() {
 		PipelineManager::SetVertexInput("POSITION", 0u, DXGI_FORMAT_R32G32B32A32_FLOAT);
 		PipelineManager::SetVertexInput("NORMAL", 0u, DXGI_FORMAT_R32G32B32_FLOAT);
 		PipelineManager::SetVertexInput("POSITION", 1u, DXGI_FORMAT_R32G32B32A32_FLOAT);
+		PipelineManager::SetVertexInput("TEXCOORD", 0u, DXGI_FORMAT_R32G32_FLOAT);
 
 		PipelineManager::SetState(Pipeline::Blend::None,  Pipeline::SolidState::Solid);
 
@@ -276,10 +223,11 @@ void Model::Draw(const Mat4x4& viewProjectionMat, const Vector3& cameraPos) {
 	pipeline->Use();
 	descHeap.Use();
 	
-	commandlist->IASetVertexBuffers(0,1,&meshData.vertexView);
-	commandlist->IASetIndexBuffer(&meshData.indexView);
+	commandlist->IASetVertexBuffers(0, 1, &meshData.vertexView);
+	//commandlist->IASetIndexBuffer(&meshData.indexView);
 	
-	commandlist->DrawIndexedInstanced(meshData.indexNum, 1, 0, 0, 0);
+	//commandlist->DrawIndexedInstanced(meshData.indexNum, 1, 0, 0, 0);
+	commandlist->DrawInstanced(meshData.vertNum, 1,  0, 0);
 }
 
 Model::~Model() {

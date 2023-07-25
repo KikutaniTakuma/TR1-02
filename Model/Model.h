@@ -20,6 +20,14 @@ private:
 	struct VertData {
 		Vector4 position;
 		Vector3 normal;
+		float pad;
+		Vector2 uv;
+	};
+
+	struct IndexData {
+		uint32_t vertNum;
+		uint32_t texNum;
+		uint32_t normalNum;
 	};
 
 	struct Mesh {
@@ -36,6 +44,9 @@ private:
 
 		// index数
 		uint32_t indexNum = 0;
+
+		// 頂点数
+		uint32_t vertNum = 0;
 	};
 
 	struct MatrixData {

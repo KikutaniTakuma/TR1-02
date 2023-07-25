@@ -33,7 +33,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	auto model = std::make_unique<Model>();
 	model->LoadObj("./Resources/Cube.obj");
-	model->LoadShader("WaveShader/WaveNone.VS.hlsl", "WaveShader/Wave.PS.hlsl", "WaveShader/Wave.GS.hlsl");
+	model->LoadShader("ModelShader/Model.VS.hlsl", "ModelShader/Model.PS.hlsl", "ModelShader/ModelNone.GS.hlsl");
 	model->CreateGraphicsPipeline();
 
 	Vector3 cameraMoveRotate{};
@@ -147,6 +147,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		line.Draw(camera2D.GetViewOthographics(), startPos, endPos, 0xff0000ff);
 
 		pera->Draw();
+
+		Gamepad::Debug();
 		///
 		/// 描画処理ここまで
 		/// 
