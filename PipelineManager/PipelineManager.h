@@ -38,6 +38,8 @@ public:
 	/// <param name="isTexture_">テクスチャを使う場合はtrue</param>
 	static void CreateRootSgnature(const D3D12_ROOT_PARAMETER& rootParamater_, bool isTexture_);
 
+	static void SetRootSgnature(RootSignature* rootSignature);
+
 	/// <summary>
 	/// 頂点シェーダの入力設定(呼び出し毎に複数設定可能)
 	/// </summary>

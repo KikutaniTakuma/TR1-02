@@ -44,6 +44,10 @@ void PipelineManager::CreateRootSgnature(const D3D12_ROOT_PARAMETER& rootParamat
 		}
 	}
 }
+void PipelineManager::SetRootSgnature(RootSignature* rootSignature) {
+	instance->rootSignature = rootSignature;
+}
+
 void PipelineManager::SetVertexInput(std::string semanticName_, uint32_t semanticIndex_, DXGI_FORMAT format_) {
 	instance->vertexInputStates.push_back({ semanticName_, semanticIndex_, format_ });
 }

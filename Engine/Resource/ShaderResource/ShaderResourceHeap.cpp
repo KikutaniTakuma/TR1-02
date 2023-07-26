@@ -32,9 +32,6 @@ void ShaderResourceHeap::Use() {
 	commandlist->SetGraphicsRootDescriptorTable(0, SrvHandle);
 }
 
-/// 
-/// デバッグ途中、一応動く
-/// 
 D3D12_ROOT_PARAMETER ShaderResourceHeap::GetParameter() {
 	uint32_t descriptorNum = 1u;
 

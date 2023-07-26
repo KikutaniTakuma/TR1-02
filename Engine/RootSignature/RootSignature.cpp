@@ -1,4 +1,4 @@
-﻿#include "RootSignature.h"
+#include "RootSignature.h"
 #include <cassert>
 
 
@@ -102,7 +102,6 @@ bool RootSignature::IsSame(const D3D12_ROOT_PARAMETER& rootParamater_, bool isTe
 		&& (
 			(
 				rootParamater.DescriptorTable.NumDescriptorRanges == rootParamater_.DescriptorTable.NumDescriptorRanges
-				&& rootParamater.DescriptorTable.pDescriptorRanges == rootParamater_.DescriptorTable.pDescriptorRanges
 				)
 			||
 			(

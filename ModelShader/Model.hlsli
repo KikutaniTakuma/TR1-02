@@ -1,6 +1,3 @@
-Texture2D<float4> tex : register(t0);
-SamplerState smp : register(s0);
-
 cbuffer WorldViewProjection : register(b0){
 	float32_t4x4 worldMat;
 	float32_t4x4 viewProjectionMat;

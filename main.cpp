@@ -32,7 +32,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 
 	auto model = std::make_unique<Model>();
-	model->LoadObj("./Resources/Cube.obj");
+	model->LoadObj("./evaluationTaskResources/resources/bunny.obj");
 	model->LoadShader("ModelShader/Model.VS.hlsl", "ModelShader/Model.PS.hlsl", "ModelShader/Model.GS.hlsl");
 	model->CreateGraphicsPipeline();
 
@@ -148,8 +148,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		line.Draw(camera2D.GetViewOthographics(), startPos, endPos, 0xff0000ff);
 
 		pera->Draw();
-
-		//Gamepad::Debug();
 		///
 		/// 描画処理ここまで
 		/// 
