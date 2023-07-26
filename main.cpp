@@ -33,7 +33,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	auto model = std::make_unique<Model>();
 	model->LoadObj("./evaluationTaskResources/resources/bunny.obj");
-	model->LoadShader("ModelShader/Model.VS.hlsl", "ModelShader/Model.PS.hlsl", "ModelShader/Model.GS.hlsl");
+	model->LoadShader("ModelShader/Model.VS.hlsl", "ModelShader/ModelUseTex.PS.hlsl", "ModelShader/Model.GS.hlsl");
 	model->CreateGraphicsPipeline();
 
 	Vector3 cameraMoveRotate{};
@@ -53,13 +53,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	StringOut text("Font/JapaneseGothic.spritefont");
 
 	bool fullscreen = false;
-
-	Line line;
-
-	Vector2 startPos;
-	Vector2 endPos;
-
-	Vector2 imguiPos;
 
 	Node node;
 	node.nodeName = "test";
@@ -119,11 +112,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		camera.Update(Vector3(), cameraMoveRotate);
 		camera2D.Update();
 
-		ImGui::Begin("Line");
-		ImGui::DragFloat2("start", &startPos.x);
-		ImGui::DragFloat2("end", &endPos.x);
-		ImGui::End();
-
 		node.Update();
 
 		//model->Update();
@@ -144,8 +132,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		//tex->Draw(Vector2::identity, texRotate, texPos, camera2D.GetViewOthographics(), Pipeline::Blend::Noaml);
 
 		//texDefault->Draw(Vector2::identity, texRotate, texDefaultPos, camera2D.GetViewOthographics(), Pipeline::Blend::Noaml);
-
-		line.Draw(camera2D.GetViewOthographics(), startPos, endPos, 0xff0000ff);
 
 		pera->Draw();
 		///

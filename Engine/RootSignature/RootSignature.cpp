@@ -98,23 +98,27 @@ void RootSignature::Create(const D3D12_ROOT_PARAMETER& rootParamater_, bool isTe
 }
 
 bool RootSignature::IsSame(const D3D12_ROOT_PARAMETER& rootParamater_, bool isTexture_) const {
+	bool isSameDescriptorTable = false;
+
+	if (rootParamater.DescriptorTable.NumDescriptorRanges == rootParamater_.DescriptorTable.NumDescriptorRanges) {
+		for (uint32_t i = 0; i < rootParamater.DescriptorTable.NumDescriptorRanges; i++) {
+			isSameDescriptorTable =
+				rootParamater.DescriptorTable.pDescriptorRanges[i].BaseShaderRegister == rootParamater_.DescriptorTable.pDescriptorRanges[i].BaseShaderRegister
+				&& rootParamater.DescriptorTable.pDescriptorRanges[i].NumDescriptors == rootParamater_.DescriptorTable.pDescriptorRanges[i].NumDescriptors
+				&& rootParamater.DescriptorTable.pDescriptorRanges[i].OffsetInDescriptorsFromTableStart == rootParamater_.DescriptorTable.pDescriptorRanges[i].OffsetInDescriptorsFromTableStart
+				&& rootParamater.DescriptorTable.pDescriptorRanges[i].RangeType == rootParamater_.DescriptorTable.pDescriptorRanges[i].RangeType
+				&& rootParamater.DescriptorTable.pDescriptorRanges[i].RegisterSpace == rootParamater_.DescriptorTable.pDescriptorRanges[i].RegisterSpace;
+
+			if (!isSameDescriptorTable) {
+				return false;
+			}
+		}
+	}
+	else {
+		return false;
+	}
+
 	return (rootParamater.ParameterType == rootParamater_.ParameterType
-		&& (
-			(
-				rootParamater.DescriptorTable.NumDescriptorRanges == rootParamater_.DescriptorTable.NumDescriptorRanges
-				)
-			||
-			(
-				rootParamater.Constants.ShaderRegister == rootParamater_.Constants.ShaderRegister
-				&& rootParamater.Constants.RegisterSpace == rootParamater_.Constants.RegisterSpace
-				&& rootParamater.Constants.Num32BitValues == rootParamater_.Constants.Num32BitValues
-				)
-			||
-			(
-				rootParamater.Descriptor.ShaderRegister == rootParamater_.Descriptor.ShaderRegister
-				&& rootParamater.Descriptor.RegisterSpace == rootParamater_.Descriptor.RegisterSpace
-				)
-			)
 		&& rootParamater.ShaderVisibility == rootParamater_.ShaderVisibility
 		)
 		&& isTexture == isTexture_;

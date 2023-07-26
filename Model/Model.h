@@ -1,8 +1,4 @@
 #pragma once
-#include <d3d12.h>
-#pragma comment(lib, "d3d12.lib")
-#include <dxcapi.h>
-#pragma comment(lib, "dxcompiler.lib")
 #include "Math/Mat4x4/Mat4x4.h"
 #include "Math/Vector2/Vector2.h"
 #include "Math/Vector3/Vector3.h"
@@ -12,6 +8,7 @@
 #include "Engine/Resource/ShaderResource/ShaderResourceHeap.h"
 #include "Engine/RootSignature/RootSignature.h"
 #include "PipelineManager/PipelineManager.h"
+#include "TextureManager/TextureManager.h"
 
 #include <wrl.h>
 
@@ -20,7 +17,6 @@ private:
 	struct VertData {
 		Vector4 position;
 		Vector3 normal;
-		float pad;
 		Vector2 uv;
 	};
 
@@ -85,6 +81,10 @@ public:
 
 public:
 	void LoadObj(const std::string& fileName);
+private:
+	void LoadMtl(const std::string fileName);
+
+public:
 	void LoadShader(const std::string& vertex,
 		const std::string& pixel,
 		const std::string& geometory = {},
@@ -124,5 +124,5 @@ private:
 
 	ConstBuffer<Vector4> colorBuf;
 
-	float waveCountSpd;
+	std::shared_ptr<Texture> tex;
 };

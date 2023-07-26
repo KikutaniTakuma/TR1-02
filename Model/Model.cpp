@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <cassert>
 #include <numbers>
+#include <filesystem>
 #include "Engine/ConvertString/ConvertString.h"
 #include "Engine/ShaderManager/ShaderManager.h"
 
@@ -21,11 +22,11 @@ Model::Model() :
 	loadObjFlg(false),
 	loadShaderFlg(false),
 	createGPFlg(false),
-	waveCountSpd(0.01f),
 	wvpData(),
 	dirLig(),
 	colorBuf(),
-	descHeap(16)
+	descHeap(16),
+	tex()
 {
 	// 単位行列を書き込んでおく
 	wvpData->worldMat = MakeMatrixIndentity();
@@ -115,38 +116,25 @@ void Model::LoadObj(const std::string& fileName) {
 				}
 			}
 			else if (identifier == "mtllib") {
+				std::string mtlFileName;
+				std::filesystem::path path = fileName;
 
+				line >> mtlFileName;
+
+				LoadMtl(path.parent_path().string() + "/" + mtlFileName);
 			}
 		}
 		objFile.close();
 
 
-		std::vector<IndexData> newIndexDatas(0);
-
-		for (auto& i : indexDatas) {
-			if (!newIndexDatas.empty()) {
-				auto itr = std::find(newIndexDatas.begin(), newIndexDatas.end(), i);
-				if (itr != newIndexDatas.end()) {
-					auto posBuf = posDatas[i.vertNum];
-					posDatas.push_back(posBuf);
-					auto indexBuf = i;
-					indexBuf.vertNum = static_cast<uint32_t>(posDatas.size()) - 1u;
-					newIndexDatas.push_back(indexBuf);
-					continue;
-				}
-			}
-			newIndexDatas.push_back(i);
-		}
-
-
-		meshData.vertexBuffer = Engine::CreateBufferResuorce(sizeof(VertData) * posDatas.size());
+		meshData.vertexBuffer = Engine::CreateBufferResuorce(sizeof(VertData) * indexDatas.size());
 		assert(meshData.vertexBuffer);
 
 
 		// リソースの先頭のアドレスから使う
 		meshData.vertexView.BufferLocation = meshData.vertexBuffer->GetGPUVirtualAddress();
 		// 使用するリソースのサイズは頂点3つ分のサイズ
-		meshData.vertexView.SizeInBytes = static_cast<UINT>(sizeof(VertData) * posDatas.size());
+		meshData.vertexView.SizeInBytes = static_cast<UINT>(sizeof(VertData) * indexDatas.size());
 		// 1頂点当たりのサイズ
 		meshData.vertexView.StrideInBytes = sizeof(VertData);
 
@@ -155,37 +143,40 @@ void Model::LoadObj(const std::string& fileName) {
 		// 書き込むためのアドレスを取得
 		meshData.vertexBuffer->Map(0, nullptr, reinterpret_cast<void**>(&meshData.vertexMap));
 
-		for (auto& i : newIndexDatas) {
-			meshData.vertexMap[i.vertNum].position = posDatas[i.vertNum];
-			meshData.vertexMap[i.vertNum].normal = normalDatas[i.normalNum];
-			meshData.vertexMap[i.vertNum].uv = uvDatas[i.uvNum];
-			meshData.vertexMap[i.vertNum].pad = 0.0f;
+		for (int32_t i = 0; i < indexDatas.size(); i++) {
+			meshData.vertexMap[i].position = posDatas[indexDatas[i].vertNum];
+			meshData.vertexMap[i].normal = normalDatas[indexDatas[i].normalNum];
+			meshData.vertexMap[i].uv = uvDatas[indexDatas[i].uvNum];
 		}
 
 
-
-		meshData.vertNum = static_cast<uint32_t>(posDatas.size());
-		meshData.indexNum = static_cast<uint32_t>(newIndexDatas.size());
-
-		// indexBUffer生成
-		meshData.indexBuffer = Engine::CreateBufferResuorce(sizeof(uint32_t) * meshData.indexNum);
-		assert(meshData.indexBuffer);
-		// リソースの先頭のアドレスから使う
-		meshData.indexView.BufferLocation = meshData.indexBuffer->GetGPUVirtualAddress();
-		meshData.indexView.SizeInBytes = sizeof(uint32_t) * meshData.indexNum;
-		meshData.indexView.Format = DXGI_FORMAT_R32_UINT;
-
-		meshData.indexMap = nullptr;
-		meshData.indexBuffer->Map(0, nullptr, reinterpret_cast<void**>(&meshData.indexMap));
-
-		for (auto i = 0; i < newIndexDatas.size();i++) {
-			meshData.indexMap[i] = newIndexDatas[i].vertNum;
-		}
+		meshData.vertNum = static_cast<uint32_t>(indexDatas.size());
 
 		meshData.vertexBuffer->Unmap(0, nullptr);
-		meshData.indexBuffer->Unmap(0, nullptr);
 
 		loadObjFlg = true;
+	}
+}
+
+void Model::LoadMtl(const std::string fileName) {
+	std::ifstream file(fileName);
+	assert(file);
+
+	std::string lineBuf;
+	while (std::getline(file, lineBuf)) {
+		std::string identifier;
+		std::istringstream line(lineBuf);
+		line >> identifier;
+		if (identifier == "map_Kd") {
+			std::string texName;
+			std::filesystem::path path = fileName;
+
+			line >> texName;
+
+			tex = TextureManager::GetInstance()->LoadTexture(path.parent_path().string() + "/" + texName);
+
+			descHeap.CreateTxtureView(tex);
+		}
 	}
 }
 
@@ -212,7 +203,7 @@ void Model::LoadShader(
 
 void Model::CreateGraphicsPipeline() {
 	if (loadShaderFlg && loadObjFlg) {
-		PipelineManager::CreateRootSgnature(descHeap.GetParameter(), false);
+		PipelineManager::CreateRootSgnature(descHeap.GetParameter(), static_cast<bool>(tex));
 
 		PipelineManager::SetShader(shader);
 		
@@ -236,7 +227,7 @@ void Model::Update() {
 
 void Model::Draw(const Mat4x4& viewProjectionMat, const Vector3& cameraPos) {
 	assert(createGPFlg);
-
+	
 	wvpData->worldMat.VertAffin(scale, rotate, pos);
 	wvpData->viewProjectoionMat = viewProjectionMat;
 
@@ -249,10 +240,10 @@ void Model::Draw(const Mat4x4& viewProjectionMat, const Vector3& cameraPos) {
 	descHeap.Use();
 	
 	commandlist->IASetVertexBuffers(0, 1, &meshData.vertexView);
-	commandlist->IASetIndexBuffer(&meshData.indexView);
+	//commandlist->IASetIndexBuffer(&meshData.indexView);
 	
-	commandlist->DrawIndexedInstanced(meshData.indexNum, 1, 0, 0, 0);
-	//commandlist->DrawInstanced(meshData.vertNum, 1,  0, 0);
+	//commandlist->DrawIndexedInstanced(meshData.indexNum, 1, 0, 0, 0);
+	commandlist->DrawInstanced(meshData.vertNum, 1,  0, 0);
 }
 
 Model::~Model() {

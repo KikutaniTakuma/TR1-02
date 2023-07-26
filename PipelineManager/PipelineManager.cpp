@@ -74,7 +74,7 @@ Pipeline* PipelineManager::Create() {
 		auto pipeline = std::make_unique<Pipeline>();
 		pipeline->SetShader(instance->shader);
 		for (auto& i : instance->vertexInputStates) {
-			pipeline->SetVertexInput(std::get<0>(i), std::get<1>(i), std::get<2>(i));
+			pipeline->SetVertexInput(std::get<std::string>(i), std::get<uint32_t>(i), std::get<DXGI_FORMAT>(i));
 		}
 		pipeline->Create(
 			*instance->rootSignature,
