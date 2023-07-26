@@ -25,6 +25,15 @@ ShaderResourceHeap::~ShaderResourceHeap() {
 	SRVHeap.Reset();
 }
 
+ShaderResourceHeap& ShaderResourceHeap::operator=(const ShaderResourceHeap& right) {
+	SRVHeap = right.SRVHeap.Get();
+	srvHeapHandle = right.srvHeapHandle;
+	heapOrder = right.heapOrder;
+	descriptorRanges = right.descriptorRanges;
+
+	return *this;
+}
+
 void ShaderResourceHeap::Use() {
 	auto commandlist = Engine::GetCommandList();
 	commandlist->SetDescriptorHeaps(1, SRVHeap.GetAddressOf());

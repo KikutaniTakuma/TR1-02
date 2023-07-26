@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "TextureManager/TextureManager.h"
 #include "Engine/Engine.h"
 #include "Engine/ConstBuffer/ConstBuffer.h"
@@ -75,5 +75,5 @@ private:
 	ConstBuffer<float> colorPibot;
 	ConstBuffer<int> colorType;
 
-	std::shared_ptr<Texture> tex;
+	Texture* tex;
 };

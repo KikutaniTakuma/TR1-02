@@ -26,7 +26,7 @@ Model::Model() :
 	dirLig(),
 	colorBuf(),
 	descHeap(16),
-	tex()
+	tex(nullptr)
 {
 	// 単位行列を書き込んでおく
 	wvpData->worldMat = MakeMatrixIndentity();
@@ -56,8 +56,6 @@ void Model::LoadObj(const std::string& fileName) {
 		std::vector<Vector4> posDatas(0);
 
 		std::vector<Vector3> normalDatas(0);
-		//uint32_t vertPositionNum = 0;
-		meshData.indexNum = 0;
 
 		std::vector<Vector2> uvDatas(0);
 
@@ -72,6 +70,7 @@ void Model::LoadObj(const std::string& fileName) {
 			if (identifier == "v") {
 				Vector4 buf;
 				line >> buf.vec.x >> buf.vec.y >> buf.vec.z;
+				buf.vec.x *= -1.0f;
 				buf.vec.w = 1.0f;
 
 				posDatas.push_back(buf);
@@ -79,16 +78,20 @@ void Model::LoadObj(const std::string& fileName) {
 			else if (identifier == "vn") {
 				Vector3 buf;
 				line >> buf.x >> buf.y >> buf.z;
+				buf.x *= -1.0f;
 				normalDatas.push_back(buf);
 			}
 			else if (identifier == "vt") {
 				Vector2 buf;
 				line >> buf.x >> buf.y;
+				buf.y = 1.0f - buf.y;
 				uvDatas.push_back(buf);
 			}
 			else if (identifier == "f") {
 				std::string buf;
 				std::vector<float> posBuf(0);
+				std::array<IndexData, 3> indcoes;
+				auto idnexItr = indcoes.rbegin();
 				while (std::getline(line, buf, ' '))
 				{
 					/// 0:vertexNumber 1:textureCoordinate 2:NormalNumber
@@ -103,16 +106,14 @@ void Model::LoadObj(const std::string& fileName) {
 						}
 					}
 					if (!num[0].empty()) {
-						IndexData index;
-
-						index.vertNum = static_cast<uint32_t>(std::stoi(num[0]) - 1);
-						index.uvNum = static_cast<uint32_t>(std::stoi(num[1]) - 1);
-						index.normalNum = static_cast<uint32_t>(std::stoi(num[2]) - 1);
-
-						indexDatas.push_back(index);
-
-						meshData.indexNum++;
+						idnexItr->vertNum = static_cast<uint32_t>(std::stoi(num[0]) - 1);
+						idnexItr->uvNum = static_cast<uint32_t>(std::stoi(num[1]) - 1);
+						idnexItr->normalNum = static_cast<uint32_t>(std::stoi(num[2]) - 1);
+						idnexItr++;
 					}
+				}
+				for (auto& i : indcoes) {
+					indexDatas.push_back(i);
 				}
 			}
 			else if (identifier == "mtllib") {
@@ -240,16 +241,11 @@ void Model::Draw(const Mat4x4& viewProjectionMat, const Vector3& cameraPos) {
 	descHeap.Use();
 	
 	commandlist->IASetVertexBuffers(0, 1, &meshData.vertexView);
-	//commandlist->IASetIndexBuffer(&meshData.indexView);
 	
-	//commandlist->DrawIndexedInstanced(meshData.indexNum, 1, 0, 0, 0);
 	commandlist->DrawInstanced(meshData.vertNum, 1,  0, 0);
 }
 
 Model::~Model() {
-	if (meshData.indexBuffer) {
-		meshData.indexBuffer->Release();
-	}
 	if (meshData.vertexBuffer) {
 		meshData.vertexBuffer->Release();
 	}

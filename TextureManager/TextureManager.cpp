@@ -28,9 +28,9 @@ TextureManager::~TextureManager() {
 }
 
 
-std::shared_ptr<Texture> TextureManager::LoadTexture(const std::string& fileName) {
+Texture* TextureManager::LoadTexture(const std::string& fileName) {
 	if (textures.empty()) {
-		auto tex = std::make_shared<Texture>();
+		auto tex = std::make_unique<Texture>();
 		tex->Load(fileName);
 		
 		textures.insert(std::make_pair(fileName, std::move(tex)));
@@ -40,7 +40,7 @@ std::shared_ptr<Texture> TextureManager::LoadTexture(const std::string& fileName
 	else {
 		auto itr = textures.find(fileName);
 		if (itr == textures.end()) {
-			auto tex = std::make_shared<Texture>();
+			auto tex = std::make_unique<Texture>();
 			tex->Load(fileName);
 
 			textures.insert(std::make_pair(fileName, std::move(tex)));
@@ -49,19 +49,7 @@ std::shared_ptr<Texture> TextureManager::LoadTexture(const std::string& fileName
 		}
 	}
 	
-	return textures[fileName];
-}
-
-void TextureManager::UnloadTexture(std::shared_ptr<Texture>& tex) {
-	auto itr = textures.find(tex->fileName);
-	assert(!(itr == textures.end()));
-
-	tex.reset();
-
-	if (itr->second.use_count() == 1L) {
-		// 参照カウントが1の場合コンテナから削除
-		textures.erase(itr);
-	}
+	return textures[fileName].get();
 }
 
 void TextureManager::ReleaseIntermediateResource() {

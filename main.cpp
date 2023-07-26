@@ -25,14 +25,15 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	Engine::LoadFont("Font/JapaneseGothic.spritefont");
 
 	Camera camera;
-	camera.pos = { 8.24f,9.63f,-20.53f };
-	camera.rotate = { 0.44f,-0.4f, 0.0f };
+	camera.pos = { 0.0f,0.0f,-10.0f };
+	//camera.pos = { 8.24f,9.63f,-20.53f };
+	//camera.rotate = { 0.44f,-0.4f, 0.0f };
 
 	Camera camera2D(Camera::Mode::Othographic);
 
 
 	auto model = std::make_unique<Model>();
-	model->LoadObj("./evaluationTaskResources/resources/bunny.obj");
+	model->LoadObj("./evaluationTaskResources/resources/axis.obj");
 	model->LoadShader("ModelShader/Model.VS.hlsl", "ModelShader/ModelUseTex.PS.hlsl", "ModelShader/Model.GS.hlsl");
 	model->CreateGraphicsPipeline();
 
@@ -123,7 +124,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		///
 		/// 描画処理
 		/// 
-		pera->PreDraw();
+		//pera->PreDraw();
 
 		//node.Draw(camera2D.GetViewOthographics());
 
@@ -133,7 +134,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		//texDefault->Draw(Vector2::identity, texRotate, texDefaultPos, camera2D.GetViewOthographics(), Pipeline::Blend::Noaml);
 
-		pera->Draw();
+		//pera->Draw();
 		///
 		/// 描画処理ここまで
 		/// 

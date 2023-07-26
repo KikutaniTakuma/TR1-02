@@ -19,6 +19,8 @@ public:
 	ShaderResourceHeap();
 	ShaderResourceHeap(uint16_t numDescriptor);
 	~ShaderResourceHeap();
+public:
+	ShaderResourceHeap& operator=(const ShaderResourceHeap& right);
 
 public:
 	void Use();
@@ -30,7 +32,7 @@ public:
 		heapOrder.push_back(HeapType::CBV);
 	}
 
-	void CreateTxtureView(std::shared_ptr<Texture> tex) {
+	void CreateTxtureView(Texture* tex) {
 		tex->CreateSRVView(srvHeapHandle);
 		srvHeapHandle.ptr += Engine::GetIncrementSRVCBVUAVHeap();
 		heapOrder.push_back(HeapType::SRV);

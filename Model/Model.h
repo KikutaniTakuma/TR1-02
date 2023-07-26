@@ -37,18 +37,10 @@ private:
 
 	struct Mesh {
 		Microsoft::WRL::ComPtr<ID3D12Resource> vertexBuffer = nullptr;
-		Microsoft::WRL::ComPtr<ID3D12Resource> indexBuffer = nullptr;
 		// 頂点バッファビュー
 		D3D12_VERTEX_BUFFER_VIEW vertexView{};
-		// インデックスバッファビュー
-		D3D12_INDEX_BUFFER_VIEW indexView{};
 		// 頂点バッファマップ
 		VertData* vertexMap = nullptr;
-		// インデックスバッファマップ
-		uint32_t* indexMap = nullptr;
-
-		// index数
-		uint32_t indexNum = 0;
 
 		// 頂点数
 		uint32_t vertNum = 0;
@@ -124,5 +116,5 @@ private:
 
 	ConstBuffer<Vector4> colorBuf;
 
-	std::shared_ptr<Texture> tex;
+	Texture* tex;
 };

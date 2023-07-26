@@ -10,7 +10,7 @@ Texture2D::Texture2D():
 	indexResource(nullptr),
 	shader(),
 	graphicsPipelineState(),
-	tex()
+	tex(nullptr)
 {}
 
 Texture2D::~Texture2D() {
@@ -79,11 +79,6 @@ void Texture2D::CreateGraphicsPipeline() {
 }
 
 void Texture2D::LoadTexture(const std::string& fileName) {
-	// Load済みだったらUnload;
-	if (tex) {
-		TextureManager::GetInstance()->UnloadTexture(tex);
-	}
-
 	if (!tex) {
 		tex = TextureManager::GetInstance()->LoadTexture(fileName);
 
