@@ -26,8 +26,17 @@ private:
 
 	struct IndexData {
 		uint32_t vertNum;
-		uint32_t texNum;
+		uint32_t uvNum;
 		uint32_t normalNum;
+
+		inline bool operator==(const IndexData& right) {
+			return vertNum == right.vertNum
+				&& uvNum == right.uvNum
+				&& normalNum == right.normalNum;
+		}
+		inline bool operator!=(const IndexData& right) {
+			return !(*this == right);
+		}
 	};
 
 	struct Mesh {

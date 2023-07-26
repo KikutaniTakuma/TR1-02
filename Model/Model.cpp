@@ -105,7 +105,7 @@ void Model::LoadObj(const std::string& fileName) {
 						IndexData index;
 
 						index.vertNum = static_cast<uint32_t>(std::stoi(num[0]) - 1);
-						index.texNum = static_cast<uint32_t>(std::stoi(num[1]) - 1);
+						index.uvNum = static_cast<uint32_t>(std::stoi(num[1]) - 1);
 						index.normalNum = static_cast<uint32_t>(std::stoi(num[2]) - 1);
 
 						indexDatas.push_back(index);
@@ -120,14 +120,33 @@ void Model::LoadObj(const std::string& fileName) {
 		}
 		objFile.close();
 
-		meshData.vertexBuffer = Engine::CreateBufferResuorce(sizeof(VertData) * indexDatas.size());
+
+		std::vector<IndexData> newIndexDatas(0);
+
+		for (auto& i : indexDatas) {
+			if (!newIndexDatas.empty()) {
+				auto itr = std::find(newIndexDatas.begin(), newIndexDatas.end(), i);
+				if (itr != newIndexDatas.end()) {
+					auto posBuf = posDatas[i.vertNum];
+					posDatas.push_back(posBuf);
+					auto indexBuf = i;
+					indexBuf.vertNum = static_cast<uint32_t>(posDatas.size()) - 1u;
+					newIndexDatas.push_back(indexBuf);
+					continue;
+				}
+			}
+			newIndexDatas.push_back(i);
+		}
+
+
+		meshData.vertexBuffer = Engine::CreateBufferResuorce(sizeof(VertData) * posDatas.size());
 		assert(meshData.vertexBuffer);
 
 
 		// リソースの先頭のアドレスから使う
 		meshData.vertexView.BufferLocation = meshData.vertexBuffer->GetGPUVirtualAddress();
 		// 使用するリソースのサイズは頂点3つ分のサイズ
-		meshData.vertexView.SizeInBytes = static_cast<UINT>(sizeof(VertData) * indexDatas.size());
+		meshData.vertexView.SizeInBytes = static_cast<UINT>(sizeof(VertData) * posDatas.size());
 		// 1頂点当たりのサイズ
 		meshData.vertexView.StrideInBytes = sizeof(VertData);
 
@@ -136,28 +155,35 @@ void Model::LoadObj(const std::string& fileName) {
 		// 書き込むためのアドレスを取得
 		meshData.vertexBuffer->Map(0, nullptr, reinterpret_cast<void**>(&meshData.vertexMap));
 
-		for (size_t i = 0; i < indexDatas.size(); i++) {
-			meshData.vertexMap[i].position = posDatas[indexDatas[i].vertNum];
-			meshData.vertexMap[i].normal = normalDatas[indexDatas[i].normalNum];
-			meshData.vertexMap[i].uv = uvDatas[indexDatas[i].texNum];
-			meshData.vertexMap[i].pad = 0.0f;
+		for (auto& i : newIndexDatas) {
+			meshData.vertexMap[i.vertNum].position = posDatas[i.vertNum];
+			meshData.vertexMap[i.vertNum].normal = normalDatas[i.normalNum];
+			meshData.vertexMap[i.vertNum].uv = uvDatas[i.uvNum];
+			meshData.vertexMap[i.vertNum].pad = 0.0f;
 		}
 
-		meshData.vertNum = static_cast<uint32_t>(indexDatas.size());
 
-		//// indexBUffer生成
-		//meshData.indexBuffer = Engine::CreateBufferResuorce(sizeof(uint32_t) * meshData.indexNum);
-		//assert(meshData.indexBuffer);
-		//// リソースの先頭のアドレスから使う
-		//meshData.indexView.BufferLocation = meshData.indexBuffer->GetGPUVirtualAddress();
-		//meshData.indexView.SizeInBytes = sizeof(uint32_t) * meshData.indexNum;
-		//meshData.indexView.Format = DXGI_FORMAT_R32_UINT;
 
-		//meshData.indexMap = nullptr;
-		//meshData.indexBuffer->Map(0, nullptr, reinterpret_cast<void**>(&meshData.indexMap));
+		meshData.vertNum = static_cast<uint32_t>(posDatas.size());
+		meshData.indexNum = static_cast<uint32_t>(newIndexDatas.size());
+
+		// indexBUffer生成
+		meshData.indexBuffer = Engine::CreateBufferResuorce(sizeof(uint32_t) * meshData.indexNum);
+		assert(meshData.indexBuffer);
+		// リソースの先頭のアドレスから使う
+		meshData.indexView.BufferLocation = meshData.indexBuffer->GetGPUVirtualAddress();
+		meshData.indexView.SizeInBytes = sizeof(uint32_t) * meshData.indexNum;
+		meshData.indexView.Format = DXGI_FORMAT_R32_UINT;
+
+		meshData.indexMap = nullptr;
+		meshData.indexBuffer->Map(0, nullptr, reinterpret_cast<void**>(&meshData.indexMap));
+
+		for (auto i = 0; i < newIndexDatas.size();i++) {
+			meshData.indexMap[i] = newIndexDatas[i].vertNum;
+		}
 
 		meshData.vertexBuffer->Unmap(0, nullptr);
-		//meshData.indexBuffer->Unmap(0, nullptr);
+		meshData.indexBuffer->Unmap(0, nullptr);
 
 		loadObjFlg = true;
 	}
@@ -224,10 +250,10 @@ void Model::Draw(const Mat4x4& viewProjectionMat, const Vector3& cameraPos) {
 	descHeap.Use();
 	
 	commandlist->IASetVertexBuffers(0, 1, &meshData.vertexView);
-	//commandlist->IASetIndexBuffer(&meshData.indexView);
+	commandlist->IASetIndexBuffer(&meshData.indexView);
 	
-	//commandlist->DrawIndexedInstanced(meshData.indexNum, 1, 0, 0, 0);
-	commandlist->DrawInstanced(meshData.vertNum, 1,  0, 0);
+	commandlist->DrawIndexedInstanced(meshData.indexNum, 1, 0, 0, 0);
+	//commandlist->DrawInstanced(meshData.vertNum, 1,  0, 0);
 }
 
 Model::~Model() {
