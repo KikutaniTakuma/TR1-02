@@ -33,7 +33,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 
 	auto model = std::make_unique<Model>();
-	model->LoadObj("./evaluationTaskResources/resources/axis.obj");
+	model->LoadObj("./evaluationTaskResources/resources/multiMaterial.obj");
 	model->LoadShader("ModelShader/Model.VS.hlsl", "ModelShader/ModelUseTex.PS.hlsl", "ModelShader/Model.GS.hlsl");
 	model->CreateGraphicsPipeline();
 

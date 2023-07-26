@@ -74,7 +74,7 @@ void RootSignature::Create(const D3D12_ROOT_PARAMETER& rootParamater_, bool isTe
 	staticSamplers.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
 	staticSamplers.MaxLOD = D3D12_FLOAT32_MAX;
 	staticSamplers.ShaderRegister = 0;
-	staticSamplers.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	staticSamplers.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
 
 	descriptionRootSignature.pStaticSamplers = isTexture ? &staticSamplers : nullptr;
 	descriptionRootSignature.NumStaticSamplers = isTexture ? 1u : 0u;

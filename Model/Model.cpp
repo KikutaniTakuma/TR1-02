@@ -204,7 +204,7 @@ void Model::LoadShader(
 
 void Model::CreateGraphicsPipeline() {
 	if (loadShaderFlg && loadObjFlg) {
-		PipelineManager::CreateRootSgnature(descHeap.GetParameter(), static_cast<bool>(tex));
+		PipelineManager::CreateRootSgnature(descHeap.GetParameter(), !!tex);
 
 		PipelineManager::SetShader(shader);
 		
