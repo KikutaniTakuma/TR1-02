@@ -95,3 +95,32 @@ void Camera::Update() {
 		break;
 	}
 }
+
+void Camera::Update(const Vector3& gazePoint, const Vector3& rotation) {
+	view.VertAffin(scale, rotate, pos);
+	view = VertMakeMatrixAffin(Vector3::identity, rotation, Vector3()) * VertMakeMatrixTranslate(gazePoint) * view;
+	view.Inverse();
+
+	static auto engine = Engine::GetInstance();
+	static const float aspect = static_cast<float>(engine->clientWidth) / static_cast<float>(engine->clientHeight);
+
+	switch (mode)
+	{
+	case Camera::Mode::Projecction:
+	default:
+		fov = std::clamp(fov, 0.0f, 1.0f);
+		projection.VertPerspectiveFov(fov, aspect, kNearClip, farClip);
+		viewProjecction = projection * view;
+		break;
+
+	case Camera::Mode::Othographic:
+		othograohics.VertOrthographic(
+			-static_cast<float>(engine->clientWidth) * 0.5f,
+			static_cast<float>(engine->clientHeight) * 0.5f,
+			static_cast<float>(engine->clientWidth) * 0.5f,
+			-static_cast<float>(engine->clientHeight) * 0.5f,
+			kNearClip, farClip);
+		viewOthograohics = othograohics * view;
+		break;
+	}
+}
