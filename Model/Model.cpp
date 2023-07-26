@@ -98,17 +98,22 @@ void Model::LoadObj(const std::string& fileName) {
 					std::string num[3];
 					int32_t count = 0;
 					if (std::any_of(buf.cbegin(), buf.cend(), isdigit)) {
-						for (auto ch = buf.begin(); ch != buf.end(); ch++) {
-							if (*ch == '/') {
+						for (auto& ch : buf) {
+							if (ch == '/') {
 								count++;
 							}
-							else { num[count] += *ch; }
+							else { num[count] += ch; }
 						}
 					}
-					if (!num[0].empty()) {
+					if (count == 2) {
 						idnexItr->vertNum = static_cast<uint32_t>(std::stoi(num[0]) - 1);
 						idnexItr->uvNum = static_cast<uint32_t>(std::stoi(num[1]) - 1);
 						idnexItr->normalNum = static_cast<uint32_t>(std::stoi(num[2]) - 1);
+						idnexItr++;
+					}
+					else if (count == 1) {
+						idnexItr->vertNum = static_cast<uint32_t>(std::stoi(num[0]) - 1);
+						idnexItr->normalNum = static_cast<uint32_t>(std::stoi(num[1]) - 1);
 						idnexItr++;
 					}
 				}
@@ -147,7 +152,9 @@ void Model::LoadObj(const std::string& fileName) {
 		for (int32_t i = 0; i < indexDatas.size(); i++) {
 			meshData.vertexMap[i].position = posDatas[indexDatas[i].vertNum];
 			meshData.vertexMap[i].normal = normalDatas[indexDatas[i].normalNum];
-			meshData.vertexMap[i].uv = uvDatas[indexDatas[i].uvNum];
+			if (!uvDatas.empty()) {
+				meshData.vertexMap[i].uv = uvDatas[indexDatas[i].uvNum];
+			}
 		}
 
 
