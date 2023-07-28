@@ -19,7 +19,7 @@
 
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	// ライブラリ初期化
-	Engine::Initialize(1280, 720, "DirectXGame");
+	Engine::Initialize(1920, 1080, "DirectXGame");
 
 	// fontLoad
 	Engine::LoadFont("Font/JapaneseGothic.spritefont");
@@ -33,7 +33,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 
 	auto model = std::make_unique<Model>();
-	model->LoadObj("./evaluationTaskResources/resources/bunny.obj");
+	model->LoadObj("./Resources/Watame.obj");
 	model->LoadShader("ModelShader/Model.VS.hlsl", "ModelShader/ModelUseTex.PS.hlsl", "ModelShader/Model.GS.hlsl");
 	model->CreateGraphicsPipeline();
 
@@ -104,7 +104,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		///
 		/// 描画処理
 		/// 
-		//pera->PreDraw();
+		pera->PreDraw();
 
 		//node.Draw(camera2D.GetViewOthographics());
 
@@ -114,7 +114,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		//texDefault->Draw(Vector2::identity, texRotate, texDefaultPos, camera2D.GetViewOthographics(), Pipeline::Blend::Noaml);
 
-		//pera->Draw();
+		pera->Draw();
 		///
 		/// 描画処理ここまで
 		/// 

@@ -9,6 +9,7 @@
 #include <filesystem>
 #include "Engine/ConvertString/ConvertString.h"
 #include "Engine/ShaderManager/ShaderManager.h"
+#include "externals/imgui/imgui.h"
 
 
 Model::Model() :
@@ -263,6 +264,12 @@ void Model::Draw(const Mat4x4& viewProjectionMat, const Vector3& cameraPos) {
 	*colorBuf = UintToVector4(color);
 
 	dirLig->eyePos = cameraPos;
+
+	ImGui::Begin("Light");
+	ImGui::DragFloat3("pos", &dirLig->ptPos.x);
+	ImGui::DragFloat3("color", &dirLig->ptColor.x, 0.01f);
+	ImGui::End();
+	
 
 	auto commandlist = Engine::GetCommandList();
 
