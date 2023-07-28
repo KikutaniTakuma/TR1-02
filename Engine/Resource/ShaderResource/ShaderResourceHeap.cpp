@@ -5,19 +5,30 @@
 
 ShaderResourceHeap::ShaderResourceHeap():
 	SRVHeap(),
-	srvHeapHandle(),
+	srvCpuHeapHandle(),
 	heapOrder(0),
 	descriptorRanges(0)
 {
 	SRVHeap = Engine::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 4, true);
 
-	srvHeapHandle = SRVHeap->GetCPUDescriptorHandleForHeapStart();
+	srvCpuHeapHandle = SRVHeap->GetCPUDescriptorHandleForHeapStart();
+	srvGpuHeapHandle = SRVHeap->GetGPUDescriptorHandleForHeapStart();
 }
 
-ShaderResourceHeap::ShaderResourceHeap(uint16_t numDescriptor) {
+ShaderResourceHeap::ShaderResourceHeap(const ShaderResourceHeap& right) {
+	*this = right;
+}
+
+ShaderResourceHeap::ShaderResourceHeap(uint16_t numDescriptor):
+	SRVHeap(),
+	srvCpuHeapHandle(),
+	heapOrder(0),
+	descriptorRanges(0)
+{
 	SRVHeap = Engine::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, numDescriptor, true);
 
-	srvHeapHandle = SRVHeap->GetCPUDescriptorHandleForHeapStart();
+	srvCpuHeapHandle = SRVHeap->GetCPUDescriptorHandleForHeapStart();
+	srvGpuHeapHandle = SRVHeap->GetGPUDescriptorHandleForHeapStart();
 }
 
 ShaderResourceHeap::~ShaderResourceHeap() {
@@ -27,11 +38,24 @@ ShaderResourceHeap::~ShaderResourceHeap() {
 
 ShaderResourceHeap& ShaderResourceHeap::operator=(const ShaderResourceHeap& right) {
 	SRVHeap = right.SRVHeap.Get();
-	srvHeapHandle = right.srvHeapHandle;
+	srvCpuHeapHandle = SRVHeap->GetCPUDescriptorHandleForHeapStart();
+	srvGpuHeapHandle = SRVHeap->GetGPUDescriptorHandleForHeapStart();
 	heapOrder = right.heapOrder;
 	descriptorRanges = right.descriptorRanges;
 
 	return *this;
+}
+
+void ShaderResourceHeap::InitializeReset() {
+	SRVHeap->Release();
+	SRVHeap.Reset();
+	heapOrder.clear();
+	descriptorRanges.clear();
+
+	SRVHeap = Engine::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 4, true);
+
+	srvCpuHeapHandle = SRVHeap->GetCPUDescriptorHandleForHeapStart();
+	srvGpuHeapHandle = SRVHeap->GetGPUDescriptorHandleForHeapStart();
 }
 
 void ShaderResourceHeap::Use() {
@@ -39,6 +63,12 @@ void ShaderResourceHeap::Use() {
 	commandlist->SetDescriptorHeaps(1, SRVHeap.GetAddressOf());
 	auto SrvHandle = SRVHeap->GetGPUDescriptorHandleForHeapStart();
 	commandlist->SetGraphicsRootDescriptorTable(0, SrvHandle);
+}
+
+void ShaderResourceHeap::Use(D3D12_GPU_DESCRIPTOR_HANDLE handle) {
+	auto commandlist = Engine::GetCommandList();
+	commandlist->SetDescriptorHeaps(1, SRVHeap.GetAddressOf());
+	commandlist->SetGraphicsRootDescriptorTable(0, handle);
 }
 
 D3D12_ROOT_PARAMETER ShaderResourceHeap::GetParameter() {

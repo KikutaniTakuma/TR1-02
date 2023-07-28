@@ -25,8 +25,8 @@ Model::Model() :
 	wvpData(),
 	dirLig(),
 	colorBuf(),
-	descHeap(16),
-	tex(nullptr)
+	SRVHeap(16),
+	tex(0)
 {
 	// 単位行列を書き込んでおく
 	wvpData->worldMat = MakeMatrixIndentity();
@@ -42,10 +42,6 @@ Model::Model() :
 	dirLig->ptRange = 10.0f;
 
 	*colorBuf = UintToVector4(color);
-
-	descHeap.CreateConstBufferView(wvpData);
-	descHeap.CreateConstBufferView(dirLig);
-	descHeap.CreateConstBufferView(colorBuf);
 }
 
 void Model::LoadObj(const std::string& fileName) {
@@ -59,7 +55,8 @@ void Model::LoadObj(const std::string& fileName) {
 
 		std::vector<Vector2> uvDatas(0);
 
-		std::vector<IndexData> indexDatas(0);
+		std::unordered_map<std::string, std::vector<IndexData>> indexDatas(0);
+		std::unordered_map<std::string, std::vector<IndexData>>::iterator indicesItr;
 
 		std::string lineBuf;
 
@@ -118,8 +115,15 @@ void Model::LoadObj(const std::string& fileName) {
 					}
 				}
 				for (auto& i : indcoes) {
-					indexDatas.push_back(i);
+					indicesItr->second.push_back(i);
 				}
+			}
+			else if (identifier == "usemtl") {
+				std::string useMtlName;
+				line >> useMtlName;
+				indexDatas.insert({ useMtlName,std::vector<IndexData>(0) });
+				indicesItr = indexDatas.find(useMtlName);
+				meshData.insert({ useMtlName,Mesh() });
 			}
 			else if (identifier == "mtllib") {
 				std::string mtlFileName;
@@ -132,36 +136,36 @@ void Model::LoadObj(const std::string& fileName) {
 		}
 		objFile.close();
 
+		for (auto i : indexDatas) {
+			meshData[i.first].vertexBuffer = Engine::CreateBufferResuorce(sizeof(VertData) * indexDatas[i.first].size());
+			assert(meshData[i.first].vertexBuffer);
 
-		meshData.vertexBuffer = Engine::CreateBufferResuorce(sizeof(VertData) * indexDatas.size());
-		assert(meshData.vertexBuffer);
 
+			// リソースの先頭のアドレスから使う
+			meshData[i.first].vertexView.BufferLocation = meshData[i.first].vertexBuffer->GetGPUVirtualAddress();
+			// 使用するリソースのサイズは頂点3つ分のサイズ
+			meshData[i.first].vertexView.SizeInBytes = static_cast<UINT>(sizeof(VertData) * indexDatas[i.first].size());
+			// 1頂点当たりのサイズ
+			meshData[i.first].vertexView.StrideInBytes = sizeof(VertData);
 
-		// リソースの先頭のアドレスから使う
-		meshData.vertexView.BufferLocation = meshData.vertexBuffer->GetGPUVirtualAddress();
-		// 使用するリソースのサイズは頂点3つ分のサイズ
-		meshData.vertexView.SizeInBytes = static_cast<UINT>(sizeof(VertData) * indexDatas.size());
-		// 1頂点当たりのサイズ
-		meshData.vertexView.StrideInBytes = sizeof(VertData);
+			// 頂点リソースにデータを書き込む
+			meshData[i.first].vertexMap = nullptr;
+			// 書き込むためのアドレスを取得
+			meshData[i.first].vertexBuffer->Map(0, nullptr, reinterpret_cast<void**>(&meshData[i.first].vertexMap));
 
-		// 頂点リソースにデータを書き込む
-		meshData.vertexMap = nullptr;
-		// 書き込むためのアドレスを取得
-		meshData.vertexBuffer->Map(0, nullptr, reinterpret_cast<void**>(&meshData.vertexMap));
-
-		for (int32_t i = 0; i < indexDatas.size(); i++) {
-			meshData.vertexMap[i].position = posDatas[indexDatas[i].vertNum];
-			meshData.vertexMap[i].normal = normalDatas[indexDatas[i].normalNum];
-			if (!uvDatas.empty()) {
-				meshData.vertexMap[i].uv = uvDatas[indexDatas[i].uvNum];
+			for (int32_t j = 0; j < indexDatas[i.first].size(); j++) {
+				meshData[i.first].vertexMap[j].position = posDatas[indexDatas[i.first][j].vertNum];
+				meshData[i.first].vertexMap[j].normal = normalDatas[indexDatas[i.first][j].normalNum];
+				if (!uvDatas.empty()) {
+					meshData[i.first].vertexMap[j].uv = uvDatas[indexDatas[i.first][j].uvNum];
+				}
 			}
+
+
+			meshData[i.first].vertNum = static_cast<uint32_t>(indexDatas[i.first].size());
+
+			meshData[i.first].vertexBuffer->Unmap(0, nullptr);
 		}
-
-
-		meshData.vertNum = static_cast<uint32_t>(indexDatas.size());
-
-		meshData.vertexBuffer->Unmap(0, nullptr);
-
 		loadObjFlg = true;
 	}
 }
@@ -171,9 +175,14 @@ void Model::LoadMtl(const std::string fileName) {
 	assert(file);
 
 	std::string lineBuf;
+	std::unordered_map<std::string, Texture*>::iterator texItr;
+	std::unordered_map<std::string, ShaderResourceHeap>::iterator hepaItr;
+
+	std::string useMtlName;
 	while (std::getline(file, lineBuf)) {
 		std::string identifier;
 		std::istringstream line(lineBuf);
+
 		line >> identifier;
 		if (identifier == "map_Kd") {
 			std::string texName;
@@ -181,9 +190,16 @@ void Model::LoadMtl(const std::string fileName) {
 
 			line >> texName;
 
-			tex = TextureManager::GetInstance()->LoadTexture(path.parent_path().string() + "/" + texName);
-
-			descHeap.CreateTxtureView(tex);
+			texItr->second = TextureManager::GetInstance()->LoadTexture(path.parent_path().string() + "/" + texName);
+			hepaItr->second.CreateTxtureView(texItr->second);
+		}
+		else if (identifier == "newmtl") {
+			line >> useMtlName;
+			tex.insert({ useMtlName, nullptr});
+			texItr = tex.find(useMtlName);
+			SRVHeap.insert({ useMtlName , ShaderResourceHeap() });
+			hepaItr = SRVHeap.find(useMtlName);
+			hepaItr->second.InitializeReset();
 		}
 	}
 }
@@ -211,7 +227,12 @@ void Model::LoadShader(
 
 void Model::CreateGraphicsPipeline() {
 	if (loadShaderFlg && loadObjFlg) {
-		PipelineManager::CreateRootSgnature(descHeap.GetParameter(), !!tex);
+		for (auto& i : SRVHeap) {
+			i.second.CreateConstBufferView(wvpData);
+			i.second.CreateConstBufferView(dirLig);
+			i.second.CreateConstBufferView(colorBuf);
+		}
+		PipelineManager::CreateRootSgnature(SRVHeap.begin()->second.GetParameter(), tex.size() != 0);
 
 		PipelineManager::SetShader(shader);
 		
@@ -244,16 +265,34 @@ void Model::Draw(const Mat4x4& viewProjectionMat, const Vector3& cameraPos) {
 	dirLig->eyePos = cameraPos;
 
 	auto commandlist = Engine::GetCommandList();
-	pipeline->Use();
-	descHeap.Use();
+
+	if (tex.size() <= 1) {
+		for (auto& i : meshData) {
+			pipeline->Use();
+			SRVHeap[i.first].Use();
+
+			commandlist->IASetVertexBuffers(0, 1, &i.second.vertexView);
+
+			commandlist->DrawInstanced(i.second.vertNum, 1, 0, 0);
+		}
+	}
+	else {
+		for (auto& i : meshData) {
+			pipeline->Use();
+			SRVHeap[i.first].Use();
+
+			commandlist->IASetVertexBuffers(0, 1, &i.second.vertexView);
+
+			commandlist->DrawInstanced(i.second.vertNum, 1, 0, 0);
+		}
+	}
 	
-	commandlist->IASetVertexBuffers(0, 1, &meshData.vertexView);
-	
-	commandlist->DrawInstanced(meshData.vertNum, 1,  0, 0);
 }
 
 Model::~Model() {
-	if (meshData.vertexBuffer) {
-		meshData.vertexBuffer->Release();
+	for (auto& i : meshData) {
+		if (i.second.vertexBuffer) {
+			i.second.vertexBuffer->Release();
+		}
 	}
 }

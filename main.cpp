@@ -25,15 +25,15 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	Engine::LoadFont("Font/JapaneseGothic.spritefont");
 
 	Camera camera;
-	//camera.pos = { 0.0f,0.0f,-10.0f };
-	camera.pos = { 8.24f,9.63f,-20.53f };
-	camera.rotate = { 0.44f,-0.4f, 0.0f };
+	camera.pos = { 0.0f,0.0f,-10.0f };
+	//camera.pos = { 8.24f,9.63f,-20.53f };
+	//camera.rotate = { 0.44f,-0.4f, 0.0f };
 
 	Camera camera2D(Camera::Mode::Othographic);
 
 
 	auto model = std::make_unique<Model>();
-	model->LoadObj("./evaluationTaskResources/resources/teapot.obj");
+	model->LoadObj("./evaluationTaskResources/resources/bunny.obj");
 	model->LoadShader("ModelShader/Model.VS.hlsl", "ModelShader/ModelUseTex.PS.hlsl", "ModelShader/Model.GS.hlsl");
 	model->CreateGraphicsPipeline();
 
@@ -81,17 +81,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			WinApp::GetInstance()->SetFullscreen(fullscreen);
 		}
 
-		if (KeyInput::Releaed(DIK_A)) {
-			tex->LoadTexture("./Resources/watame.png");
-		}
-		else if (KeyInput::Releaed(DIK_S)) {
-			tex->LoadTexture("./Resources/uvChecker.png");
-		}
-		else if (KeyInput::Releaed(DIK_D)) {
-			tex->LoadTexture("./Resources/zeno.png");
-		}
-
-
 
 		ImGui::Begin("Camera");
 		ImGui::Checkbox("Debug", &camera.isDebug);
@@ -121,7 +110,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		model->Draw(camera.GetViewProjection(), camera.pos);
 
-		tex->Draw(Vector2::identity, 0.0f, Vector2(), camera2D.GetViewOthographics(), Pipeline::Blend::Noaml);
+		//tex->Draw(Vector2::identity, 0.0f, Vector2(), camera2D.GetViewOthographics(), Pipeline::Blend::Noaml);
 
 		//texDefault->Draw(Vector2::identity, texRotate, texDefaultPos, camera2D.GetViewOthographics(), Pipeline::Blend::Noaml);
 

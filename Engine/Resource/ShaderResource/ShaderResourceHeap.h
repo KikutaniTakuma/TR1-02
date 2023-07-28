@@ -17,29 +17,46 @@ private:
 
 public:
 	ShaderResourceHeap();
+	ShaderResourceHeap(const ShaderResourceHeap& right);
 	ShaderResourceHeap(uint16_t numDescriptor);
 	~ShaderResourceHeap();
 public:
 	ShaderResourceHeap& operator=(const ShaderResourceHeap& right);
 
 public:
+	void InitializeReset();
+
 	void Use();
+	void Use(D3D12_GPU_DESCRIPTOR_HANDLE handle);
 
 	template<class T>
 	D3D12_CPU_DESCRIPTOR_HANDLE CreateConstBufferView(ConstBuffer<T>& conBuf) {
-		auto result = srvHeapHandle;
-		conBuf.CrerateView(srvHeapHandle);
-		srvHeapHandle.ptr += Engine::GetIncrementSRVCBVUAVHeap();
+		auto result = srvCpuHeapHandle;
+		conBuf.CrerateView(srvCpuHeapHandle);
+		srvCpuHeapHandle.ptr += Engine::GetIncrementSRVCBVUAVHeap();
+		srvGpuHeapHandle.ptr += Engine::GetIncrementSRVCBVUAVHeap();
 		heapOrder.push_back(HeapType::CBV);
 		return result;
 	}
 
-	inline D3D12_CPU_DESCRIPTOR_HANDLE CreateTxtureView(Texture* tex) {
-		auto result = srvHeapHandle;
+	inline D3D12_GPU_DESCRIPTOR_HANDLE CreateTxtureView(Texture* tex, bool) {
 		assert(tex != nullptr);
-		tex->CreateSRVView(srvHeapHandle);
-		srvHeapHandle.ptr += Engine::GetIncrementSRVCBVUAVHeap();
+		tex->CreateSRVView(srvCpuHeapHandle);
+		srvCpuHeapHandle.ptr += Engine::GetIncrementSRVCBVUAVHeap();
+		srvGpuHeapHandle.ptr += Engine::GetIncrementSRVCBVUAVHeap();
 		heapOrder.push_back(HeapType::SRV);
+		
+		return srvGpuHeapHandle;
+	}
+	inline D3D12_CPU_DESCRIPTOR_HANDLE CreateTxtureView(Texture* tex) {
+		auto result = srvCpuHeapHandle;
+
+		assert(tex != nullptr);
+		tex->CreateSRVView(srvCpuHeapHandle);
+		srvCpuHeapHandle.ptr += Engine::GetIncrementSRVCBVUAVHeap();
+		srvGpuHeapHandle.ptr += Engine::GetIncrementSRVCBVUAVHeap();
+		heapOrder.push_back(HeapType::SRV);
+
 		return result;
 	}
 	inline void CreateTxtureView(Texture* tex, D3D12_CPU_DESCRIPTOR_HANDLE handle) {
@@ -49,9 +66,17 @@ public:
 
 	D3D12_ROOT_PARAMETER GetParameter();
 
+	D3D12_CPU_DESCRIPTOR_HANDLE GetSrvCpuHeapHandle(){
+		return srvCpuHeapHandle;
+	}
+	D3D12_GPU_DESCRIPTOR_HANDLE GetSrvGpuHeapHandle(){
+		return srvGpuHeapHandle;
+	}
+
 private:
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> SRVHeap;
-	D3D12_CPU_DESCRIPTOR_HANDLE srvHeapHandle;
+	D3D12_CPU_DESCRIPTOR_HANDLE srvCpuHeapHandle;
+	D3D12_GPU_DESCRIPTOR_HANDLE srvGpuHeapHandle;
 
 	std::vector<HeapType> heapOrder;
 

@@ -9,6 +9,7 @@
 #include "Engine/RootSignature/RootSignature.h"
 #include "PipelineManager/PipelineManager.h"
 #include "TextureManager/TextureManager.h"
+#include <unordered_map>
 
 #include <wrl.h>
 
@@ -98,9 +99,9 @@ public:
 	uint32_t color;
 
 private:
-	ShaderResourceHeap descHeap;
+	std::unordered_map<std::string, ShaderResourceHeap> SRVHeap;
 
-	Mesh meshData;
+	std::unordered_map<std::string, Mesh> meshData;
 
 	Shader shader;
 
@@ -116,5 +117,5 @@ private:
 
 	ConstBuffer<Vector4> colorBuf;
 
-	Texture* tex;
+	std::unordered_map<std::string, Texture*> tex;
 };
