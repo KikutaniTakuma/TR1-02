@@ -24,7 +24,7 @@ public:
 
 public:
 	void Update();
-	void Update(const Vector3& gazePoint, const Vector3& rotation);
+	void Update(const Vector3& gazePoint);
 
 	// 透視投影
 	inline const Mat4x4& GetViewProjection() noexcept {
@@ -39,14 +39,22 @@ public:
 
 public:
 	Mode mode;
+	bool isDebug;
 
 public:
 	Vector3 pos;
 	Vector3 scale;
 	Vector3 rotate;
 
+	Vector3 moveVec;
+	float moveSpd;
+	Vector2 moveRotate;
+	float moveRotateSpd;
+	Vector2 gazePointRotate;
+	float gazePointRotateSpd;
+
 private:
-	const float kNearClip;
+	static constexpr float kNearClip = 0.01f;
 
 public:
 	float farClip;
