@@ -66,10 +66,10 @@
       <Filter>Math</Filter>
     </ClCompile>
     <ClCompile Include="AudioManager\AudioManager.cpp">
-      <Filter>Camera\AudioManager</Filter>
+      <Filter>AudioManager</Filter>
     </ClCompile>
     <ClCompile Include="AudioManager\Audio\Audio.cpp">
-      <Filter>Camera\AudioManager\Audio</Filter>
+      <Filter>AudioManager\Audio</Filter>
     </ClCompile>
     <ClCompile Include="Camera\Camera.cpp">
       <Filter>Camera</Filter>
@@ -187,10 +187,10 @@
     <Filter Include="Line">
       <UniqueIdentifier>{17a37595-e9f9-42e9-9496-d637dc153066}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Camera\AudioManager">
+    <Filter Include="AudioManager">
       <UniqueIdentifier>{2487b7fc-0f80-433c-af4a-03b5842ec259}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Camera\AudioManager\Audio">
+    <Filter Include="AudioManager\Audio">
       <UniqueIdentifier>{7d34ec95-2a47-42f6-93fb-23ebe8cc0e42}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -265,10 +265,10 @@
       <Filter>Texture2D</Filter>
     </ClInclude>
     <ClInclude Include="AudioManager\AudioManager.h">
-      <Filter>Camera\AudioManager</Filter>
+      <Filter>AudioManager</Filter>
     </ClInclude>
     <ClInclude Include="AudioManager\Audio\Audio.h">
-      <Filter>Camera\AudioManager\Audio</Filter>
+      <Filter>AudioManager\Audio</Filter>
     </ClInclude>
     <ClInclude Include="Camera\Camera.h">
       <Filter>Camera</Filter>

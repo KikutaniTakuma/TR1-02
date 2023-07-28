@@ -42,6 +42,8 @@ public:
 	static void Initialize();
 	static void Finalize();
 
+	static void Debug();
+
 private:
 	static Mouse* instance;
 

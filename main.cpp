@@ -25,9 +25,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	Engine::LoadFont("Font/JapaneseGothic.spritefont");
 
 	Camera camera;
-	camera.pos = { 0.0f,0.0f,-10.0f };
-	//camera.pos = { 8.24f,9.63f,-20.53f };
-	//camera.rotate = { 0.44f,-0.4f, 0.0f };
+	//camera.pos = { 0.0f,0.0f,-10.0f };
+	camera.pos = { 8.24f,9.63f,-20.53f };
+	camera.rotate = { 0.44f,-0.4f, 0.0f };
 
 	Camera camera2D(Camera::Mode::Othographic);
 
@@ -36,8 +36,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	model->LoadObj("./evaluationTaskResources/resources/teapot.obj");
 	model->LoadShader("ModelShader/Model.VS.hlsl", "ModelShader/ModelUseTex.PS.hlsl", "ModelShader/Model.GS.hlsl");
 	model->CreateGraphicsPipeline();
-
-	Vector3 cameraMoveRotate{};
 
 	auto tex = std::make_unique<Texture2D>();
 	tex->LoadTexture("./Resources/uvChecker.png");
@@ -81,19 +79,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// 
 		/// 更新処理
 		/// 
-		if ((Gamepad::GetStick(Gamepad::Stick::RIGHT_X) > 0.1f)) {
-			cameraMoveRotate.y += 0.1f;
-		}
-		else if ((Gamepad::GetStick(Gamepad::Stick::RIGHT_X) < -0.1f)) {
-			cameraMoveRotate.y -= 0.1f;
-		}
-
-		if ((Gamepad::GetStick(Gamepad::Stick::RIGHT_Y) > 0.1f)) {
-			cameraMoveRotate.x += 0.1f;
-		}
-		else if ((Gamepad::GetStick(Gamepad::Stick::RIGHT_Y) < -0.1f)) {
-			cameraMoveRotate.x -= 0.1f;
-		}
 
 		if (KeyInput::Releaed(DIK_F11)) {
 			fullscreen = !fullscreen;
@@ -103,14 +88,14 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 
 		ImGui::Begin("Camera");
+		ImGui::Checkbox("Debug", &camera.isDebug);
 		ImGui::DragFloat3("cameraPos", &camera.pos.x, 0.01f);
 		ImGui::DragFloat3("cameraRotate", &camera.rotate.x, 0.01f);
 		ImGui::DragFloat3("cameraScale", &camera.scale.x, 0.01f);
-		ImGui::DragFloat3("cameraMoveRotate", &cameraMoveRotate.x, 0.01f);
 		ImGui::DragFloat("cameraFoV", &camera.fov, 0.01f);
 		ImGui::End();
 
-		camera.Update(Vector3(), cameraMoveRotate);
+		camera.Update(Vector3());
 		camera2D.Update();
 
 		node.Update();
