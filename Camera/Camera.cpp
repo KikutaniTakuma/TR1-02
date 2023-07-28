@@ -160,14 +160,14 @@ void Camera::Update(const Vector3& gazePoint) {
 		moveVec = Vector3();
 
 		if (Mouse::LongPush(Mouse::Button::Right) && (KeyInput::LongPush(DIK_LSHIFT) || KeyInput::LongPush(DIK_RSHIFT))) {
-			auto moveRotateBuf = Mouse::GetVelocity().Normalize() * gazePointRotateSpd;
-			moveRotateBuf.x *= -1.0f;
-			gazePointRotate -= moveRotateBuf;
-		}
-		else if (Mouse::LongPush(Mouse::Button::Right)) {
 			auto moveRotateBuf = Mouse::GetVelocity().Normalize() * moveRotateSpd;
 			moveRotateBuf.x *= -1.0f;
 			moveRotate += moveRotateBuf;
+		}
+		else if (Mouse::LongPush(Mouse::Button::Right)) {
+			auto moveRotateBuf = Mouse::GetVelocity().Normalize() * gazePointRotateSpd;
+			moveRotateBuf.x *= -1.0f;
+			gazePointRotate -= moveRotateBuf;
 		}
 		if (Mouse::LongPush(Mouse::Button::Middle)) {
 			moveVec = Mouse::GetVelocity().Normalize() * moveSpd;
