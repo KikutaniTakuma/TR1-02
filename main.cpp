@@ -85,6 +85,13 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			WinApp::GetInstance()->SetFullscreen(fullscreen);
 		}
 
+		if (KeyInput::Releaed(DIK_A)) {
+			tex->LoadTexture("./Resources/watame.png");
+		}
+		else if (KeyInput::Releaed(DIK_S)) {
+			tex->LoadTexture("./Resources/uvChecker.png");
+		}
+
 
 
 		ImGui::Begin("Camera");
@@ -115,7 +122,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		model->Draw(camera.GetViewProjection(), camera.pos);
 
-		//tex->Draw(Vector2::identity, texRotate, texPos, camera2D.GetViewOthographics(), Pipeline::Blend::Noaml);
+		tex->Draw(Vector2::identity, 0.0f, Vector2(), camera2D.GetViewOthographics(), Pipeline::Blend::Noaml);
 
 		//texDefault->Draw(Vector2::identity, texRotate, texDefaultPos, camera2D.GetViewOthographics(), Pipeline::Blend::Noaml);
 

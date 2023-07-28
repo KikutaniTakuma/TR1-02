@@ -79,6 +79,10 @@ void Texture2D::CreateGraphicsPipeline() {
 }
 
 void Texture2D::LoadTexture(const std::string& fileName) {
+	if (tex) {
+
+	}
+
 	if (!tex) {
 		tex = TextureManager::GetInstance()->LoadTexture(fileName);
 
