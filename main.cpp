@@ -41,10 +41,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	tex->LoadTexture("./Resources/uvChecker.png");
 	tex->Initialize("Texture2DShader/Texture2D.VS.hlsl", "Texture2DShader/Texture2DNone.PS.hlsl");
 
-	auto texDefault = std::make_unique<Texture2D>();
-	texDefault->LoadTexture("./Resources/uvChecker.png");
-	texDefault->Initialize("Texture2DShader/Texture2D.VS.hlsl", "Texture2DShader/Texture2DColorChoose.PS.hlsl");
-
 
 	auto pera = std::make_unique<PeraRender>();
 	pera->Initialize("PostShader/Post.VS.hlsl", "PostShader/PostNone.PS.hlsl");
@@ -90,6 +86,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		}
 		else if (KeyInput::Releaed(DIK_S)) {
 			tex->LoadTexture("./Resources/uvChecker.png");
+		}
+		else if (KeyInput::Releaed(DIK_D)) {
+			tex->LoadTexture("./Resources/zeno.png");
 		}
 
 

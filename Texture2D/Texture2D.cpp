@@ -4,6 +4,7 @@
 
 Texture2D::Texture2D():
 	SRVHeap(16),
+	SRVHandle{},
 	vertexView(),
 	vertexResource(nullptr),
 	indexView(),
@@ -42,17 +43,11 @@ void Texture2D::Initialize(const std::string& vsFileName, const std::string& psF
 	}
 	indexResource->Unmap(0, nullptr);
 
-	*colorPibot = 0.6f;
-
-	*colorType = 0;
 
 	*color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 
 	SRVHeap.CreateConstBufferView(wvpMat);
 	SRVHeap.CreateConstBufferView(color);
-	SRVHeap.CreateConstBufferView(colorPibot);
-	SRVHeap.CreateConstBufferView(colorType);
-
 
 	CreateGraphicsPipeline();
 }
@@ -79,14 +74,15 @@ void Texture2D::CreateGraphicsPipeline() {
 }
 
 void Texture2D::LoadTexture(const std::string& fileName) {
-	if (tex) {
-
-	}
-
 	if (!tex) {
 		tex = TextureManager::GetInstance()->LoadTexture(fileName);
 
-		SRVHeap.CreateTxtureView(tex);
+		SRVHandle = SRVHeap.CreateTxtureView(tex);
+	}
+	else if (tex) {
+		tex = TextureManager::GetInstance()->LoadTexture(fileName);
+
+		SRVHeap.CreateTxtureView(tex, SRVHandle);
 	}
 }
 
@@ -98,9 +94,6 @@ void Texture2D::Draw(
 	Pipeline::Blend blend,
 	const Vector2& pibot, const Vector2& size
 ) {
-	ImGui::DragFloat("pibot", &(*colorPibot), 0.01f, 0.0f,1.0f);
-	ImGui::DragInt("type", &(*colorType), 1.0f,0,3);
-
 	const Vector2& uv0 = { pibot.x, pibot.y + size.y }; const Vector2& uv1 = size;
 	const Vector2& uv2 = { pibot.x + size.x, pibot.y }; const Vector2& uv3 = pibot;
 	
@@ -125,10 +118,6 @@ void Texture2D::Draw(
 		Vector3(pos.x, pos.y, 0.01f)
 	);
 
-	ImGui::Begin("tex color");
-	ImGui::DragFloat4("Color", color->m.data(), 0.01f, 0.0f, 1.0f);
-	ImGui::End();
-
 	auto commandlist = Engine::GetCommandList();
 
 	// 各種描画コマンドを積む
@@ -147,9 +136,6 @@ void Texture2D::Draw(
 	Pipeline::Blend blend,
 	const Vector2& pibot, const Vector2& size
 ) {
-	ImGui::DragFloat("pibot", &(*colorPibot), 0.01f, 0.0f, 1.0f);
-	ImGui::DragInt("type", &(*colorType), 1.0f, 0, 3);
-
 	const Vector2& uv0 = { pibot.x, pibot.y + size.y }; const Vector2& uv1 = size;
 	const Vector2& uv2 = { pibot.x + size.x, pibot.y }; const Vector2& uv3 = pibot;
 
@@ -173,10 +159,6 @@ void Texture2D::Draw(
 			rotate,
 			pos
 		);
-
-	ImGui::Begin("tex color");
-	ImGui::DragFloat4("Color", color->m.data(), 0.01f, 0.0f, 1.0f);
-	ImGui::End();
 
 	auto commandlist = Engine::GetCommandList();
 

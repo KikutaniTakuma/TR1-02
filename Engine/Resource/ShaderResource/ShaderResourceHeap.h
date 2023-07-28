@@ -26,16 +26,25 @@ public:
 	void Use();
 
 	template<class T>
-	void CreateConstBufferView(ConstBuffer<T>& conBuf) {
+	D3D12_CPU_DESCRIPTOR_HANDLE CreateConstBufferView(ConstBuffer<T>& conBuf) {
+		auto result = srvHeapHandle;
 		conBuf.CrerateView(srvHeapHandle);
 		srvHeapHandle.ptr += Engine::GetIncrementSRVCBVUAVHeap();
 		heapOrder.push_back(HeapType::CBV);
+		return result;
 	}
 
-	void CreateTxtureView(Texture* tex) {
+	inline D3D12_CPU_DESCRIPTOR_HANDLE CreateTxtureView(Texture* tex) {
+		auto result = srvHeapHandle;
+		assert(tex != nullptr);
 		tex->CreateSRVView(srvHeapHandle);
 		srvHeapHandle.ptr += Engine::GetIncrementSRVCBVUAVHeap();
 		heapOrder.push_back(HeapType::SRV);
+		return result;
+	}
+	inline void CreateTxtureView(Texture* tex, D3D12_CPU_DESCRIPTOR_HANDLE handle) {
+		assert(tex != nullptr);
+		tex->CreateSRVView(handle);
 	}
 
 	D3D12_ROOT_PARAMETER GetParameter();

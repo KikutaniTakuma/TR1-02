@@ -60,6 +60,8 @@ public:
 private:
 	ShaderResourceHeap SRVHeap;
 
+	D3D12_CPU_DESCRIPTOR_HANDLE SRVHandle;
+
 	D3D12_VERTEX_BUFFER_VIEW vertexView;
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource;
 
@@ -72,8 +74,6 @@ private:
 
 	ConstBuffer<Mat4x4> wvpMat;
 	ConstBuffer<Vector4> color;
-	ConstBuffer<float> colorPibot;
-	ConstBuffer<int> colorType;
 
 	Texture* tex;
 };
