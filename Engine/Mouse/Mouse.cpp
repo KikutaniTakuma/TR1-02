@@ -21,7 +21,8 @@ void Mouse::Finalize() {
 Mouse::Mouse() :
 	mouse(),
 	mosueState(),
-	preMosueState()
+	preMosueState(),
+	wheel(0)
 {
 	HRESULT hr = Engine::GetDirectInput()->CreateDevice(GUID_SysMouse, mouse.GetAddressOf(), NULL);
 	assert(SUCCEEDED(hr));
@@ -46,6 +47,8 @@ void Mouse::Input() {
 
 	instance->mosueState = {};
 	instance->mouse->GetDeviceState(sizeof(DIMOUSESTATE2), &instance->mosueState);
+
+	instance->wheel += static_cast<size_t>(instance->mosueState.lZ);
 }
 
 bool Mouse::Pushed(Mouse::Button button) {
@@ -82,6 +85,14 @@ Vector2 Mouse::GetVelocity() {
 	return { static_cast<float>(instance->mosueState.lX), -static_cast<float>(instance->mosueState.lY) };
 }
 
+float Mouse::GetWheel() {
+	return static_cast<float>(instance->wheel);
+}
+
+float Mouse::GetWheelVelocity() {
+	return static_cast<float>(instance->mosueState.lZ);
+}
+
 Vector2 Mouse::GetPos() {
 	POINT p{};
 	GetCursorPos(&p);
@@ -98,15 +109,17 @@ void Mouse::Show(bool flg) {
 
 void Mouse::Debug() {
 	ImGui::Begin("Mouse Debug");
-	ImGui::Text("Left     : %d", LongPush(Mouse::Button::Left));
-	ImGui::Text("Midle    : %d", LongPush(Mouse::Button::Middle));
-	ImGui::Text("Right    : %d", LongPush(Mouse::Button::Right));
-	ImGui::Text("EX0      : %d", LongPush(Mouse::Button::EX0));
-	ImGui::Text("EX1      : %d", LongPush(Mouse::Button::EX1));
-	ImGui::Text("EX2      : %d", LongPush(Mouse::Button::EX2));
-	ImGui::Text("EX3      : %d", LongPush(Mouse::Button::EX3));
-	ImGui::Text("EX4      : %d", LongPush(Mouse::Button::EX4));
-	ImGui::Text("pos      : %.2f, %.2f", GetPos().x, GetPos().y);
-	ImGui::Text("velocity : %.2f, %.2f", GetVelocity().x, GetVelocity().y);
+	ImGui::Text("Left          : %d", LongPush(Mouse::Button::Left));
+	ImGui::Text("Midle         : %d", LongPush(Mouse::Button::Middle));
+	ImGui::Text("Right         : %d", LongPush(Mouse::Button::Right));
+	ImGui::Text("EX0           : %d", LongPush(Mouse::Button::EX0));
+	ImGui::Text("EX1           : %d", LongPush(Mouse::Button::EX1));
+	ImGui::Text("EX2           : %d", LongPush(Mouse::Button::EX2));
+	ImGui::Text("EX3           : %d", LongPush(Mouse::Button::EX3));
+	ImGui::Text("EX4           : %d", LongPush(Mouse::Button::EX4));
+	ImGui::Text("pos           : %.2f, %.2f", GetPos().x, GetPos().y);
+	ImGui::Text("velocity      : %.2f, %.2f", GetVelocity().x, GetVelocity().y);
+	ImGui::Text("Wheel         : %.0f", GetWheel());
+	ImGui::Text("WheelVelocity : %.0f", GetWheelVelocity());
 	ImGui::End();
 }

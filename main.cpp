@@ -115,6 +115,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		//texDefault->Draw(Vector2::identity, texRotate, texDefaultPos, camera2D.GetViewOthographics(), Pipeline::Blend::Noaml);
 
 		pera->Draw();
+
+		Mouse::Debug();
 		///
 		/// 描画処理ここまで
 		/// 

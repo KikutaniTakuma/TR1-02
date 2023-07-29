@@ -23,8 +23,7 @@ public:
 	Camera& operator=(Camera&& right) noexcept;
 
 public:
-	void Update();
-	void Update(const Vector3& gazePoint);
+	void Update(const Vector3& gazePoint = {});
 
 	// 透視投影
 	inline const Mat4x4& GetViewProjection() noexcept {

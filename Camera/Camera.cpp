@@ -13,9 +13,9 @@ Camera::Camera() noexcept :
 	scale(Vector3::identity),
 	rotate(),
 	moveVec(),
-	moveSpd(0.05f),
+	moveSpd(0.01f),
 	moveRotate(),
-	moveRotateSpd(std::numbers::pi_v<float> / 180.0f),
+	moveRotateSpd(std::numbers::pi_v<float> / 720.0f),
 	gazePointRotate(),
 	gazePointRotateSpd(std::numbers::pi_v<float> / 90.0f),
 	farClip(1000.0f),
@@ -32,11 +32,11 @@ Camera::Camera(Camera::Mode mode) noexcept :
 	scale(Vector3::identity),
 	rotate(),
 	moveVec(),
-	moveSpd(0.05f),
+	moveSpd(0.01f),
 	moveRotate(),
-	moveRotateSpd(std::numbers::pi_v<float> / 180.0f),
+	moveRotateSpd(std::numbers::pi_v<float> / 720.0f),
 	gazePointRotate(),
-	gazePointRotateSpd(std::numbers::pi_v<float> / 90.0f),
+	gazePointRotateSpd(std::numbers::pi_v<float> / 9.0f),
 	farClip(1000.0f),
 	fov(0.45f),
 	view(),
@@ -109,52 +109,6 @@ Camera& Camera::operator=(Camera&& right) noexcept {
 	return *this;
 }
 
-void Camera::Update() {
-	if (isDebug) {
-		moveVec = Vector3();
-
-		if (Mouse::LongPush(Mouse::Button::Right)) {
-			auto moveRotateBuf = Mouse::GetVelocity().Normalize() * moveRotateSpd;
-			moveRotateBuf.x *= -1.0f;
-			moveRotate += moveRotateBuf;
-		}
-		if (Mouse::LongPush(Mouse::Button::Middle)) {
-			moveVec = Mouse::GetVelocity().Normalize() * moveSpd;
-			moveVec *= HoriMakeMatrixRotateX(rotate.x) * HoriMakeMatrixRotateY(rotate.y) * HoriMakeMatrixRotateZ(rotate.z);
-			pos += moveVec;
-		}
-		view = VertMakeMatrixAffin(scale, rotate, pos) * HoriMakeMatrixRotateY(moveRotate.x) * HoriMakeMatrixRotateX(moveRotate.y);
-		view.Inverse();
-	}
-	else {
-		view.VertAffin(scale, rotate, pos);
-		view.Inverse();
-	}
-
-	static auto engine = Engine::GetInstance();
-	static const float aspect = static_cast<float>(engine->clientWidth) / static_cast<float>(engine->clientHeight);
-
-	switch (mode)
-	{
-	case Camera::Mode::Projecction:
-	default:
-		fov = std::clamp(fov, 0.0f, 1.0f);
-		projection.VertPerspectiveFov(fov, aspect, kNearClip, farClip);
-		viewProjecction = projection * view;
-		break;
-
-	case Camera::Mode::Othographic:
-		othograohics.VertOrthographic(
-			-static_cast<float>(engine->clientWidth) * 0.5f,
-			static_cast<float>(engine->clientHeight) * 0.5f,
-			static_cast<float>(engine->clientWidth) * 0.5f,
-			-static_cast<float>(engine->clientHeight) * 0.5f,
-			kNearClip, farClip);
-		viewOthograohics = othograohics * view;
-		break;
-	}
-}
-
 void Camera::Update(const Vector3& gazePoint) {
 	if (isDebug) {
 		moveVec = Vector3();
@@ -173,6 +127,12 @@ void Camera::Update(const Vector3& gazePoint) {
 			moveVec = Mouse::GetVelocity().Normalize() * moveSpd;
 			moveVec *= HoriMakeMatrixRotateX(rotate.x) * HoriMakeMatrixRotateY(rotate.y) * HoriMakeMatrixRotateZ(rotate.z);
 			pos -= moveVec;
+		}
+		if (Mouse::GetWheelVelocity() != 0.0f) {
+			moveVec.z = Mouse::GetWheelVelocity();
+			moveVec = moveVec.Normalize() * moveSpd;
+			moveVec *= HoriMakeMatrixRotateX(rotate.x) * HoriMakeMatrixRotateY(rotate.y) * HoriMakeMatrixRotateZ(rotate.z);
+			pos += moveVec;
 		}
 		view = VertMakeMatrixAffin(scale, rotate, pos) * HoriMakeMatrixRotateY(moveRotate.x) * HoriMakeMatrixRotateX(moveRotate.y);
 		view = VertMakeMatrixAffin(Vector3::identity, Vector3(gazePointRotate.y, gazePointRotate.x, 0.0f), Vector3()) * VertMakeMatrixTranslate(gazePoint) * view;

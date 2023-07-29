@@ -34,6 +34,9 @@ public:
 
 	static Vector2 GetVelocity();
 
+	static float GetWheel();
+	static float GetWheelVelocity();
+
 	static Vector2 GetPos();
 
 	static void Show(bool flg);
@@ -52,4 +55,6 @@ private:
 
 	DIMOUSESTATE2 mosueState;
 	DIMOUSESTATE2 preMosueState;
+
+	size_t wheel;
 };
