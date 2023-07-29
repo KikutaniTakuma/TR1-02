@@ -34,7 +34,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	auto model = std::make_unique<Model>();
 	model->LoadObj("./Resources/Watame.obj");
-	model->LoadShader("ModelShader/Model.VS.hlsl", "ModelShader/ModelUseTex.PS.hlsl", "ModelShader/Model.GS.hlsl");
+	model->LoadShader("ModelShader/Model.VS.hlsl", "ModelShader/ModelUseTex.PS.hlsl", "ModelShader/ModelNone.GS.hlsl");
 	model->CreateGraphicsPipeline();
 
 	auto tex = std::make_unique<Texture2D>();

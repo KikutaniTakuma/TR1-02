@@ -35,26 +35,31 @@ public:
 		conBuf.CrerateView(srvCpuHeapHandle);
 		srvCpuHeapHandle.ptr += Engine::GetIncrementSRVCBVUAVHeap();
 		srvGpuHeapHandle.ptr += Engine::GetIncrementSRVCBVUAVHeap();
+		
 		heapOrder.push_back(HeapType::CBV);
 		return result;
 	}
 
-	inline D3D12_GPU_DESCRIPTOR_HANDLE CreateTxtureView(Texture* tex, bool) {
+	inline D3D12_GPU_DESCRIPTOR_HANDLE CreateTxtureViewGPUh(Texture* tex) {
+		auto result = srvGpuHeapHandle;
+
 		assert(tex != nullptr);
 		tex->CreateSRVView(srvCpuHeapHandle);
 		srvCpuHeapHandle.ptr += Engine::GetIncrementSRVCBVUAVHeap();
 		srvGpuHeapHandle.ptr += Engine::GetIncrementSRVCBVUAVHeap();
+		
 		heapOrder.push_back(HeapType::SRV);
 		
-		return srvGpuHeapHandle;
+		return result;
 	}
-	inline D3D12_CPU_DESCRIPTOR_HANDLE CreateTxtureView(Texture* tex) {
+	inline D3D12_CPU_DESCRIPTOR_HANDLE CreateTxtureViewCPUh(Texture* tex) {
 		auto result = srvCpuHeapHandle;
 
 		assert(tex != nullptr);
 		tex->CreateSRVView(srvCpuHeapHandle);
 		srvCpuHeapHandle.ptr += Engine::GetIncrementSRVCBVUAVHeap();
 		srvGpuHeapHandle.ptr += Engine::GetIncrementSRVCBVUAVHeap();
+		
 		heapOrder.push_back(HeapType::SRV);
 
 		return result;

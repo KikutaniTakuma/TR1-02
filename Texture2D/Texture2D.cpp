@@ -77,7 +77,8 @@ void Texture2D::LoadTexture(const std::string& fileName) {
 	if (!tex) {
 		tex = TextureManager::GetInstance()->LoadTexture(fileName);
 
-		SRVHandle = SRVHeap.CreateTxtureView(tex);
+		SRVHandle = SRVHeap.CreateTxtureViewCPUh(tex);
+		SRVHandle.ptr -= Engine::GetIncrementSRVCBVUAVHeap();
 	}
 	else if (tex) {
 		tex = TextureManager::GetInstance()->LoadTexture(fileName);

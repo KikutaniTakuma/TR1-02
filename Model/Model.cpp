@@ -192,7 +192,7 @@ void Model::LoadMtl(const std::string fileName) {
 			line >> texName;
 
 			texItr->second = TextureManager::GetInstance()->LoadTexture(path.parent_path().string() + "/" + texName);
-			hepaItr->second.CreateTxtureView(texItr->second);
+			hepaItr->second.CreateTxtureViewCPUh(texItr->second);
 		}
 		else if (identifier == "newmtl") {
 			line >> useMtlName;
