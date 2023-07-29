@@ -13,7 +13,7 @@ Camera::Camera() noexcept :
 	scale(Vector3::identity),
 	rotate(),
 	moveVec(),
-	moveSpd(0.01f),
+	moveSpd(0.02f),
 	moveRotate(),
 	moveRotateSpd(std::numbers::pi_v<float> / 720.0f),
 	gazePointRotate(),
@@ -32,7 +32,7 @@ Camera::Camera(Camera::Mode mode) noexcept :
 	scale(Vector3::identity),
 	rotate(),
 	moveVec(),
-	moveSpd(0.01f),
+	moveSpd(0.02f),
 	moveRotate(),
 	moveRotateSpd(std::numbers::pi_v<float> / 720.0f),
 	gazePointRotate(),
@@ -117,7 +117,7 @@ void Camera::Update(const Vector3& gazePoint) {
 		{
 		case Camera::Mode::Projecction:
 		default:
-			moveSpd = 0.01f;
+			moveSpd = 0.02f;
 			if (Mouse::LongPush(Mouse::Button::Right) && (KeyInput::LongPush(DIK_LSHIFT) || KeyInput::LongPush(DIK_RSHIFT))) {
 				auto moveRotateBuf = Mouse::GetVelocity().Normalize() * moveRotateSpd;
 				moveRotateBuf.x *= -1.0f;

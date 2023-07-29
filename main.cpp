@@ -36,9 +36,14 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 
 	auto model = std::make_unique<Model>();
-	model->LoadObj("./Resources/Watame/Watame.obj");
-	model->LoadShader("ModelShader/Model.VS.hlsl", "ModelShader/ModelUseTex.PS.hlsl", "ModelShader/ModelNone.GS.hlsl");
+	model->LoadObj("./Resources/Cube.obj");
+	model->LoadShader("ModelShader/Model.VS.hlsl", "ModelShader/Model.PS.hlsl", "ModelShader/ModelNone.GS.hlsl");
 	model->CreateGraphicsPipeline();
+
+	auto watame = std::make_unique<Model>();
+	watame->LoadObj("./Resources/Watame/Watame.obj");
+	watame->LoadShader("ModelShader/Model.VS.hlsl", "ModelShader/ModelUseTex.PS.hlsl", "ModelShader/ModelNone.GS.hlsl");
+	watame->CreateGraphicsPipeline();
 
 	auto tex = std::make_unique<Texture2D>();
 	tex->LoadTexture("./Resources/watame.png");
@@ -121,7 +126,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		model->Draw(camera.GetViewProjection(), camera.pos);
 
-		tex->Draw(Vector2::identity, 0.0f, Vector2(), camera2D.GetViewOthographics(), Pipeline::Blend::Noaml);
+		watame->Draw(camera.GetViewProjection(), camera.pos);
+
+		//tex->Draw(Vector2::identity, 0.0f, Vector2(), camera2D.GetViewOthographics(), Pipeline::Blend::Noaml);
 
 		pera->Draw();
 		///
