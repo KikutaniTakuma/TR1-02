@@ -28,17 +28,20 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	camera.pos = { 0.0f,0.0f,-10.0f };
 	//camera.pos = { 8.24f,9.63f,-20.53f };
 	//camera.rotate = { 0.44f,-0.4f, 0.0f };
+#if _DEBUG
+	camera.isDebug = true;
+#endif
 
 	Camera camera2D(Camera::Mode::Othographic);
 
 
 	auto model = std::make_unique<Model>();
-	model->LoadObj("./Resources/Watame.obj");
+	model->LoadObj("./Resources/Watame/Watame.obj");
 	model->LoadShader("ModelShader/Model.VS.hlsl", "ModelShader/ModelUseTex.PS.hlsl", "ModelShader/ModelNone.GS.hlsl");
 	model->CreateGraphicsPipeline();
 
 	auto tex = std::make_unique<Texture2D>();
-	tex->LoadTexture("./Resources/uvChecker.png");
+	tex->LoadTexture("./Resources/watame.png");
 	tex->Initialize("Texture2DShader/Texture2D.VS.hlsl", "Texture2DShader/Texture2DNone.PS.hlsl");
 
 
@@ -90,6 +93,14 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		ImGui::DragFloat("cameraFoV", &camera.fov, 0.01f);
 		ImGui::End();
 
+		ImGui::Begin("Camera2D");
+		ImGui::Checkbox("Debug", &camera2D.isDebug);
+		ImGui::DragFloat3("cameraPos", &camera2D.pos.x, 0.01f);
+		ImGui::DragFloat3("cameraRotate", &camera2D.rotate.x, 0.01f);
+		ImGui::DragFloat3("cameraScale", &camera2D.scale.x, 0.01f);
+		ImGui::DragFloat("cameraFoV", &camera2D.fov, 0.01f);
+		ImGui::End();
+
 		camera.Update(Vector3());
 		camera2D.Update();
 
@@ -110,13 +121,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		model->Draw(camera.GetViewProjection(), camera.pos);
 
-		//tex->Draw(Vector2::identity, 0.0f, Vector2(), camera2D.GetViewOthographics(), Pipeline::Blend::Noaml);
-
-		//texDefault->Draw(Vector2::identity, texRotate, texDefaultPos, camera2D.GetViewOthographics(), Pipeline::Blend::Noaml);
+		tex->Draw(Vector2::identity, 0.0f, Vector2(), camera2D.GetViewOthographics(), Pipeline::Blend::Noaml);
 
 		pera->Draw();
-
-		Mouse::Debug();
 		///
 		/// 描画処理ここまで
 		/// 

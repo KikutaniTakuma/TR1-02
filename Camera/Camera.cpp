@@ -113,27 +113,49 @@ void Camera::Update(const Vector3& gazePoint) {
 	if (isDebug) {
 		moveVec = Vector3();
 
-		if (Mouse::LongPush(Mouse::Button::Right) && (KeyInput::LongPush(DIK_LSHIFT) || KeyInput::LongPush(DIK_RSHIFT))) {
-			auto moveRotateBuf = Mouse::GetVelocity().Normalize() * moveRotateSpd;
-			moveRotateBuf.x *= -1.0f;
-			moveRotate += moveRotateBuf;
+		switch (mode)
+		{
+		case Camera::Mode::Projecction:
+		default:
+			moveSpd = 0.01f;
+			if (Mouse::LongPush(Mouse::Button::Right) && (KeyInput::LongPush(DIK_LSHIFT) || KeyInput::LongPush(DIK_RSHIFT))) {
+				auto moveRotateBuf = Mouse::GetVelocity().Normalize() * moveRotateSpd;
+				moveRotateBuf.x *= -1.0f;
+				moveRotate += moveRotateBuf;
+			}
+			else if (Mouse::LongPush(Mouse::Button::Right)) {
+				auto moveRotateBuf = Mouse::GetVelocity().Normalize() * gazePointRotateSpd;
+				moveRotateBuf.x *= -1.0f;
+				gazePointRotate -= moveRotateBuf;
+			}
+			if (Mouse::LongPush(Mouse::Button::Middle)) {
+				moveVec = Mouse::GetVelocity().Normalize() * moveSpd;
+				moveVec *= HoriMakeMatrixRotateX(rotate.x) * HoriMakeMatrixRotateY(rotate.y) * HoriMakeMatrixRotateZ(rotate.z);
+				pos -= moveVec;
+			}
+			if (Mouse::GetWheelVelocity() != 0.0f) {
+				moveVec.z = Mouse::GetWheelVelocity();
+				moveVec = moveVec.Normalize() * moveSpd;
+				moveVec *= HoriMakeMatrixRotateX(rotate.x) * HoriMakeMatrixRotateY(rotate.y) * HoriMakeMatrixRotateZ(rotate.z);
+				pos += moveVec;
+			}
+			break;
+		case Camera::Mode::Othographic:
+			moveSpd = 10.0f;
+
+			if (Mouse::LongPush(Mouse::Button::Middle)) {
+				moveVec = Mouse::GetVelocity().Normalize() * moveSpd;
+				moveVec *= HoriMakeMatrixRotateX(rotate.x) * HoriMakeMatrixRotateY(rotate.y) * HoriMakeMatrixRotateZ(rotate.z);
+				pos -= moveVec;
+			}
+			/*if (Mouse::GetWheelVelocity() != 0.0f) {
+				moveVec.z = Mouse::GetWheelVelocity();
+				moveVec = moveVec.Normalize() * (moveSpd * 0.001f);
+				scale += moveVec;
+			}*/
+			break;
 		}
-		else if (Mouse::LongPush(Mouse::Button::Right)) {
-			auto moveRotateBuf = Mouse::GetVelocity().Normalize() * gazePointRotateSpd;
-			moveRotateBuf.x *= -1.0f;
-			gazePointRotate -= moveRotateBuf;
-		}
-		if (Mouse::LongPush(Mouse::Button::Middle)) {
-			moveVec = Mouse::GetVelocity().Normalize() * moveSpd;
-			moveVec *= HoriMakeMatrixRotateX(rotate.x) * HoriMakeMatrixRotateY(rotate.y) * HoriMakeMatrixRotateZ(rotate.z);
-			pos -= moveVec;
-		}
-		if (Mouse::GetWheelVelocity() != 0.0f) {
-			moveVec.z = Mouse::GetWheelVelocity();
-			moveVec = moveVec.Normalize() * moveSpd;
-			moveVec *= HoriMakeMatrixRotateX(rotate.x) * HoriMakeMatrixRotateY(rotate.y) * HoriMakeMatrixRotateZ(rotate.z);
-			pos += moveVec;
-		}
+
 		view = VertMakeMatrixAffin(scale, rotate, pos) * HoriMakeMatrixRotateY(moveRotate.x) * HoriMakeMatrixRotateX(moveRotate.y);
 		view = VertMakeMatrixAffin(Vector3::identity, Vector3(gazePointRotate.y, gazePointRotate.x, 0.0f), Vector3()) * VertMakeMatrixTranslate(gazePoint) * view;
 		view.Inverse();
