@@ -43,6 +43,8 @@ Model::Model() :
 	dirLig->ptColor = { 15.0f,15.0f,15.0f };
 	dirLig->ptRange = 10.0f;
 
+	*lightingType = 1;
+
 	*colorBuf = UintToVector4(color);
 }
 

@@ -17,6 +17,10 @@ cbuffer Color : register(b2){
 	float4 color;
 }
 
+cbuffer LightingType : register(b3){
+    int lightingType;
+}
+
 struct VertexShaderOutput{
     float32_t4 position : POSITION0;
     float32_t3 normal : NORMAL;

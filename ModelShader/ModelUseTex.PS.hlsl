@@ -15,6 +15,7 @@ PixelShaderOutPut main(GeometoryOutPut input)
 	PixelShaderOutPut output;
 	input.normal = normalize(input.normal);
 
+	if(lightingType == 1){
 	// ディレクションライト拡散反射光
 	float t = dot(input.normal, ligDirection);
 
@@ -84,4 +85,27 @@ PixelShaderOutPut main(GeometoryOutPut input)
 	output.color.xyz *= lig;
 
 	return output;
+	}
+	else if(lightingType == 2){
+		// ディレクションライト拡散反射光
+		float t = dot(input.normal, ligDirection);
+
+		t *= -1.0f;
+		t = (t + abs(t)) * 0.5f;
+
+		t = pow(t * 0.5f + 0.5f, 2.0f);
+
+		float3 diffDirection = ligColor * t;
+
+		output.color = tex.Sample(smp, input.uv);
+    	output.color *= color;
+		output.color.xyz *= diffDirection;
+
+		return output;
+	}
+	else {
+		output.color = tex.Sample(smp, input.uv);
+    	output.color *= color;
+		return output;
+	}
 }
