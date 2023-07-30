@@ -40,22 +40,19 @@ public:
 
 public:
 	void Draw(
-		const Vector2& scale,
-		float rotate,
-		const Vector2& pos,
 		const Mat4x4& viewProjection,
-		Pipeline::Blend blend = Pipeline::Blend::None,
-		const Vector2& pibot = {0.0f, 0.0f}, const Vector2& size = {1.0f, 1.0f}
+		Pipeline::Blend blend = Pipeline::Blend::None
 	);
 
-	void Draw(
-		const Vector2& scale,
-		const Vector3& rotate,
-		const Vector3& pos,
-		const Mat4x4& viewProjection,
-		Pipeline::Blend blend = Pipeline::Blend::None,
-		const Vector2& pibot = { 0.0f, 0.0f }, const Vector2& size = { 1.0f, 1.0f }
-	);
+	void Debug(const std::string& guiName);
+
+public:
+	Vector2 scale;
+	Vector3 rotate;
+	Vector3 pos;
+
+	Vector2 uvPibot;
+	Vector2 uvSize;
 
 private:
 	ShaderResourceHeap SRVHeap;
