@@ -26,6 +26,7 @@ Model::Model() :
 	wvpData(),
 	dirLig(),
 	colorBuf(),
+	lightingType(),
 	SRVHeap(16),
 	tex(0)
 {
@@ -196,11 +197,11 @@ void Model::LoadMtl(const std::string fileName) {
 		}
 		else if (identifier == "newmtl") {
 			line >> useMtlName;
-			tex.insert({ useMtlName, nullptr});
+			tex.insert({ useMtlName, nullptr });
 			texItr = tex.find(useMtlName);
 			SRVHeap.insert({ useMtlName , ShaderResourceHeap() });
 			hepaItr = SRVHeap.find(useMtlName);
-			hepaItr->second.InitializeReset();
+			hepaItr->second.InitializeReset(16);
 		}
 	}
 }
@@ -232,16 +233,17 @@ void Model::CreateGraphicsPipeline() {
 			i.second.CreateConstBufferView(wvpData);
 			i.second.CreateConstBufferView(dirLig);
 			i.second.CreateConstBufferView(colorBuf);
+			i.second.CreateConstBufferView(lightingType);
 		}
 		PipelineManager::CreateRootSgnature(SRVHeap.begin()->second.GetParameter(), tex.size() != 0);
 
 		PipelineManager::SetShader(shader);
-		
+
 		PipelineManager::SetVertexInput("POSITION", 0u, DXGI_FORMAT_R32G32B32A32_FLOAT);
 		PipelineManager::SetVertexInput("NORMAL", 0u, DXGI_FORMAT_R32G32B32_FLOAT);
 		PipelineManager::SetVertexInput("TEXCOORD", 0u, DXGI_FORMAT_R32G32_FLOAT);
 
-		PipelineManager::SetState(Pipeline::Blend::None,  Pipeline::SolidState::Solid);
+		PipelineManager::SetState(Pipeline::Blend::None, Pipeline::SolidState::Solid);
 
 		pipeline = PipelineManager::Create();
 
@@ -252,12 +254,12 @@ void Model::CreateGraphicsPipeline() {
 }
 
 void Model::Update() {
-	
+
 }
 
 void Model::Draw(const Mat4x4& viewProjectionMat, const Vector3& cameraPos) {
 	assert(createGPFlg);
-	
+
 	wvpData->worldMat.VertAffin(scale, rotate, pos);
 	wvpData->viewProjectoionMat = viewProjectionMat;
 
@@ -265,11 +267,6 @@ void Model::Draw(const Mat4x4& viewProjectionMat, const Vector3& cameraPos) {
 
 	dirLig->eyePos = cameraPos;
 
-	ImGui::Begin("Light");
-	ImGui::DragFloat3("pos", &dirLig->ptPos.x);
-	ImGui::DragFloat3("color", &dirLig->ptColor.x, 0.01f);
-	ImGui::End();
-	
 
 	auto commandlist = Engine::GetCommandList();
 
@@ -293,7 +290,23 @@ void Model::Draw(const Mat4x4& viewProjectionMat, const Vector3& cameraPos) {
 			commandlist->DrawInstanced(i.second.vertNum, 1, 0, 0);
 		}
 	}
-	
+
+}
+
+void Model::Debug(const std::string& guiName) {
+	ImGui::Begin(guiName.c_str());
+	ImGui::DragFloat3("pos", &pos.x, 0.01f);
+	ImGui::DragFloat3("rotate", &rotate.x, 0.01f);
+	ImGui::DragFloat3("scale", &scale.x, 0.01f);
+	ImGui::ColorEdit4("SphereColor", &colorBuf->color.r);
+	ImGui::DragInt("lightingType", &(*lightingType), 0.01f, 0, 2);
+	ImGui::DragFloat3("ligDirection", &dirLig->ligDirection.x, 0.01f);
+	dirLig->ligDirection = dirLig->ligDirection.Normalize();
+	ImGui::DragFloat3("ligColor", &dirLig->ligColor.x, 0.01f);
+	ImGui::DragFloat3("ptPos", &dirLig->ptPos.x, 0.01f);
+	ImGui::DragFloat3("ptColor", &dirLig->ptColor.x, 0.01f);
+	ImGui::DragFloat("ptRange", &dirLig->ptRange);
+	ImGui::End();
 }
 
 Model::~Model() {
