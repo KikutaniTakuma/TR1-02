@@ -2,7 +2,12 @@
 #include "Engine/ShaderManager/ShaderManager.h"
 #include "externals/imgui/imgui.h"
 
-Texture2D::Texture2D():
+Texture2D::Texture2D() :
+	scale(Vector2::identity),
+	rotate(),
+	pos({ 0.0f,0.0f,0.01f }),
+	uvPibot(),
+	uvSize(Vector2::identity),
 	SRVHeap(16),
 	SRVHandle{},
 	vertexView(),
@@ -15,8 +20,8 @@ Texture2D::Texture2D():
 {}
 
 Texture2D::~Texture2D() {
-	if(indexResource)indexResource->Release();
-	if(vertexResource)vertexResource->Release();
+	if (indexResource)indexResource->Release();
+	if (vertexResource)vertexResource->Release();
 }
 
 void Texture2D::Initialize(const std::string& vsFileName, const std::string& psFileName) {
@@ -88,57 +93,11 @@ void Texture2D::LoadTexture(const std::string& fileName) {
 }
 
 void Texture2D::Draw(
-	const Vector2& scale,
-	float rotate,
-	const Vector2& pos,
-	const Mat4x4& viewProjection, 
-	Pipeline::Blend blend,
-	const Vector2& pibot, const Vector2& size
-) {
-	const Vector2& uv0 = { pibot.x, pibot.y + size.y }; const Vector2& uv1 = size;
-	const Vector2& uv2 = { pibot.x + size.x, pibot.y }; const Vector2& uv3 = pibot;
-	
-	VertexData pv[4] = {
-		{ { -0.5f,  0.5f, 0.1f }, uv3 },
-		{ {  0.5f,  0.5f, 0.1f }, uv2 },
-		{ {  0.5f, -0.5f, 0.1f }, uv1 },
-		{ { -0.5f, -0.5f, 0.1f }, uv0 },
-	};
-
-	VertexData* mappedData = nullptr;
-	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&mappedData));
-	for (int32_t i = 0; i < _countof(pv); i++) {
-		mappedData[i] = pv[i];
-	}
-	vertexResource->Unmap(0, nullptr);
-
-	*wvpMat = viewProjection * 
-		VertMakeMatrixAffin(
-		Vector3(scale.x * tex->getSize().x, scale.y * tex->getSize().y, 1.0f), 
-		Vector3(0.0f, 0.0f, rotate), 
-		Vector3(pos.x, pos.y, 0.01f)
-	);
-
-	auto commandlist = Engine::GetCommandList();
-
-	// 各種描画コマンドを積む
-	graphicsPipelineState[blend]->Use();
-	SRVHeap.Use();
-	commandlist->IASetVertexBuffers(0, 1, &vertexView);
-	commandlist->IASetIndexBuffer(&indexView);
-	commandlist->DrawIndexedInstanced(6, 1, 0, 0, 0);
-}
-
-void Texture2D::Draw(
-	const Vector2& scale,
-	const Vector3& rotate,
-	const Vector3& pos,
 	const Mat4x4& viewProjection,
-	Pipeline::Blend blend,
-	const Vector2& pibot, const Vector2& size
+	Pipeline::Blend blend
 ) {
-	const Vector2& uv0 = { pibot.x, pibot.y + size.y }; const Vector2& uv1 = size;
-	const Vector2& uv2 = { pibot.x + size.x, pibot.y }; const Vector2& uv3 = pibot;
+	const Vector2& uv0 = { uvPibot.x, uvPibot.y + uvSize.y }; const Vector2& uv1 = uvSize + uvPibot;
+	const Vector2& uv2 = { uvPibot.x + uvSize.x, uvPibot.y }; const Vector2& uv3 = uvPibot;
 
 	VertexData pv[4] = {
 		{ { -0.5f,  0.5f, 0.1f }, uv3 },
@@ -169,4 +128,15 @@ void Texture2D::Draw(
 	commandlist->IASetVertexBuffers(0, 1, &vertexView);
 	commandlist->IASetIndexBuffer(&indexView);
 	commandlist->DrawIndexedInstanced(6, 1, 0, 0, 0);
+}
+
+void Texture2D::Debug(const std::string& guiName) {
+	ImGui::Begin(guiName.c_str());
+	ImGui::DragFloat2("scale", &scale.x, 1.0f);
+	ImGui::DragFloat3("rotate", &rotate.x, 0.01f);
+	ImGui::DragFloat3("pos", &pos.x, 1.0f);
+	ImGui::DragFloat2("uvPibot", &uvPibot.x, 0.01f);
+	ImGui::DragFloat2("uvSize", &uvSize.x, 0.01f);
+	ImGui::ColorEdit4("SphereColor", &color->color.r);
+	ImGui::End();
 }
