@@ -18,8 +18,15 @@
 #include "Editor/Node/Node.h"
 
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
+	// 画面解像度取得
+	int32_t width = GetSystemMetrics(SM_CXSCREEN);
+	int32_t height = GetSystemMetrics(SM_CYSCREEN);
+
 	// ライブラリ初期化
-	Engine::Initialize(1920, 1080, "DirectXGame");
+	Engine::Initialize(width, height, "DirectXGame");
+
+	// フルスクリーン化
+	WinApp::GetInstance()->SetFullscreen(true);
 
 	// fontLoad
 	Engine::LoadFont("Font/JapaneseGothic.spritefont");
@@ -34,31 +41,40 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	Camera camera2D(Camera::Mode::Othographic);
 
-
-	auto model = std::make_unique<Model>();
-	model->LoadObj("./Resources/Cube.obj");
-	model->LoadShader("ModelShader/Model.VS.hlsl", "ModelShader/Model.PS.hlsl", "ModelShader/ModelNone.GS.hlsl");
-	model->CreateGraphicsPipeline();
-
 	auto watame = std::make_unique<Model>();
 	watame->LoadObj("./Resources/Watame/Watame.obj");
 	watame->LoadShader("ModelShader/Model.VS.hlsl", "ModelShader/ModelUseTex.PS.hlsl", "ModelShader/ModelNone.GS.hlsl");
 	watame->CreateGraphicsPipeline();
 
-	auto tex = std::make_unique<Texture2D>();
-	tex->LoadTexture("./Resources/watame.png");
-	tex->Initialize("Texture2DShader/Texture2D.VS.hlsl", "Texture2DShader/Texture2DNone.PS.hlsl");
+	auto multiMaterial = std::make_unique<Model>();
+	multiMaterial->LoadObj("./evaluationTaskResources/resources/multiMaterial.obj");
+	multiMaterial->LoadShader("ModelShader/Model.VS.hlsl", "ModelShader/ModelUseTex.PS.hlsl", "ModelShader/ModelNone.GS.hlsl");
+	multiMaterial->CreateGraphicsPipeline();
 
+	auto bunny = std::make_unique<Model>();
+	bunny->LoadObj("./evaluationTaskResources/resources/bunny.obj");
+	bunny->LoadShader("ModelShader/Model.VS.hlsl", "ModelShader/ModelUseTex.PS.hlsl", "ModelShader/ModelNone.GS.hlsl");
+	bunny->CreateGraphicsPipeline();
+
+	auto teapot = std::make_unique<Model>();
+	teapot->LoadObj("./evaluationTaskResources/resources/teapot.obj");
+	teapot->LoadShader("ModelShader/Model.VS.hlsl", "ModelShader/ModelUseTex.PS.hlsl", "ModelShader/ModelNone.GS.hlsl");
+	teapot->CreateGraphicsPipeline();
+
+	auto suzanne = std::make_unique<Model>();
+	suzanne->LoadObj("./evaluationTaskResources/resources/suzanne.obj");
+	suzanne->LoadShader("ModelShader/Model.VS.hlsl", "ModelShader/Model.PS.hlsl", "ModelShader/ModelNone.GS.hlsl");
+	suzanne->CreateGraphicsPipeline();
+
+
+	auto tex = std::make_unique<Texture2D>();
+	tex->LoadTexture("./Resources/uvChecker.png");
+	tex->Initialize("Texture2DShader/Texture2D.VS.hlsl", "Texture2DShader/Texture2DNone.PS.hlsl");
 
 	auto pera = std::make_unique<PeraRender>();
 	pera->Initialize("PostShader/Post.VS.hlsl", "PostShader/PostNone.PS.hlsl");
 
-	StringOut text("Font/JapaneseGothic.spritefont");
-
 	bool fullscreen = false;
-
-	Node node;
-	node.nodeName = "test";
 
 	/// 
 	/// メインループ
@@ -84,12 +100,14 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// 更新処理
 		/// 
 
-		if (KeyInput::Releaed(DIK_F11)) {
+		if (KeyInput::Releaed(DIK_F11) || ((KeyInput::LongPush(DIK_LALT) || KeyInput::LongPush(DIK_RALT)) && KeyInput::Releaed(DIK_RETURN))) {
 			fullscreen = !fullscreen;
 			WinApp::GetInstance()->SetFullscreen(fullscreen);
 		}
 
-
+		if (camera2D.isDebug) {
+			camera.isDebug = !camera2D.isDebug;
+		}
 		ImGui::Begin("Camera");
 		ImGui::Checkbox("Debug", &camera.isDebug);
 		ImGui::DragFloat3("cameraPos", &camera.pos.x, 0.01f);
@@ -98,6 +116,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		ImGui::DragFloat("cameraFoV", &camera.fov, 0.01f);
 		ImGui::End();
 
+		if (camera.isDebug) {
+			camera2D.isDebug = !camera.isDebug;
+		}
 		ImGui::Begin("Camera2D");
 		ImGui::Checkbox("Debug", &camera2D.isDebug);
 		ImGui::DragFloat3("cameraPos", &camera2D.pos.x, 0.01f);
@@ -109,7 +130,12 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		camera.Update(Vector3());
 		camera2D.Update();
 
-		node.Update();
+		watame->Debug("watame");
+		multiMaterial->Debug("multiMaterial");
+		bunny->Debug("bunny");
+		teapot->Debug("teapot");
+		suzanne->Debug("suzanne");
+		tex->Debug("tex");
 
 		//model->Update();
 
@@ -122,13 +148,13 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// 
 		pera->PreDraw();
 
-		//node.Draw(camera2D.GetViewOthographics());
-
-		model->Draw(camera.GetViewProjection(), camera.pos);
-
 		watame->Draw(camera.GetViewProjection(), camera.pos);
+		multiMaterial->Draw(camera.GetViewProjection(), camera.pos);
+		bunny->Draw(camera.GetViewProjection(), camera.pos);
+		teapot->Draw(camera.GetViewProjection(), camera.pos);
+		suzanne->Draw(camera.GetViewProjection(), camera.pos);
 
-		//tex->Draw(Vector2::identity, 0.0f, Vector2(), camera2D.GetViewOthographics(), Pipeline::Blend::Noaml);
+		tex->Draw(camera2D.GetViewOthographics(), Pipeline::Blend::Noaml);
 
 		pera->Draw();
 		///
