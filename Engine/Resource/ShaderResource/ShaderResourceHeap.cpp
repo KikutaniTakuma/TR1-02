@@ -3,7 +3,7 @@
 #include "Engine/ConvertString/ConvertString.h"
 #include <cassert>
 
-ShaderResourceHeap::ShaderResourceHeap():
+ShaderResourceHeap::ShaderResourceHeap() :
 	SRVHeap(),
 	srvCpuHeapHandle(),
 	heapOrder(0),
@@ -19,7 +19,7 @@ ShaderResourceHeap::ShaderResourceHeap(const ShaderResourceHeap& right) {
 	*this = right;
 }
 
-ShaderResourceHeap::ShaderResourceHeap(uint16_t numDescriptor):
+ShaderResourceHeap::ShaderResourceHeap(uint16_t numDescriptor) :
 	SRVHeap(),
 	srvCpuHeapHandle(),
 	heapOrder(0),
@@ -37,7 +37,7 @@ ShaderResourceHeap::~ShaderResourceHeap() {
 }
 
 ShaderResourceHeap& ShaderResourceHeap::operator=(const ShaderResourceHeap& right) {
-	SRVHeap = right.SRVHeap.Get();
+	SRVHeap = right.SRVHeap;
 	srvCpuHeapHandle = SRVHeap->GetCPUDescriptorHandleForHeapStart();
 	srvGpuHeapHandle = SRVHeap->GetGPUDescriptorHandleForHeapStart();
 	heapOrder = right.heapOrder;
@@ -53,6 +53,18 @@ void ShaderResourceHeap::InitializeReset() {
 	descriptorRanges.clear();
 
 	SRVHeap = Engine::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 4, true);
+
+	srvCpuHeapHandle = SRVHeap->GetCPUDescriptorHandleForHeapStart();
+	srvGpuHeapHandle = SRVHeap->GetGPUDescriptorHandleForHeapStart();
+}
+
+void ShaderResourceHeap::InitializeReset(uint16_t numDescriptor) {
+	SRVHeap->Release();
+	SRVHeap.Reset();
+	heapOrder.clear();
+	descriptorRanges.clear();
+
+	SRVHeap = Engine::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, numDescriptor, true);
 
 	srvCpuHeapHandle = SRVHeap->GetCPUDescriptorHandleForHeapStart();
 	srvGpuHeapHandle = SRVHeap->GetGPUDescriptorHandleForHeapStart();
