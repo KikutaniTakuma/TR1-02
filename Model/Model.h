@@ -91,6 +91,8 @@ public:
 
 	void CreateGraphicsPipeline();
 
+	void Debug(const std::string& guiName);
+
 public:
 	Vector3 pos;
 	Vector3 rotate;
@@ -116,6 +118,8 @@ private:
 	ConstBuffer<DirectionLight> dirLig;
 
 	ConstBuffer<Vector4> colorBuf;
+
+	ConstBuffer<int> lightingType;
 
 	std::unordered_map<std::string, Texture*> tex;
 };
