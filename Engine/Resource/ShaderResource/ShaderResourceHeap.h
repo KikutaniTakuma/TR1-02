@@ -25,6 +25,7 @@ public:
 
 public:
 	void InitializeReset();
+	void InitializeReset(uint16_t numDescriptor);
 
 	void Use();
 	void Use(D3D12_GPU_DESCRIPTOR_HANDLE handle);
@@ -35,7 +36,7 @@ public:
 		conBuf.CrerateView(srvCpuHeapHandle);
 		srvCpuHeapHandle.ptr += Engine::GetIncrementSRVCBVUAVHeap();
 		srvGpuHeapHandle.ptr += Engine::GetIncrementSRVCBVUAVHeap();
-		
+
 		heapOrder.push_back(HeapType::CBV);
 		return result;
 	}
@@ -47,9 +48,9 @@ public:
 		tex->CreateSRVView(srvCpuHeapHandle);
 		srvCpuHeapHandle.ptr += Engine::GetIncrementSRVCBVUAVHeap();
 		srvGpuHeapHandle.ptr += Engine::GetIncrementSRVCBVUAVHeap();
-		
+
 		heapOrder.push_back(HeapType::SRV);
-		
+
 		return result;
 	}
 	inline D3D12_CPU_DESCRIPTOR_HANDLE CreateTxtureViewCPUh(Texture* tex) {
@@ -59,7 +60,7 @@ public:
 		tex->CreateSRVView(srvCpuHeapHandle);
 		srvCpuHeapHandle.ptr += Engine::GetIncrementSRVCBVUAVHeap();
 		srvGpuHeapHandle.ptr += Engine::GetIncrementSRVCBVUAVHeap();
-		
+
 		heapOrder.push_back(HeapType::SRV);
 
 		return result;
@@ -71,10 +72,10 @@ public:
 
 	D3D12_ROOT_PARAMETER GetParameter();
 
-	D3D12_CPU_DESCRIPTOR_HANDLE GetSrvCpuHeapHandle(){
+	D3D12_CPU_DESCRIPTOR_HANDLE GetSrvCpuHeapHandle() {
 		return srvCpuHeapHandle;
 	}
-	D3D12_GPU_DESCRIPTOR_HANDLE GetSrvGpuHeapHandle(){
+	D3D12_GPU_DESCRIPTOR_HANDLE GetSrvGpuHeapHandle() {
 		return srvGpuHeapHandle;
 	}
 
