@@ -163,7 +163,7 @@ void Camera::Update(const Vector3& gazePoint) {
 					moveVec = moveVec.Normalize() * (moveSpd * 0.001f);
 				}
 				drawScale -= moveVec.z;
-				drawScale = std::clamp(drawScale, 0.1f, 10.0f);
+				drawScale = std::clamp(drawScale, 0.01f, 10.0f);
 			}
 			break;
 		}
