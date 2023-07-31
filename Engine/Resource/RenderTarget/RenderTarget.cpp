@@ -1,4 +1,4 @@
-﻿#include "RenderTarget.h"
+#include "RenderTarget.h"
 #include "Engine/Engine.h"
 #include "Engine/ConvertString/ConvertString.h"
 #include <cassert>
@@ -144,17 +144,10 @@ RenderTarget::RenderTarget(uint16_t numDescriptor) :
 RenderTarget::~RenderTarget() {
 	if(SRVHeap){
 		SRVHeap->Release();
-		SRVHeap.Reset();
 	}
 
 	if (RTVHeap) {
 		RTVHeap->Release();
-		RTVHeap.Reset();
-	}
-
-	if (resource) {
-		resource->Release();
-		resource.Reset();
 	}
 }
 
