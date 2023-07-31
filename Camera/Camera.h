@@ -45,6 +45,8 @@ public:
 	Vector3 scale;
 	Vector3 rotate;
 
+	float drawScale;
+
 	Vector3 moveVec;
 	float moveSpd;
 	Vector2 moveRotate;

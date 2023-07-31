@@ -18,15 +18,20 @@
 #include "Editor/Node/Node.h"
 
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
+
+	// ライブラリ初期化
+#if _DEBUG
+	Engine::Initialize(1280, 720, "DirectXGame");
+#else 
 	// 画面解像度取得
 	int32_t width = GetSystemMetrics(SM_CXSCREEN);
 	int32_t height = GetSystemMetrics(SM_CYSCREEN);
 
 	// ライブラリ初期化
 	Engine::Initialize(width, height, "DirectXGame");
-
 	// フルスクリーン化
 	WinApp::GetInstance()->SetFullscreen(true);
+#endif
 
 	// fontLoad
 	Engine::LoadFont("Font/JapaneseGothic.spritefont");
@@ -41,30 +46,30 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	Camera camera2D(Camera::Mode::Othographic);
 
-	auto watame = std::make_unique<Model>();
-	watame->LoadObj("./Resources/Watame/Watame.obj");
-	watame->LoadShader("ModelShader/Model.VS.hlsl", "ModelShader/ModelUseTex.PS.hlsl", "ModelShader/ModelNone.GS.hlsl");
-	watame->CreateGraphicsPipeline();
+	//auto watame = std::make_unique<Model>();
+	//watame->LoadObj("./Resources/Watame/Watame.obj");
+	//watame->LoadShader("ModelShader/Model.VS.hlsl", "ModelShader/ModelUseTex.PS.hlsl", "ModelShader/ModelNone.GS.hlsl");
+	//watame->CreateGraphicsPipeline();
 
-	auto multiMaterial = std::make_unique<Model>();
-	multiMaterial->LoadObj("./evaluationTaskResources/resources/multiMaterial.obj");
-	multiMaterial->LoadShader("ModelShader/Model.VS.hlsl", "ModelShader/ModelUseTex.PS.hlsl", "ModelShader/ModelNone.GS.hlsl");
-	multiMaterial->CreateGraphicsPipeline();
+	//auto multiMaterial = std::make_unique<Model>();
+	//multiMaterial->LoadObj("./evaluationTaskResources/resources/multiMaterial.obj");
+	//multiMaterial->LoadShader("ModelShader/Model.VS.hlsl", "ModelShader/ModelUseTex.PS.hlsl", "ModelShader/ModelNone.GS.hlsl");
+	//multiMaterial->CreateGraphicsPipeline();
 
-	auto bunny = std::make_unique<Model>();
-	bunny->LoadObj("./evaluationTaskResources/resources/bunny.obj");
-	bunny->LoadShader("ModelShader/Model.VS.hlsl", "ModelShader/ModelUseTex.PS.hlsl", "ModelShader/ModelNone.GS.hlsl");
-	bunny->CreateGraphicsPipeline();
+	//auto bunny = std::make_unique<Model>();
+	//bunny->LoadObj("./evaluationTaskResources/resources/bunny.obj");
+	//bunny->LoadShader("ModelShader/Model.VS.hlsl", "ModelShader/ModelUseTex.PS.hlsl", "ModelShader/ModelNone.GS.hlsl");
+	//bunny->CreateGraphicsPipeline();
 
-	auto teapot = std::make_unique<Model>();
-	teapot->LoadObj("./evaluationTaskResources/resources/teapot.obj");
-	teapot->LoadShader("ModelShader/Model.VS.hlsl", "ModelShader/ModelUseTex.PS.hlsl", "ModelShader/ModelNone.GS.hlsl");
-	teapot->CreateGraphicsPipeline();
+	//auto teapot = std::make_unique<Model>();
+	//teapot->LoadObj("./evaluationTaskResources/resources/teapot.obj");
+	//teapot->LoadShader("ModelShader/Model.VS.hlsl", "ModelShader/ModelUseTex.PS.hlsl", "ModelShader/ModelNone.GS.hlsl");
+	//teapot->CreateGraphicsPipeline();
 
-	auto suzanne = std::make_unique<Model>();
-	suzanne->LoadObj("./evaluationTaskResources/resources/suzanne.obj");
-	suzanne->LoadShader("ModelShader/Model.VS.hlsl", "ModelShader/Model.PS.hlsl", "ModelShader/ModelNone.GS.hlsl");
-	suzanne->CreateGraphicsPipeline();
+	//auto suzanne = std::make_unique<Model>();
+	//suzanne->LoadObj("./evaluationTaskResources/resources/suzanne.obj");
+	//suzanne->LoadShader("ModelShader/Model.VS.hlsl", "ModelShader/Model.PS.hlsl", "ModelShader/ModelNone.GS.hlsl");
+	//suzanne->CreateGraphicsPipeline();
 
 
 	auto tex = std::make_unique<Texture2D>();
@@ -130,11 +135,11 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		camera.Update(Vector3());
 		camera2D.Update();
 
-		watame->Debug("watame");
+		/*watame->Debug("watame");
 		multiMaterial->Debug("multiMaterial");
 		bunny->Debug("bunny");
 		teapot->Debug("teapot");
-		suzanne->Debug("suzanne");
+		suzanne->Debug("suzanne");*/
 		tex->Debug("tex");
 
 		//model->Update();
@@ -148,11 +153,11 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// 
 		pera->PreDraw();
 
-		watame->Draw(camera.GetViewProjection(), camera.pos);
+	/*	watame->Draw(camera.GetViewProjection(), camera.pos);
 		multiMaterial->Draw(camera.GetViewProjection(), camera.pos);
 		bunny->Draw(camera.GetViewProjection(), camera.pos);
 		teapot->Draw(camera.GetViewProjection(), camera.pos);
-		suzanne->Draw(camera.GetViewProjection(), camera.pos);
+		suzanne->Draw(camera.GetViewProjection(), camera.pos);*/
 
 		tex->Draw(camera2D.GetViewOthographics(), Pipeline::Blend::Noaml);
 

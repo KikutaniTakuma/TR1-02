@@ -12,6 +12,7 @@ Camera::Camera() noexcept :
 	pos(),
 	scale(Vector3::identity),
 	rotate(),
+	drawScale(1.0f),
 	moveVec(),
 	moveSpd(0.02f),
 	moveRotate(),
@@ -31,6 +32,7 @@ Camera::Camera(Camera::Mode mode) noexcept :
 	pos(),
 	scale(Vector3::identity),
 	rotate(),
+	drawScale(1.0f),
 	moveVec(),
 	moveSpd(0.02f),
 	moveRotate(),
@@ -59,6 +61,8 @@ Camera& Camera::operator=(const Camera& right) noexcept {
 	scale = right.scale;
 	rotate = right.rotate;
 
+	drawScale = right.drawScale;
+
 	moveVec = right.moveVec;
 	moveSpd = right.moveSpd;
 	moveRotate = right.moveRotate;
@@ -85,6 +89,8 @@ Camera& Camera::operator=(Camera&& right) noexcept {
 	pos = std::move(right.pos);
 	scale = std::move(right.scale);
 	rotate = std::move(right.rotate);
+
+	drawScale = std::move(right.drawScale);
 
 	moveVec = std::move(right.moveVec);
 	moveSpd = std::move(right.moveSpd);
@@ -141,18 +147,24 @@ void Camera::Update(const Vector3& gazePoint) {
 			}
 			break;
 		case Camera::Mode::Othographic:
-			moveSpd = 10.0f;
+			moveSpd = 15.0f;
 
 			if (Mouse::LongPush(Mouse::Button::Middle)) {
 				moveVec = Mouse::GetVelocity().Normalize() * moveSpd;
 				moveVec *= HoriMakeMatrixRotateX(rotate.x) * HoriMakeMatrixRotateY(rotate.y) * HoriMakeMatrixRotateZ(rotate.z);
-				pos -= moveVec;
+				pos -= moveVec * drawScale;
 			}
-			/*if (Mouse::GetWheelVelocity() != 0.0f) {
+			if (Mouse::GetWheelVelocity() != 0.0f) {
 				moveVec.z = Mouse::GetWheelVelocity();
-				moveVec = moveVec.Normalize() * (moveSpd * 0.001f);
-				scale += moveVec;
-			}*/
+				if (drawScale <= 1.0f) {
+					moveVec = moveVec.Normalize() * (moveSpd * 0.00005f);
+				}
+				else {
+					moveVec = moveVec.Normalize() * (moveSpd * 0.001f);
+				}
+				drawScale -= moveVec.z;
+				drawScale = std::clamp(drawScale, 0.1f, 10.0f);
+			}
 			break;
 		}
 
@@ -179,10 +191,10 @@ void Camera::Update(const Vector3& gazePoint) {
 
 	case Camera::Mode::Othographic:
 		othograohics.VertOrthographic(
-			-static_cast<float>(engine->clientWidth) * 0.5f,
-			static_cast<float>(engine->clientHeight) * 0.5f,
-			static_cast<float>(engine->clientWidth) * 0.5f,
-			-static_cast<float>(engine->clientHeight) * 0.5f,
+			-static_cast<float>(engine->clientWidth) * 0.5f * drawScale,
+			static_cast<float>(engine->clientHeight) * 0.5f * drawScale,
+			static_cast<float>(engine->clientWidth) * 0.5f * drawScale,
+			-static_cast<float>(engine->clientHeight) * 0.5f * drawScale,
 			kNearClip, farClip);
 		viewOthograohics = othograohics * view;
 		break;
