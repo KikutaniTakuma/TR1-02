@@ -11,7 +11,7 @@ class Pipeline {
 public:
 	enum Blend : uint16_t {
 		None,
-		Noaml,
+		Normal,
 		Add,
 		Sub,
 		Mul,
@@ -65,7 +65,8 @@ public:
 		Pipeline::CullMode cullMode_,
 		Pipeline::SolidState solidState_,
 		bool isLine_,
-		uint32_t numRenderTarget_ = 1
+		uint32_t numRenderTarget_ = 1,
+		bool isDepth_ = true
 	);
 
 	void Use();
@@ -77,7 +78,8 @@ public:
 		Pipeline::SolidState solidState_,
 		bool isLine_,
 		uint32_t numRenderTarget_,
-		ID3D12RootSignature* rootSignature_
+		ID3D12RootSignature* rootSignature_,
+		bool isDepth_
 	);
 
 /// <summary>
@@ -96,6 +98,7 @@ private:
 	Pipeline::SolidState solidState;
 	uint32_t numRenderTarget;
 	bool isLine;
+	bool isDepth;
 
 	ID3D12RootSignature* rootSignature;
 };

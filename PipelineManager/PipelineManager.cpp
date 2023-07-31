@@ -69,6 +69,10 @@ void PipelineManager::SetState(
 	instance->numRenderTarget = numRenderTarget_;
 }
 
+void PipelineManager::IsDepth(bool isDepth_) {
+	instance->isDepth = isDepth_;
+}
+
 Pipeline* PipelineManager::Create() {
 	if (instance->pipelines.empty()) {
 		auto pipeline = std::make_unique<Pipeline>();
@@ -82,7 +86,8 @@ Pipeline* PipelineManager::Create() {
 			instance->cullMode,
 			instance->solidState,
 			instance->isLine,
-			instance->numRenderTarget
+			instance->numRenderTarget,
+			instance->isDepth
 		);
 
 		instance->pipelines.push_back(std::move(pipeline));
@@ -98,7 +103,8 @@ Pipeline* PipelineManager::Create() {
 				instance->solidState,
 				instance->isLine,
 				instance->numRenderTarget,
-				instance->rootSignature->Get()
+				instance->rootSignature->Get(),
+				instance->isDepth
 			);
 
 			return issame;
@@ -118,7 +124,8 @@ Pipeline* PipelineManager::Create() {
 				instance->cullMode,
 				instance->solidState,
 				instance->isLine,
-				instance->numRenderTarget
+				instance->numRenderTarget,
+				instance->isDepth
 			);
 
 			instance->pipelines.push_back(std::move(pipeline));
@@ -140,6 +147,7 @@ void PipelineManager::StateReset() {
 	instance->solidState = {};
 	instance->isLine = false;
 	instance->numRenderTarget = 0u;
+	instance->isDepth = true;
 }
 
 PipelineManager::PipelineManager() :
@@ -152,5 +160,6 @@ PipelineManager::PipelineManager() :
 	solidState(),
 	isLine(false),
 	numRenderTarget(0u),
-	vertexInputStates(0)
+	vertexInputStates(0),
+	isDepth(true)
 {}

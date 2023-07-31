@@ -12,7 +12,8 @@ Pipeline::Pipeline():
 	numRenderTarget(1u),
 	semanticNames(0),
 	isLine(false),
-	rootSignature(nullptr)
+	rootSignature(nullptr),
+	isDepth(true)
 {
 	vertexInput.reserve(0);
 }
@@ -37,7 +38,8 @@ bool Pipeline::operator==(const Pipeline& right) const {
 		&& blend == right.blend
 		&& cullMode == right.cullMode
 		&& solidState == right.solidState
-		&& numRenderTarget && right.numRenderTarget;
+		&& numRenderTarget && right.numRenderTarget
+		&& isDepth == right.isDepth;
 }
 bool Pipeline::operator!=(const Pipeline& right) const {
 	return !this->operator==(right);
@@ -49,6 +51,7 @@ void Pipeline::SetVertexInput(std::string semanticName, uint32_t semanticIndex, 
 	inputElementDescs.SemanticIndex = semanticIndex;
 	inputElementDescs.Format = format;
 	inputElementDescs.AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+	inputElementDescs.InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
 
 	vertexInput.push_back(inputElementDescs);
 	semanticNames.push_back(semanticName);
@@ -66,13 +69,15 @@ void Pipeline::Create(
 	Pipeline::CullMode cullMode_,
 	Pipeline::SolidState solidState_,
 	bool isLine_,
-	uint32_t numRenderTarget_
+	uint32_t numRenderTarget_,
+	bool isDepth_
 ) {
 	blend = blend_;
 	cullMode = cullMode_;
 	solidState = solidState_;
 	numRenderTarget = numRenderTarget_;
 	isLine = isLine_;
+	isDepth = isDepth_;
 
 	rootSignature = rootSignature_.Get();
 
@@ -152,19 +157,24 @@ void Pipeline::Create(
 	graphicsPipelineStateDesc.SampleDesc.Quality = 0;
 	graphicsPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 
-	graphicsPipelineStateDesc.DepthStencilState.DepthEnable = true;
-	graphicsPipelineStateDesc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-	graphicsPipelineStateDesc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
-	graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
+	if (isDepth) {
+		graphicsPipelineStateDesc.DepthStencilState.DepthEnable = true;
+		graphicsPipelineStateDesc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+		graphicsPipelineStateDesc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+		graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
+	}
 
 	for (uint32_t i = 0; i < numRenderTarget; i++) {
 		switch (blend)
 		{
 		case Pipeline::Blend::None:
 		default:
-			graphicsPipelineStateDesc.BlendState.RenderTarget[i].BlendEnable = false;
+			graphicsPipelineStateDesc.BlendState.RenderTarget[i].BlendEnable = true;
+			graphicsPipelineStateDesc.BlendState.RenderTarget[i].SrcBlend = D3D12_BLEND_ONE;
+			graphicsPipelineStateDesc.BlendState.RenderTarget[i].DestBlend = D3D12_BLEND_ZERO;
+			graphicsPipelineStateDesc.BlendState.RenderTarget[i].BlendOp = D3D12_BLEND_OP_ADD;
 			break;
-		case Pipeline::Blend::Noaml:
+		case Pipeline::Blend::Normal:
 			graphicsPipelineStateDesc.BlendState.RenderTarget[i].BlendEnable = true;
 			graphicsPipelineStateDesc.BlendState.RenderTarget[i].SrcBlend = D3D12_BLEND_SRC_ALPHA;
 			graphicsPipelineStateDesc.BlendState.RenderTarget[i].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
@@ -225,7 +235,8 @@ bool Pipeline::IsSame(
 	Pipeline::SolidState solidState_,
 	bool isLine_,
 	uint32_t numRenderTarget_,
-	ID3D12RootSignature* rootSignature_
+	ID3D12RootSignature* rootSignature_,
+	bool isDepth_
 ) {
 	return shader.vertex == shader_.vertex
 		&& shader.pixel == shader_.pixel
@@ -237,5 +248,6 @@ bool Pipeline::IsSame(
 		&& solidState == solidState_
 		&& isLine == isLine_
 		&& numRenderTarget == numRenderTarget_
-		&& rootSignature == rootSignature_;
+		&& rootSignature == rootSignature_
+		&& isDepth == isDepth_;
 }

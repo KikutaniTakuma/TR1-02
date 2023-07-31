@@ -10,6 +10,8 @@
 #include <string>
 #include "Engine/ConstBuffer/ConstBuffer.h"
 #include "Engine/Resource/RenderTarget/RenderTarget.h"
+#include "PipelineManager/PipelineManager.h"
+#include "Engine/ShaderManager/ShaderManager.h"
 
 class PeraRender {
 public:
@@ -47,11 +49,7 @@ private:
 
 	D3D12_VERTEX_BUFFER_VIEW peraVertexView;
 	Microsoft::WRL::ComPtr<ID3D12Resource> peraVertexResource = nullptr;
-	Microsoft::WRL::ComPtr<IDxcBlob> peraVertexShader = nullptr;
-	Microsoft::WRL::ComPtr<IDxcBlob> peraPixelShader = nullptr;
+	Shader shader;
 
-	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState = nullptr;
-
-	ConstBuffer<Wipe> cbuffer;
+	Pipeline* graphicsPipelineState;
 };

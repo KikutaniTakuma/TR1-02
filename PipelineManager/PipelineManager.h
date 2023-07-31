@@ -69,6 +69,8 @@ public:
 		uint32_t numRenderTarget_ = 1u
 	);
 
+	static void IsDepth(bool isDepth_ = true);
+
 	/// <summary>
 	/// 設定したものでPSOの生成
 	/// </summary>
@@ -101,6 +103,7 @@ private:
 	Pipeline::SolidState solidState;
 	bool isLine;
 	uint32_t numRenderTarget;
+	bool isDepth;
 
 	std::vector<std::tuple<std::string, uint32_t, DXGI_FORMAT>> vertexInputStates;
 };
