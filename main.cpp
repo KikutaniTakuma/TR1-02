@@ -38,27 +38,11 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	Camera camera;
 	camera.pos = { 0.0f,0.0f,-10.0f };
-	//camera.pos = { 8.24f,9.63f,-20.53f };
-	//camera.rotate = { 0.44f,-0.4f, 0.0f };
 #if _DEBUG
 	camera.isDebug = true;
 #endif
 
 	Camera camera2D(Camera::Mode::Othographic);
-
-	auto watame = std::make_unique<Model>();
-	watame->LoadObj("./Resources/Watame/Watame.obj");
-	watame->LoadShader("ModelShader/Model.VS.hlsl", "ModelShader/ModelUseTex.PS.hlsl", "ModelShader/ModelNone.GS.hlsl");
-	watame->CreateGraphicsPipeline();
-
-	auto cube = std::make_unique<Model>();
-	cube->LoadObj("./Resources/Cube.obj");
-	cube->LoadShader("ModelShader/Model.VS.hlsl", "ModelShader/Model.PS.hlsl", "ModelShader/ModelNone.GS.hlsl");
-	cube->CreateGraphicsPipeline();
-
-	auto tex = std::make_unique<Texture2D>();
-	tex->LoadTexture("./Resources/uvChecker.png");
-	tex->Initialize("Texture2DShader/Texture2D.VS.hlsl", "Texture2DShader/Texture2DNone.PS.hlsl");
 
 	auto pera = std::make_unique<PeraRender>();
 	pera->Initialize("PostShader/Post.VS.hlsl", "PostShader/PostNone.PS.hlsl");
@@ -94,6 +78,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			WinApp::GetInstance()->SetFullscreen(fullscreen);
 		}
 
+
 		if (camera2D.isDebug) {
 			camera.isDebug = !camera2D.isDebug;
 		}
@@ -119,12 +104,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		camera.Update(Vector3());
 		camera2D.Update();
 
-		/*watame->Debug("watame");
-		cube->Debug("Cube");*/
-		tex->Debug("tex");
-
-		//model->Update();
-
 		///
 		/// 更新処理ここまで
 		/// 
@@ -134,10 +113,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// 
 		pera->PreDraw();
 
-		watame->Draw(camera.GetViewProjection(), camera.pos);
-		cube->Draw(camera.GetViewProjection(), camera.pos);
 
-		tex->Draw(camera2D.GetViewOthographics(), Pipeline::Blend::Normal);
 
 		pera->Draw();
 		///

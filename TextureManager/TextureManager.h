@@ -24,6 +24,8 @@ private:
 public:
 	Texture* LoadTexture(const std::string& fileName);
 
+	Texture* GetWhiteTex();
+
 	void ReleaseIntermediateResource();
 
 

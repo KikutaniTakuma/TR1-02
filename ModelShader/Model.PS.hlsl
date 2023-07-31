@@ -7,12 +7,14 @@ struct PixelShaderOutPut {
 	float32_t4 color : SV_TARGET0;
 };
 
+Texture2D<float4> tex : register(t0);
+SamplerState smp : register(s0);
+
 PixelShaderOutPut main(GeometoryOutPut input)
 {
 	PixelShaderOutPut output;
 	input.normal = normalize(input.normal);
-	
-	if(lightingType == 1){
+
 	// ディレクションライト拡散反射光
 	float t = dot(input.normal, ligDirection);
 
@@ -74,32 +76,12 @@ PixelShaderOutPut main(GeometoryOutPut input)
 	float3 lig = diffuseLig + specularLig;
 
 	
-	output.color = color;
+	output.color = tex.Sample(smp, input.uv);
+    output.color *= color;
 	lig.x += 0.2f;
 	lig.y += 0.2f;
 	lig.z += 0.2f;
 	output.color.xyz *= lig;
 
 	return output;
-	}
-	else if(lightingType == 2){
-		// ディレクションライト拡散反射光
-		float t = dot(input.normal, ligDirection);
-
-		t *= -1.0f;
-		t = (t + abs(t)) * 0.5f;
-
-		t = pow(t * 0.5f + 0.5f, 2.0f);
-
-		float3 diffDirection = ligColor * t;
-
-		output.color = color;
-		output.color.xyz *= diffDirection;
-
-		return output;
-	}
-	else {
-		output.color = color;
-		return output;
-	}
 }

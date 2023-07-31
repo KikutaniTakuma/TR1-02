@@ -28,7 +28,10 @@ public:
 	~Texture2D();
 
 public:
-	void Initialize(const std::string& vsFileName, const std::string& psFileName);
+	void Initialize(
+		const std::string& vsFileName = "Texture2DShader/Texture2D.VS.hlsl",
+		const std::string& psFileName = "Texture2DShader/Texture2DNone.PS.hlsl"
+	);
 
 private:
 	void CreateShader(const std::string& vsFileName, const std::string& psFileName);
@@ -57,7 +60,7 @@ public:
 private:
 	ShaderResourceHeap SRVHeap;
 
-	D3D12_CPU_DESCRIPTOR_HANDLE SRVHandle;
+	uint32_t SRVHandle;
 
 	D3D12_VERTEX_BUFFER_VIEW vertexView;
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource;

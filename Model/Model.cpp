@@ -26,8 +26,7 @@ Model::Model() :
 	wvpData(),
 	dirLig(),
 	colorBuf(),
-	lightingType(),
-	SRVHeap(16),
+	SRVHeap(),
 	tex(0)
 {
 	// 単位行列を書き込んでおく
@@ -42,8 +41,6 @@ Model::Model() :
 	dirLig->ptPos = { 5.0f,5.0f,5.0f };
 	dirLig->ptColor = { 15.0f,15.0f,15.0f };
 	dirLig->ptRange = 10.0f;
-
-	*lightingType = 1;
 
 	*colorBuf = UintToVector4(color);
 }
@@ -195,7 +192,7 @@ void Model::LoadMtl(const std::string fileName) {
 			line >> texName;
 
 			texItr->second = TextureManager::GetInstance()->LoadTexture(path.parent_path().string() + "/" + texName);
-			hepaItr->second.CreateTxtureViewCPUh(texItr->second);
+			hepaItr->second.CreateTxtureView(texItr->second);
 		}
 		else if (identifier == "newmtl") {
 			line >> useMtlName;
@@ -204,6 +201,13 @@ void Model::LoadMtl(const std::string fileName) {
 			SRVHeap.insert({ useMtlName , ShaderResourceHeap() });
 			hepaItr = SRVHeap.find(useMtlName);
 			hepaItr->second.InitializeReset(16);
+		}
+	}
+
+	for (auto& i : tex) {
+		if (i.second == nullptr) {
+			i.second = TextureManager::GetInstance()->GetWhiteTex();
+			SRVHeap[i.first].CreateTxtureView(i.second);
 		}
 	}
 }
@@ -235,9 +239,8 @@ void Model::CreateGraphicsPipeline() {
 			i.second.CreateConstBufferView(wvpData);
 			i.second.CreateConstBufferView(dirLig);
 			i.second.CreateConstBufferView(colorBuf);
-			i.second.CreateConstBufferView(lightingType);
 		}
-		PipelineManager::CreateRootSgnature(SRVHeap.begin()->second.GetParameter(), tex.size() != 0);
+		PipelineManager::CreateRootSgnature(SRVHeap.begin()->second.GetParameter(), true);
 
 		PipelineManager::SetShader(shader);
 
@@ -272,27 +275,15 @@ void Model::Draw(const Mat4x4& viewProjectionMat, const Vector3& cameraPos) {
 
 	auto commandlist = Engine::GetCommandList();
 
-	if (tex.size() <= 1) {
-		for (auto& i : meshData) {
-			pipeline->Use();
-			SRVHeap[i.first].Use();
+	
+	for (auto& i : meshData) {
+		pipeline->Use();
+		SRVHeap[i.first].Use();
 
-			commandlist->IASetVertexBuffers(0, 1, &i.second.vertexView);
+		commandlist->IASetVertexBuffers(0, 1, &i.second.vertexView);
 
-			commandlist->DrawInstanced(i.second.vertNum, 1, 0, 0);
-		}
+		commandlist->DrawInstanced(i.second.vertNum, 1, 0, 0);
 	}
-	else {
-		for (auto& i : meshData) {
-			pipeline->Use();
-			SRVHeap[i.first].Use();
-
-			commandlist->IASetVertexBuffers(0, 1, &i.second.vertexView);
-
-			commandlist->DrawInstanced(i.second.vertNum, 1, 0, 0);
-		}
-	}
-
 }
 
 void Model::Debug(const std::string& guiName) {
@@ -301,7 +292,6 @@ void Model::Debug(const std::string& guiName) {
 	ImGui::DragFloat3("rotate", &rotate.x, 0.01f);
 	ImGui::DragFloat3("scale", &scale.x, 0.01f);
 	ImGui::ColorEdit4("SphereColor", &colorBuf->color.r);
-	ImGui::DragInt("lightingType", &(*lightingType), 0.01f, 0, 2);
 	ImGui::DragFloat3("ligDirection", &dirLig->ligDirection.x, 0.01f);
 	dirLig->ligDirection = dirLig->ligDirection.Normalize();
 	ImGui::DragFloat3("ligColor", &dirLig->ligColor.x, 0.01f);

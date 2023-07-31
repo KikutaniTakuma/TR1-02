@@ -78,9 +78,9 @@ private:
 	void LoadMtl(const std::string fileName);
 
 public:
-	void LoadShader(const std::string& vertex,
-		const std::string& pixel,
-		const std::string& geometory = {},
+	void LoadShader(const std::string& vertex = "ModelShader/Model.VS.hlsl",
+		const std::string& pixel = "ModelShader/Model.PS.hlsl",
+		const std::string& geometory = "ModelShader/ModelNone.GS.hlsl",
 		const std::string& hull = {},
 		const std::string& domain = {}
 	);
@@ -118,8 +118,6 @@ private:
 	ConstBuffer<DirectionLight> dirLig;
 
 	ConstBuffer<Vector4> colorBuf;
-
-	ConstBuffer<int> lightingType;
 
 	std::unordered_map<std::string, Texture*> tex;
 };

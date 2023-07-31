@@ -25,65 +25,58 @@ public:
 
 public:
 	void InitializeReset();
-	void InitializeReset(uint16_t numDescriptor);
+	void InitializeReset(uint32_t numDescriptor);
 
 	void Use();
 	void Use(D3D12_GPU_DESCRIPTOR_HANDLE handle);
 
 	template<class T>
-	D3D12_CPU_DESCRIPTOR_HANDLE CreateConstBufferView(ConstBuffer<T>& conBuf) {
-		auto result = srvCpuHeapHandle;
-		conBuf.CrerateView(srvCpuHeapHandle);
-		srvCpuHeapHandle.ptr += Engine::GetIncrementSRVCBVUAVHeap();
-		srvGpuHeapHandle.ptr += Engine::GetIncrementSRVCBVUAVHeap();
+	uint32_t CreateConstBufferView(ConstBuffer<T>& conBuf) {
+		assert(currentHadleIndex < heapSize);
+		conBuf.CrerateView(heapHadles[currentHadleIndex].first);
+		currentHadleIndex++;
 
 		heapOrder.push_back(HeapType::CBV);
-		return result;
+
+		return currentHadleIndex - 1u;
 	}
 
-	inline D3D12_GPU_DESCRIPTOR_HANDLE CreateTxtureViewGPUh(Texture* tex) {
-		auto result = srvGpuHeapHandle;
-
+	inline uint32_t CreateTxtureView(Texture* tex) {
 		assert(tex != nullptr);
-		tex->CreateSRVView(srvCpuHeapHandle);
-		srvCpuHeapHandle.ptr += Engine::GetIncrementSRVCBVUAVHeap();
-		srvGpuHeapHandle.ptr += Engine::GetIncrementSRVCBVUAVHeap();
+		assert(currentHadleIndex < heapSize);
+		tex->CreateSRVView(heapHadles[currentHadleIndex].first);
+		currentHadleIndex++;
 
 		heapOrder.push_back(HeapType::SRV);
 
-		return result;
+		return currentHadleIndex - 1u;
 	}
-	inline D3D12_CPU_DESCRIPTOR_HANDLE CreateTxtureViewCPUh(Texture* tex) {
-		auto result = srvCpuHeapHandle;
-
+	inline void CreateTxtureView(Texture* tex, uint32_t heapIndex) {
 		assert(tex != nullptr);
-		tex->CreateSRVView(srvCpuHeapHandle);
-		srvCpuHeapHandle.ptr += Engine::GetIncrementSRVCBVUAVHeap();
-		srvGpuHeapHandle.ptr += Engine::GetIncrementSRVCBVUAVHeap();
-
-		heapOrder.push_back(HeapType::SRV);
-
-		return result;
-	}
-	inline void CreateTxtureView(Texture* tex, D3D12_CPU_DESCRIPTOR_HANDLE handle) {
-		assert(tex != nullptr);
-		tex->CreateSRVView(handle);
+		assert(heapIndex < heapSize);
+		tex->CreateSRVView(heapHadles[heapIndex].first);
 	}
 
 	D3D12_ROOT_PARAMETER GetParameter();
 
-	D3D12_CPU_DESCRIPTOR_HANDLE GetSrvCpuHeapHandle() {
-		return srvCpuHeapHandle;
+	D3D12_CPU_DESCRIPTOR_HANDLE GetSrvCpuHeapHandle(uint32_t heapIndex) {
+		return heapHadles[heapIndex].first;
 	}
-	D3D12_GPU_DESCRIPTOR_HANDLE GetSrvGpuHeapHandle() {
-		return srvGpuHeapHandle;
+	D3D12_GPU_DESCRIPTOR_HANDLE GetSrvGpuHeapHandle(uint32_t heapIndex) {
+		return heapHadles[heapIndex].second;
+	}
+	
+	inline UINT GetSize() const {
+		return heapSize;
 	}
 
 private:
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> SRVHeap;
-	D3D12_CPU_DESCRIPTOR_HANDLE srvCpuHeapHandle;
-	D3D12_GPU_DESCRIPTOR_HANDLE srvGpuHeapHandle;
 
+	UINT heapSize;
+	UINT currentHadleIndex;
+
+	std::vector<std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE>> heapHadles;
 	std::vector<HeapType> heapOrder;
 
 	std::vector<D3D12_DESCRIPTOR_RANGE> descriptorRanges;

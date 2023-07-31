@@ -5,30 +5,50 @@
 
 ShaderResourceHeap::ShaderResourceHeap() :
 	SRVHeap(),
-	srvCpuHeapHandle(),
 	heapOrder(0),
-	descriptorRanges(0)
+	descriptorRanges(0),
+	heapSize(4),
+	currentHadleIndex(),
+	heapHadles(0)
 {
-	SRVHeap = Engine::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 4, true);
+	SRVHeap = Engine::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, heapSize, true);
 
-	srvCpuHeapHandle = SRVHeap->GetCPUDescriptorHandleForHeapStart();
-	srvGpuHeapHandle = SRVHeap->GetGPUDescriptorHandleForHeapStart();
+	heapHadles.reserve(heapSize);
+	heapHadles.push_back({ SRVHeap->GetCPUDescriptorHandleForHeapStart(), 
+							SRVHeap->GetGPUDescriptorHandleForHeapStart() });
+	auto heapHandleFirstItr = heapHadles.begin();
+	for (uint32_t i = 1; i < heapSize; i++) {
+		auto hadleTmp = *heapHandleFirstItr;
+		hadleTmp.first.ptr += Engine::GetIncrementSRVCBVUAVHeap() * i;
+		hadleTmp.second.ptr += Engine::GetIncrementSRVCBVUAVHeap() * i;
+		heapHadles.push_back(hadleTmp);
+	}
 }
 
-ShaderResourceHeap::ShaderResourceHeap(const ShaderResourceHeap& right) {
+ShaderResourceHeap::ShaderResourceHeap(const ShaderResourceHeap& right)
+{
 	*this = right;
 }
 
 ShaderResourceHeap::ShaderResourceHeap(uint16_t numDescriptor) :
 	SRVHeap(),
-	srvCpuHeapHandle(),
 	heapOrder(0),
-	descriptorRanges(0)
+	descriptorRanges(0),
+	heapSize(numDescriptor),
+	heapHadles(0)
 {
 	SRVHeap = Engine::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, numDescriptor, true);
 
-	srvCpuHeapHandle = SRVHeap->GetCPUDescriptorHandleForHeapStart();
-	srvGpuHeapHandle = SRVHeap->GetGPUDescriptorHandleForHeapStart();
+	heapHadles.reserve(heapSize);
+	heapHadles.push_back({ SRVHeap->GetCPUDescriptorHandleForHeapStart(),
+							SRVHeap->GetGPUDescriptorHandleForHeapStart() });
+	auto heapHandleFirstItr = heapHadles.begin();
+	for (uint32_t i = 1; i < heapSize; i++) {
+		auto hadleTmp = *heapHandleFirstItr;
+		hadleTmp.first.ptr += Engine::GetIncrementSRVCBVUAVHeap() * i;
+		hadleTmp.second.ptr += Engine::GetIncrementSRVCBVUAVHeap() * i;
+		heapHadles.push_back(hadleTmp);
+	}
 }
 
 ShaderResourceHeap::~ShaderResourceHeap() {
@@ -37,11 +57,26 @@ ShaderResourceHeap::~ShaderResourceHeap() {
 }
 
 ShaderResourceHeap& ShaderResourceHeap::operator=(const ShaderResourceHeap& right) {
-	SRVHeap = right.SRVHeap;
-	srvCpuHeapHandle = SRVHeap->GetCPUDescriptorHandleForHeapStart();
-	srvGpuHeapHandle = SRVHeap->GetGPUDescriptorHandleForHeapStart();
+	auto&& pHeap = right.SRVHeap.Get();
+	SRVHeap = pHeap;
+
 	heapOrder = right.heapOrder;
 	descriptorRanges = right.descriptorRanges;
+
+	heapSize = right.heapSize;
+	currentHadleIndex = right.currentHadleIndex;
+
+	heapHadles.clear();
+	heapHadles.reserve(heapSize);
+	heapHadles.push_back({ SRVHeap->GetCPUDescriptorHandleForHeapStart(),
+							SRVHeap->GetGPUDescriptorHandleForHeapStart() });
+	auto heapHandleFirstItr = heapHadles.begin();
+	for (uint32_t i = 1; i < heapSize; i++) {
+		auto hadleTmp = *heapHandleFirstItr;
+		hadleTmp.first.ptr += Engine::GetIncrementSRVCBVUAVHeap() * i;
+		hadleTmp.second.ptr += Engine::GetIncrementSRVCBVUAVHeap() * i;
+		heapHadles.push_back(hadleTmp);
+	}
 
 	return *this;
 }
@@ -51,23 +86,45 @@ void ShaderResourceHeap::InitializeReset() {
 	SRVHeap.Reset();
 	heapOrder.clear();
 	descriptorRanges.clear();
+	heapHadles.clear();
+	heapSize = 4;
+	currentHadleIndex = 0;
 
-	SRVHeap = Engine::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 4, true);
+	SRVHeap = Engine::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, heapSize, true);
 
-	srvCpuHeapHandle = SRVHeap->GetCPUDescriptorHandleForHeapStart();
-	srvGpuHeapHandle = SRVHeap->GetGPUDescriptorHandleForHeapStart();
+	heapHadles.reserve(heapSize);
+	heapHadles.push_back({ SRVHeap->GetCPUDescriptorHandleForHeapStart(),
+							SRVHeap->GetGPUDescriptorHandleForHeapStart() });
+	auto heapHandleFirstItr = heapHadles.begin();
+	for (uint32_t i = 1; i < heapSize; i++) {
+		auto hadleTmp = *heapHandleFirstItr;
+		hadleTmp.first.ptr += Engine::GetIncrementSRVCBVUAVHeap() * i;
+		hadleTmp.second.ptr += Engine::GetIncrementSRVCBVUAVHeap() * i;
+		heapHadles.push_back(hadleTmp);
+	}
 }
 
-void ShaderResourceHeap::InitializeReset(uint16_t numDescriptor) {
+void ShaderResourceHeap::InitializeReset(uint32_t numDescriptor) {
 	SRVHeap->Release();
 	SRVHeap.Reset();
 	heapOrder.clear();
 	descriptorRanges.clear();
+	heapHadles.clear();
+	heapSize = numDescriptor;
+	currentHadleIndex = 0;
 
-	SRVHeap = Engine::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, numDescriptor, true);
+	SRVHeap = Engine::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, heapSize, true);
 
-	srvCpuHeapHandle = SRVHeap->GetCPUDescriptorHandleForHeapStart();
-	srvGpuHeapHandle = SRVHeap->GetGPUDescriptorHandleForHeapStart();
+	heapHadles.reserve(heapSize);
+	heapHadles.push_back({ SRVHeap->GetCPUDescriptorHandleForHeapStart(),
+							SRVHeap->GetGPUDescriptorHandleForHeapStart() });
+	auto heapHandleFirstItr = heapHadles.begin();
+	for (uint32_t i = 1; i < heapSize; i++) {
+		auto hadleTmp = *heapHandleFirstItr;
+		hadleTmp.first.ptr += Engine::GetIncrementSRVCBVUAVHeap() * i;
+		hadleTmp.second.ptr += Engine::GetIncrementSRVCBVUAVHeap() * i;
+		heapHadles.push_back(hadleTmp);
+	}
 }
 
 void ShaderResourceHeap::Use() {

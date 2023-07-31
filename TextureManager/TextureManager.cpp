@@ -10,6 +10,7 @@ TextureManager* TextureManager::GetInstance() {
 void TextureManager::Initialize() {
 	instance = new TextureManager();
 	assert(instance);
+	instance->LoadTexture("./Resources/white2x2.png");
 }
 
 void TextureManager::Finalize() {
@@ -25,6 +26,7 @@ TextureManager::TextureManager() :
 }
 
 TextureManager::~TextureManager() {
+	textures.clear();
 }
 
 
@@ -50,6 +52,10 @@ Texture* TextureManager::LoadTexture(const std::string& fileName) {
 	}
 	
 	return textures[fileName].get();
+}
+
+Texture* TextureManager::GetWhiteTex() {
+	return instance->LoadTexture("./Resources/white2x2.png");
 }
 
 void TextureManager::ReleaseIntermediateResource() {
