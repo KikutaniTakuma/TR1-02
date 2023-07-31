@@ -151,11 +151,6 @@ RenderTarget::~RenderTarget() {
 		RTVHeap->Release();
 		RTVHeap.Reset();
 	}
-
-	if (resource) {
-		resource->Release();
-		resource.Reset();
-	}
 }
 
 void RenderTarget::SetThisRenderTarget() {
