@@ -37,6 +37,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	Engine::LoadFont("Font/JapaneseGothic.spritefont");
 
 	Camera camera;
+	camera.farClip = 5000.0f;
 	camera.pos = { 0.0f,0.0f,-10.0f };
 #if _DEBUG
 	camera.isDebug = true;
@@ -50,9 +51,23 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	bool fullscreen = false;
 
 	auto player = std::make_unique<Model>();
-	player->LoadObj("Resources/Cube.obj");
+	player->LoadObj("AL_Resouce/Player.obj");
 	player->LoadShader();
 	player->CreateGraphicsPipeline();
+
+	auto skyDome = std::make_unique<Model>();
+	skyDome->LoadObj("AL_Resouce/skydome/skydome.obj");
+	skyDome->LoadShader("ModelShader/Model.VS.hlsl", "ModelShader/ModelNone.PS.hlsl");
+	skyDome->CreateGraphicsPipeline();
+	skyDome->scale *= 1000.0f;
+
+	auto ground = std::make_unique<Texture2D>();
+	ground->LoadTexture("AL_Resouce/ground.png");
+	ground->Initialize();
+	ground->scale *= 1000.0f;
+	ground->rotate.x = std::numbers::pi_v<float> * 0.5f;
+	ground->uvSize *= 10000.0f;
+
 
 
 	/// 
@@ -120,6 +135,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		pera->PreDraw();
 
 		player->Draw(camera.GetViewProjection(), camera.pos);
+		skyDome->Draw(camera.GetViewProjection(), camera.pos);
+		ground->Draw(camera.GetViewProjection(),Pipeline::Normal);
 
 		pera->Draw();
 		///
