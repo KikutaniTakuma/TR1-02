@@ -6,6 +6,12 @@
 
 class Player {
 public:
+	enum class Behavior {
+		Normal,
+		Attack,
+	};
+
+public:
 	Player();
 	Player(const Player&) = default;
 	~Player() = default;
@@ -29,6 +35,7 @@ private:
 
 private:
 	std::vector<std::unique_ptr<Model>> model;
+	std::unique_ptr<Model> weapon;
 
 	float spd;
 
@@ -41,4 +48,9 @@ private:
 
 	float armFreqSpd;
 	float armFreq;
+
+	Behavior behavior;
+
+	float attack;
+	float attackSpd;
 };
