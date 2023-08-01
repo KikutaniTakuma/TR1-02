@@ -49,6 +49,12 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	bool fullscreen = false;
 
+	auto player = std::make_unique<Model>();
+	player->LoadObj("Resources/Cube.obj");
+	player->LoadShader();
+	player->CreateGraphicsPipeline();
+
+
 	/// 
 	/// メインループ
 	/// 
@@ -113,7 +119,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// 
 		pera->PreDraw();
 
-
+		player->Draw(camera.GetViewProjection(), camera.pos);
 
 		pera->Draw();
 		///
