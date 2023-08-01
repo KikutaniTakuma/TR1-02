@@ -126,13 +126,15 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		ImGui::DragFloat("cameraFoV", &camera2D.fov, 0.01f);
 		ImGui::End();
 
-		player->Update();
-		enemy->Update();
+		player->Debug();
 
 		auto playerPos = player->GetPos();
 		playerPos.y = 0.0f;
 		camera.Update(playerPos);
 		camera2D.Update();
+
+		player->Update();
+		enemy->Update();
 
 		///
 		/// 更新処理ここまで

@@ -165,3 +165,25 @@ void Player::Draw() {
 		weapon->Draw(camera->GetViewProjection(), camera->pos);
 	}
 }
+
+void Player::Debug() {
+	model[0]->Debug("Player");
+	ImGui::Begin("Player");
+	ImGui::DragFloat("spd", &spd);
+	if (ImGui::TreeNode("Freq")) {
+		ImGui::DragFloat("Freq", &freq);
+		ImGui::DragFloat("FreqSpd", &freqSpd);
+		ImGui::TreePop();
+	}
+	if (ImGui::TreeNode("armFreq")) {
+		ImGui::DragFloat("armFreq", &armFreq);
+		ImGui::DragFloat("armFreqSpd", &armFreqSpd);
+		ImGui::TreePop();
+	}
+	if (ImGui::TreeNode("Attack")) {
+		ImGui::DragFloat("attack", &attack);
+		ImGui::DragFloat("attackSpd", &attackSpd);
+		ImGui::TreePop();
+	}
+	ImGui::End();
+}

@@ -30,6 +30,8 @@ public:
 		camera = camera_;
 	}
 
+	void Debug();
+
 private:
 	void Animation();
 
