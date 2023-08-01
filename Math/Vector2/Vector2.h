@@ -42,6 +42,8 @@ public:
 
 	Vector2 Normalize() const noexcept;
 
+	float GetRad() const noexcept;
+
 /// <summary>
 /// 静的定数
 /// </summary>

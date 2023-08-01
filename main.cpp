@@ -16,6 +16,7 @@
 #include "StringOut/StringOut.h"
 #include "Line/Line.h"
 #include "Editor/Node/Node.h"
+#include "Player/Player.h"
 
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
@@ -39,9 +40,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	Camera camera;
 	camera.farClip = 5000.0f;
 	camera.pos = { 0.0f,0.0f,-10.0f };
-#if _DEBUG
+
 	camera.isDebug = true;
-#endif
 
 	Camera camera2D(Camera::Mode::Othographic);
 
@@ -50,10 +50,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	bool fullscreen = false;
 
-	auto player = std::make_unique<Model>();
-	player->LoadObj("AL_Resouce/Player.obj");
-	player->LoadShader();
-	player->CreateGraphicsPipeline();
+	auto player = std::make_unique<Player>();
+	player->SetCamera(&camera);
 
 	auto skyDome = std::make_unique<Model>();
 	skyDome->LoadObj("AL_Resouce/skydome/skydome.obj");
@@ -105,7 +103,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		}
 		ImGui::Begin("Camera");
 		ImGui::Checkbox("Debug", &camera.isDebug);
-		ImGui::DragFloat3("cameraPos", &camera.pos.x, 0.01f);
+		static auto cameraPos =  camera.GetPos();
+		cameraPos =  camera.GetPos();
+		ImGui::Text("cameraPos : %.0f, %.0f, %.0f", cameraPos.x, cameraPos.y, cameraPos.z);
 		ImGui::DragFloat3("cameraRotate", &camera.rotate.x, 0.01f);
 		ImGui::DragFloat3("cameraScale", &camera.scale.x, 0.01f);
 		ImGui::DragFloat("cameraFoV", &camera.fov, 0.01f);
@@ -122,7 +122,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		ImGui::DragFloat("cameraFoV", &camera2D.fov, 0.01f);
 		ImGui::End();
 
-		camera.Update(Vector3());
+		player->Update();
+
+		camera.Update(player->GetPos());
 		camera2D.Update();
 
 		///
@@ -134,7 +136,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// 
 		pera->PreDraw();
 
-		player->Draw(camera.GetViewProjection(), camera.pos);
+		player->Draw();
 		skyDome->Draw(camera.GetViewProjection(), camera.pos);
 		ground->Draw(camera.GetViewProjection(),Pipeline::Normal);
 

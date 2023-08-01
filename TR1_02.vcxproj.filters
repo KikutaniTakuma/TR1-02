@@ -107,6 +107,9 @@
     <ClCompile Include="Line\Line.cpp">
       <Filter>Line</Filter>
     </ClCompile>
+    <ClCompile Include="Player\Player.cpp">
+      <Filter>Player</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -192,6 +195,9 @@
     </Filter>
     <Filter Include="AudioManager\Audio">
       <UniqueIdentifier>{7d34ec95-2a47-42f6-93fb-23ebe8cc0e42}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Player">
+      <UniqueIdentifier>{349c38cb-a1cb-44ee-8057-5821aeb241ad}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -305,6 +311,9 @@
     </ClInclude>
     <ClInclude Include="Line\Line.h">
       <Filter>Line</Filter>
+    </ClInclude>
+    <ClInclude Include="Player\Player.h">
+      <Filter>Player</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
