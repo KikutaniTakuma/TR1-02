@@ -4,12 +4,12 @@
 #include "Camera/Camera.h"
 #include <vector>
 
-class Player {
+class Enemy {
 public:
-	Player();
-	Player(const Player&) = default;
-	~Player() = default;
-	Player& operator=(const Player&) = default;
+	Enemy();
+	Enemy(const Enemy&) = default;
+	~Enemy() = default;
+	Enemy& operator=(const Enemy&) = default;
 
 public:
 	void Update();
@@ -25,9 +25,6 @@ public:
 	}
 
 private:
-	void Animation();
-
-private:
 	std::vector<std::unique_ptr<Model>> model;
 
 	float spd;
@@ -38,7 +35,5 @@ private:
 
 	float freqSpd;
 	float freq;
-
-	float armFreqSpd;
-	float armFreq;
+	float radius;
 };

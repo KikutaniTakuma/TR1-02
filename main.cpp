@@ -17,6 +17,7 @@
 #include "Line/Line.h"
 #include "Editor/Node/Node.h"
 #include "Player/Player.h"
+#include "Enemy/Enemy.h"
 
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
@@ -52,6 +53,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	auto player = std::make_unique<Player>();
 	player->SetCamera(&camera);
+
+	auto enemy = std::make_unique<Enemy>();
+	enemy->SetCamera(&camera);
 
 	auto skyDome = std::make_unique<Model>();
 	skyDome->LoadObj("AL_Resouce/skydome/skydome.obj");
@@ -123,8 +127,11 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		ImGui::End();
 
 		player->Update();
+		enemy->Update();
 
-		camera.Update(player->GetPos());
+		auto playerPos = player->GetPos();
+		playerPos.y = 0.0f;
+		camera.Update(playerPos);
 		camera2D.Update();
 
 		///
@@ -137,6 +144,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		pera->PreDraw();
 
 		player->Draw();
+		enemy->Draw();
 		skyDome->Draw(camera.GetViewProjection(), camera.pos);
 		ground->Draw(camera.GetViewProjection(),Pipeline::Normal);
 

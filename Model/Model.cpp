@@ -17,6 +17,7 @@ Model::Model() :
 	rotate(),
 	scale(Vector3::identity),
 	color(0xffffffff),
+	parent(nullptr),
 	meshData(),
 	shader(),
 	pipeline(nullptr),
@@ -266,6 +267,9 @@ void Model::Draw(const Mat4x4& viewProjectionMat, const Vector3& cameraPos) {
 	assert(createGPFlg);
 
 	wvpData->worldMat.VertAffin(scale, rotate, pos);
+	if (parent) {
+		wvpData->worldMat *= parent->wvpData->worldMat;
+	}
 	wvpData->viewProjectoionMat = viewProjectionMat;
 
 	*colorBuf = UintToVector4(color);
