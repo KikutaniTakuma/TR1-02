@@ -1,0 +1,24 @@
+{
+    "PlayerParts": {
+        "Body Translation": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "Head Translation": [
+            0.0,
+            5.199999809265137,
+            0.0
+        ],
+        "LeftArm Translation": [
+            0.0,
+            6.400000095367432,
+            0.0
+        ],
+        "RightArm Translation": [
+            0.0,
+            6.800000190734863,
+            0.0
+        ]
+    }
+}

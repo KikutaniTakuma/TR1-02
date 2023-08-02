@@ -71,7 +71,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	ground->rotate.x = std::numbers::pi_v<float> * 0.5f;
 	ground->uvSize *= 10000.0f;
 
-
+	GlobalVariables::GetInstance()->LoadFile();
 
 	/// 
 	/// メインループ

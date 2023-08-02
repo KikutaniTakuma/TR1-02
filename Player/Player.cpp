@@ -10,6 +10,7 @@
 Player::Player():
 	spd(10.0f),
 	moveVec(),
+	pos(),
 	camera(nullptr),
 	freqSpd(std::numbers::pi_v<float>),
 	freq(0.0f),
@@ -20,9 +21,6 @@ Player::Player():
 	attack(0.0f),
 	attackSpd(std::numbers::pi_v<float> / 2.0f)
 {
-	GlobalVariables::GetInstance()->CreateGroup("Player");
-	GlobalVariables::GetInstance()->SetValue("Player", "test", 0);
-
 	model.push_back(std::make_unique<Model>());
 	auto itr = model.rbegin();
 	(*itr)->LoadObj("AL_Resouce/PlayerDivision/PlayerBody.obj");
@@ -56,6 +54,32 @@ Player::Player():
 	weapon->LoadShader();
 	weapon->CreateGraphicsPipeline();
 	weapon->SetParent(model.begin()->get());
+
+	const std::string groupName = "Player";
+	const std::string groupName2 = "PlayerParts";
+	GlobalVariables::GetInstance()->CreateGroup(groupName);
+	GlobalVariables::GetInstance()->AddItem(groupName2, "Body Translation", model[0]->pos);
+	GlobalVariables::GetInstance()->AddItem(groupName2, "Head Translation", model[1]->pos);
+	GlobalVariables::GetInstance()->AddItem(groupName2, "LeftArm Translation", model[2]->pos);
+	GlobalVariables::GetInstance()->AddItem(groupName2, "RightArm Translation", model[3]->pos);
+	GlobalVariables::GetInstance()->AddItem(groupName, "Speed", spd);
+	GlobalVariables::GetInstance()->AddItem(groupName, "freqSpd", freqSpd);
+	GlobalVariables::GetInstance()->AddItem(groupName, "armFreqSpd", armFreqSpd);
+	GlobalVariables::GetInstance()->AddItem(groupName, "attackSpd", attackSpd);
+}
+
+void Player::ApplyGlobalVariables() {
+	const std::string groupName = "Player";
+	const std::string groupName2 = "PlayerParts";
+	auto globalVariables = GlobalVariables::GetInstance();
+	model[0]->pos = globalVariables->GetVector3Value(groupName2, "Body Translation");
+	model[1]->pos = globalVariables->GetVector3Value(groupName2, "Head Translation");
+	model[2]->pos = globalVariables->GetVector3Value(groupName2, "LeftArm Translation");
+	model[3]->pos = globalVariables->GetVector3Value(groupName2, "RightArm Translation");
+	spd = globalVariables->GetFloatValue(groupName, "Speed");
+	freqSpd = globalVariables->GetFloatValue(groupName, "freqSpd");
+	armFreqSpd = globalVariables->GetFloatValue(groupName, "armFreqSpd");
+	attackSpd = globalVariables->GetFloatValue(groupName, "attackSpd");
 }
 
 void Player::Animation() {
@@ -100,6 +124,7 @@ void Player::Animation() {
 }
 
 void Player::Update() {
+	ApplyGlobalVariables();
 	moveVec = {};
 	bool isMove = false;
 	Animation();
@@ -150,7 +175,9 @@ void Player::Update() {
 	moveVec.x = moveRotate.x;
 	moveVec.z = moveRotate.y;*/
 
-	model[0]->pos += moveVec.Normalize() * spd * ImGui::GetIO().DeltaTime;
+	pos += moveVec.Normalize() * spd * ImGui::GetIO().DeltaTime;
+
+	model[0]->pos += pos;
 
 	if (isMove) {
 		Vector2 rotate;
@@ -171,7 +198,7 @@ void Player::Draw() {
 }
 
 void Player::Debug() {
-	model[0]->Debug("Player");
+	/*model[0]->Debug("Player");
 	ImGui::Begin("Player");
 	ImGui::DragFloat("spd", &spd);
 	if (ImGui::TreeNode("Freq")) {
@@ -189,5 +216,5 @@ void Player::Debug() {
 		ImGui::DragFloat("attackSpd", &attackSpd);
 		ImGui::TreePop();
 	}
-	ImGui::End();
+	ImGui::End();*/
 }

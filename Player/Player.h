@@ -35,6 +35,8 @@ public:
 private:
 	void Animation();
 
+	void ApplyGlobalVariables();
+
 private:
 	std::vector<std::unique_ptr<Model>> model;
 	std::unique_ptr<Model> weapon;
@@ -42,6 +44,8 @@ private:
 	float spd;
 
 	Vector3 moveVec;
+
+	Vector3 pos;
 
 	Camera* camera;
 

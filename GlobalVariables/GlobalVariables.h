@@ -31,6 +31,16 @@ public:
 	void Update();
 
 	void SaveFile(const std::string& groupName);
+	void LoadFile();
+	void LoadFile(const std::string& groupName);
+
+	void AddItem(const std::string& groupName, const std::string& key, int32_t value);
+	void AddItem(const std::string& groupName, const std::string& key, float value);
+	void AddItem(const std::string& groupName, const std::string& key, const Vector3& value);
+
+	int32_t GetIntValue(const std::string& groupName, const std::string& key) const;
+	float GetFloatValue(const std::string& groupName, const std::string& key)const;
+	Vector3 GetVector3Value(const std::string& groupName, const std::string& key) const;
 
 private:
 	std::unordered_map<std::string, Group> datas;
