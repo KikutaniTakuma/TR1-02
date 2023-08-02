@@ -4,6 +4,8 @@
 #include "Engine/Gamepad/Gamepad.h"
 #include <numbers>
 #include <cmath>
+#include "externals/nlohmann/json.hpp"
+#include "GlobalVariables/GlobalVariables.h"
 
 Player::Player():
 	spd(10.0f),
@@ -18,6 +20,9 @@ Player::Player():
 	attack(0.0f),
 	attackSpd(std::numbers::pi_v<float> / 2.0f)
 {
+	GlobalVariables::GetInstance()->CreateGroup("Player");
+	GlobalVariables::GetInstance()->SetValue("Player", "test", 0);
+
 	model.push_back(std::make_unique<Model>());
 	auto itr = model.rbegin();
 	(*itr)->LoadObj("AL_Resouce/PlayerDivision/PlayerBody.obj");
@@ -135,26 +140,25 @@ void Player::Update() {
 	}
 	
 	/*Vector2 moveRotate;
-	moveRotate.x = camera->GetPos().x;
-	moveRotate.y = camera->GetPos().z;
+	moveRotate.x = moveVec.x;
+	moveRotate.y = moveVec.z;
 
-	moveRotate = Vector2{ model->pos.x,model->pos.z } - moveRotate;*/
-	
+	moveRotate.Rotate(camera->gazePointRotate.x);
+	ImGui::Begin("Hoge");
+	ImGui::DragFloat2("Hoge", &camera->gazePointRotate.x);
+	ImGui::End();
+	moveVec.x = moveRotate.x;
+	moveVec.z = moveRotate.y;*/
 
-	model[0]->pos += moveVec * ImGui::GetIO().DeltaTime;
+	model[0]->pos += moveVec.Normalize() * spd * ImGui::GetIO().DeltaTime;
 
 	if (isMove) {
 		Vector2 rotate;
 		rotate.x = moveVec.x;
 		rotate.y = moveVec.z;
 		
-		
 		model[0]->rotate.y = rotate.GetRad();
 	}
-
-	ImGui::Begin("Rad");
-	ImGui::Text("%f", model[0]->rotate.y);
-	ImGui::End();
 }
 
 void Player::Draw() {

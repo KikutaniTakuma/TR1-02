@@ -15,7 +15,7 @@ Enemy::Enemy() :
 	radius(5.0f)
 {
 	model.push_back(std::make_unique<Model>());
-	model[0]->LoadObj("AL_Resouce/Enemy/Enemy.obj");
+	model[0]->LoadObj("AL_Resouce/Enemy/enemy/enemy.obj");
 	model[0]->LoadShader();
 	model[0]->CreateGraphicsPipeline();
 }

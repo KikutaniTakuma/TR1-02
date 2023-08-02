@@ -120,7 +120,7 @@ void Camera::Update(const Vector3& gazePoint) {
 		{
 		case Camera::Mode::Projecction:
 		default:
-			moveSpd = 0.02f;
+			moveSpd = 0.5f;
 			if (Mouse::LongPush(Mouse::Button::Right) && (KeyInput::LongPush(DIK_LSHIFT) || KeyInput::LongPush(DIK_RSHIFT))) {
 				auto moveRotate = Mouse::GetVelocity().Normalize() * moveRotateSpd;
 				moveRotate.x *= -1.0f;
