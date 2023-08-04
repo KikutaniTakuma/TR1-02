@@ -3,7 +3,6 @@
 #include "Engine/WinApp/WinApp.h"
 #include "externals/imgui/imgui.h"
 #include "Engine/ErrorCheck/ErrorCheck.h"
-#include <cassert>
 
 
 Mouse* Mouse::instance = nullptr;
@@ -11,6 +10,10 @@ Mouse* Mouse::instance = nullptr;
 void Mouse::Initialize() {
 	instance = new Mouse();
 	assert(instance);
+	if (!instance) {
+		ErrorCheck::GetInstance()->ErrorTextBox("Initialize() : instance failed", "Mouse");
+		return;
+	}
 }
 
 

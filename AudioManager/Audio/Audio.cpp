@@ -1,6 +1,5 @@
 #include "Audio.h"
 #include <fstream>
-#include <cassert>
 #include "AudioManager/AudioManager.h"
 #include "Engine/ErrorCheck/ErrorCheck.h"
 
@@ -22,19 +21,18 @@ Audio::~Audio() {
 
 void Audio::Load(const std::string& fileName, bool loopFlg_) {
 	std::ifstream file(fileName, std::ios::binary);
-	assert(file);
-	ErrorCheck::GetInstance()->ErrorTextBox("Load() : Not found file", "Audio");
+	if (!file) {
+		ErrorCheck::GetInstance()->ErrorTextBox("Load() : Not found file", "Audio");
+	}
 
 	RiffHeader riff;
 	file.read((char*)&riff, sizeof(riff));
 
 	if (strncmp(riff.chunk.id.data(), "RIFF", 4) != 0) {
-		assert(!"Not RIFF");
 		ErrorCheck::GetInstance()->ErrorTextBox("Load() : Not found RIFF", "Audio");
 		return;
 	}
 	if (strncmp(riff.type.data(), "WAVE", 4) != 0) {
-		assert(!"Not WAVE");
 		ErrorCheck::GetInstance()->ErrorTextBox("Load() : Not found WAVE", "Audio");
 		return;
 	}
@@ -42,12 +40,14 @@ void Audio::Load(const std::string& fileName, bool loopFlg_) {
 	FormatChunk format{};
 	file.read((char*)&format, sizeof(ChunkHeader));
 	if (strncmp(format.chunk.id.data(), "fmt ", 4) != 0) {
-		assert(!"Not fmt");
 		ErrorCheck::GetInstance()->ErrorTextBox("Load() : Not found fmt", "Audio");
 		return;
 	}
 
-	assert(format.chunk.size <= sizeof(format.fmt));
+	if (format.chunk.size > sizeof(format.fmt)) {
+		ErrorCheck::GetInstance()->ErrorTextBox("Load() : format.chunk.size > sizeof(format.fmt)", "Audio");
+		return;
+	}
 	file.read((char*)&format.fmt, format.chunk.size);
 
 	ChunkHeader data;
@@ -59,7 +59,6 @@ void Audio::Load(const std::string& fileName, bool loopFlg_) {
 	}
 
 	if (strncmp(data.id.data(), "data", 4) != 0) {
-		assert(!"Not data");
 		ErrorCheck::GetInstance()->ErrorTextBox("Load() : Not found data", "Audio");
 		return;
 	}
@@ -74,7 +73,6 @@ void Audio::Load(const std::string& fileName, bool loopFlg_) {
 	bufferSize = data.size;
 
 	HRESULT hr = AudioManager::GetInstance()->xAudio2->CreateSourceVoice(&pSourceVoice, &wfet);
-	assert(SUCCEEDED(hr));
 	if (!SUCCEEDED(hr)) {
 		ErrorCheck::GetInstance()->ErrorTextBox("Load() : CreateSourceVoice() failed", "Audio");
 	}
@@ -102,11 +100,15 @@ void Audio::Start(float volume) {
 		buf.LoopCount = loopFlg ? XAUDIO2_LOOP_INFINITE : 0;
 
 		hr = pSourceVoice->SubmitSourceBuffer(&buf);
-		assert(SUCCEEDED(hr));
+		if (!SUCCEEDED(hr)) {
+			ErrorCheck::GetInstance()->ErrorTextBox("Start() : SubmitSourceBuffer() failed", "Audio");
+		}
 	}
 	hr = pSourceVoice->Start();
 	pSourceVoice->SetVolume(volume);
-	assert(SUCCEEDED(hr));
+	if (!SUCCEEDED(hr)) {
+		ErrorCheck::GetInstance()->ErrorTextBox("Start() : Start() failed", "Audio");
+	}
 }
 
 void Audio::Pause() {

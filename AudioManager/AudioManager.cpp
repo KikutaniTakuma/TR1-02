@@ -1,10 +1,13 @@
 #include "AudioManager.h"
+#include "Engine/ErrorCheck/ErrorCheck.h"
 #include <cassert>
 
 AudioManager* AudioManager::instance = nullptr;
 void AudioManager::Inititalize() {
 	instance = new AudioManager();
-	assert(instance!=nullptr);
+	if (instance == nullptr) {
+		ErrorCheck::GetInstance()->ErrorTextBox("Inititalize() : Instance failed", "AudioManager");
+	}
 }
 void AudioManager::Finalize() {
 	delete instance;
@@ -17,8 +20,15 @@ AudioManager::AudioManager() :
 {
 	HRESULT hr = XAudio2Create(xAudio2.GetAddressOf(), 0u, XAUDIO2_DEFAULT_PROCESSOR);
 	assert(SUCCEEDED(hr));
+	if (!SUCCEEDED(hr)) {
+		ErrorCheck::GetInstance()->ErrorTextBox("Constructor : XAudio2Create() failed", "AudioManager");
+	}
+
 	hr = xAudio2->CreateMasteringVoice(&masterVoice);
 	assert(SUCCEEDED(hr));
+	if (!SUCCEEDED(hr)) {
+		ErrorCheck::GetInstance()->ErrorTextBox("Constructor : CreateMasteringVoicey() failed", "AudioManager");
+	}
 }
 AudioManager::~AudioManager() {
 	xAudio2.Reset();
