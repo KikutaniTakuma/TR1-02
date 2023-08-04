@@ -50,6 +50,10 @@ void Model::LoadObj(const std::string& fileName) {
 	if (!loadObjFlg) {
 		std::ifstream objFile(fileName);
 		assert(objFile);
+		if (!objFile) {
+			ErrorCheck::GetInstance()->ErrorTextBox("LoadObj() : Not found objFile : " + fileName, "Model");
+			return;
+		}
 
 		std::vector<Vector4> posDatas(0);
 
