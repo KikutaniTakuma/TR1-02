@@ -101,7 +101,7 @@ DirectX::ScratchImage Texture::LoadTexture(const std::string& filePath) {
 	std::wstring filePathW = ConvertString(filePath);
 	HRESULT hr = DirectX::LoadFromWICFile(filePathW.c_str(), DirectX::WIC_FLAGS_FORCE_SRGB, nullptr, image);
 	if (!SUCCEEDED(hr)) {
-		ErrorCheck::GetInstance()->ErrorTextBox("LoadTexture() :  DirectX::LoadFromWICFile() failed", "Texture");
+		ErrorCheck::GetInstance()->ErrorTextBox("LoadTexture() : DirectX::LoadFromWICFile() failed", "Texture");
 		return DirectX::ScratchImage();
 	}
 
@@ -109,7 +109,7 @@ DirectX::ScratchImage Texture::LoadTexture(const std::string& filePath) {
 	DirectX::ScratchImage mipImages{};
 	hr = DirectX::GenerateMipMaps(image.GetImages(), image.GetImageCount(), image.GetMetadata(), DirectX::TEX_FILTER_SRGB, 0, mipImages);
 	if (!SUCCEEDED(hr)) {
-		ErrorCheck::GetInstance()->ErrorTextBox("LoadTexture() :  DirectX::GenerateMipMaps failed", "Texture");
+		ErrorCheck::GetInstance()->ErrorTextBox("LoadTexture() : DirectX::GenerateMipMaps failed", "Texture");
 		return DirectX::ScratchImage();
 	}
 

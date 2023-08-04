@@ -6,7 +6,7 @@ private:
 	ErrorCheck();
 	ErrorCheck(const ErrorCheck&) = delete;
 	ErrorCheck(ErrorCheck&&) noexcept = delete;
-	~ErrorCheck() = default;
+	~ErrorCheck();
 
 	ErrorCheck& operator=(const ErrorCheck&) = delete;
 	ErrorCheck& operator=(ErrorCheck&&) noexcept = delete;
@@ -21,7 +21,7 @@ public:
 	}
 
 private:
-	void ErrorLog(const std::string& text);
+	void ErrorLog(const std::string& text, const std::string& boxName = "Error");
 
 private:
 	bool isError;

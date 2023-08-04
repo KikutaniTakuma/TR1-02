@@ -3,6 +3,7 @@
 #include "Math/Mat4x4/Mat4x4.h"
 #include "Math/Vector2/Vector2.h"
 #include <cassert>
+#include "Engine/ErrorCheck/ErrorCheck.h"
 
 Vector3::Vector3() noexcept :
 	x(0.0f),
@@ -87,6 +88,9 @@ Vector3 Vector3::operator*(const Mat4x4& mat) const noexcept {
 	result.z = x * mat[0][2] + y * mat[1][2] + z * mat[2][2] + 1.0f * mat[3][2];
 	float&& w = x * mat[0][3] + y * mat[1][3] + z * mat[2][3] + 1.0f * mat[3][3];
 	assert(w != 0.0f);
+	if (w == 0.0f) {
+		ErrorCheck::GetInstance()->ErrorTextBox("Vector3 * Matrix4x4 : w = 0.0f", "Vector3");
+	}
 	w = 1.0f / w;
 	result.x *= w;
 	result.y *= w;
@@ -104,6 +108,10 @@ Vector3 operator*(const Mat4x4& left, const Vector3& right) {
 	result.z = left[2].Dot(vec);
 	float&& w = left[3].Dot(vec);
 	assert(w != 0.0f);
+	if (w == 0.0f) {
+		ErrorCheck::GetInstance()->ErrorTextBox("Vector3 * Matrix4x4 : w = 0.0f", "Vector3");
+	}
+
 	w = 1.0f / w;
 	result.x *= w;
 	result.y *= w;

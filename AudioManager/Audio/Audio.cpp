@@ -2,12 +2,14 @@
 #include <fstream>
 #include <cassert>
 #include "AudioManager/AudioManager.h"
+#include "Engine/ErrorCheck/ErrorCheck.h"
 
 Audio::Audio():
 	wfet(),
 	pBuffer(nullptr),
 	bufferSize(0u),
-	pSourceVoice(nullptr)
+	pSourceVoice(nullptr),
+	loopFlg(false)
 {}
 
 Audio::~Audio() {
@@ -21,21 +23,28 @@ Audio::~Audio() {
 void Audio::Load(const std::string& fileName, bool loopFlg_) {
 	std::ifstream file(fileName, std::ios::binary);
 	assert(file);
+	ErrorCheck::GetInstance()->ErrorTextBox("Load() : Not found file", "Audio");
 
 	RiffHeader riff;
 	file.read((char*)&riff, sizeof(riff));
 
 	if (strncmp(riff.chunk.id.data(), "RIFF", 4) != 0) {
 		assert(!"Not RIFF");
+		ErrorCheck::GetInstance()->ErrorTextBox("Load() : Not found RIFF", "Audio");
+		return;
 	}
 	if (strncmp(riff.type.data(), "WAVE", 4) != 0) {
 		assert(!"Not WAVE");
+		ErrorCheck::GetInstance()->ErrorTextBox("Load() : Not found WAVE", "Audio");
+		return;
 	}
 
 	FormatChunk format{};
 	file.read((char*)&format, sizeof(ChunkHeader));
 	if (strncmp(format.chunk.id.data(), "fmt ", 4) != 0) {
 		assert(!"Not fmt");
+		ErrorCheck::GetInstance()->ErrorTextBox("Load() : Not found fmt", "Audio");
+		return;
 	}
 
 	assert(format.chunk.size <= sizeof(format.fmt));
@@ -51,6 +60,8 @@ void Audio::Load(const std::string& fileName, bool loopFlg_) {
 
 	if (strncmp(data.id.data(), "data", 4) != 0) {
 		assert(!"Not data");
+		ErrorCheck::GetInstance()->ErrorTextBox("Load() : Not found data", "Audio");
+		return;
 	}
 
 	char* pBufferLocal = new char[data.size];
@@ -64,6 +75,9 @@ void Audio::Load(const std::string& fileName, bool loopFlg_) {
 
 	HRESULT hr = AudioManager::GetInstance()->xAudio2->CreateSourceVoice(&pSourceVoice, &wfet);
 	assert(SUCCEEDED(hr));
+	if (!SUCCEEDED(hr)) {
+		ErrorCheck::GetInstance()->ErrorTextBox("Load() : CreateSourceVoice() failed", "Audio");
+	}
 
 	XAUDIO2_BUFFER buf{};
 	buf.pAudioData = pBuffer;

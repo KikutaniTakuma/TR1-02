@@ -48,7 +48,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	bool fullscreen = false;
 
 	auto player = std::make_unique<Model>();
-	player->LoadObj("Resources/Ball.obj");
+	player->LoadObj("Resources/skydome/skydome.obj");
 	player->LoadShader();
 	player->CreateGraphicsPipeline();
 
