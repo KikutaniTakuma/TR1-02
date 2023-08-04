@@ -34,4 +34,6 @@ private:
 	// キー入力バッファー
 	std::array<BYTE, 0x100> key;
 	std::array<BYTE, 0x100> preKey;
+
+	bool initalizeSucceeded;
 };

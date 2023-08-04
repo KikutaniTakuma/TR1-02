@@ -5,6 +5,12 @@
 #include "Engine/ShaderManager/ShaderManager.h"
 
 class Pipeline {
+public:
+	/// <summary>
+	/// フレンドクラス
+	/// </summary>
+	friend class PipelineManager;
+
 /// <summary>
 /// サブクラス
 /// </summary>

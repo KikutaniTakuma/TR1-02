@@ -1,6 +1,7 @@
 #include "Texture2D.h"
 #include "Engine/ShaderManager/ShaderManager.h"
 #include "externals/imgui/imgui.h"
+#include "Engine/ErrorCheck/ErrorCheck.h"
 
 Texture2D::Texture2D() :
 	scale(Vector2::identity),
@@ -120,6 +121,13 @@ void Texture2D::Draw(
 		);
 
 	auto commandlist = Engine::GetCommandList();
+
+	for (auto& i : graphicsPipelineState) {
+		if (!i) {
+			ErrorCheck::GetInstance()->ErrorTextBox("pipeline is nullptr", "Model");
+			return;
+		}
+	}
 
 	// 各種描画コマンドを積む
 	graphicsPipelineState[blend]->Use();

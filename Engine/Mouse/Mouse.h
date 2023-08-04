@@ -57,4 +57,6 @@ private:
 	DIMOUSESTATE2 preMosueState;
 
 	size_t wheel;
+
+	bool initalizeSucceeded;
 };

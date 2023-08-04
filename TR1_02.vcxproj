@@ -156,6 +156,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Engine.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Disabled</Optimization>
     </ClCompile>
+    <ClCompile Include="Engine\ErrorCheck\ErrorCheck.cpp" />
     <ClCompile Include="Engine\Gamepad\Gamepad.cpp" />
     <ClCompile Include="Engine\KeyInput\KeyInput.cpp" />
     <ClCompile Include="Engine\Mouse\Mouse.cpp" />
@@ -195,6 +196,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\ConstBuffer\ConstBuffer.h" />
     <ClInclude Include="Engine\ConvertString\ConvertString.h" />
     <ClInclude Include="Engine\Engine.h" />
+    <ClInclude Include="Engine\ErrorCheck\ErrorCheck.h" />
     <ClInclude Include="Engine\Gamepad\Gamepad.h" />
     <ClInclude Include="Engine\KeyInput\KeyInput.h" />
     <ClInclude Include="Engine\Mouse\Mouse.h" />

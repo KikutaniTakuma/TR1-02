@@ -1,8 +1,9 @@
-﻿#include "Texture.h"
+#include "Texture.h"
 #include "Engine/ConvertString/ConvertString.h"
 #include "Engine/Engine.h"
 #include <cassert>
 #include <iostream>
+#include "Engine/ErrorCheck/ErrorCheck.h"
 
 Texture::Texture():
 	textureResouce(nullptr),
@@ -40,7 +41,12 @@ void Texture::Load(const std::string& filePath) {
 		const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
 		size = { static_cast<float>(metadata.width),static_cast<float>(metadata.height) };
 		textureResouce = CreateTextureResource(metadata);
-		intermediateResource = UploadTextureData(textureResouce.Get(), mipImages);
+		if (textureResouce) {
+			intermediateResource = UploadTextureData(textureResouce.Get(), mipImages);
+		}
+		else {
+			return;
+		}
 
 		srvDesc.Format = metadata.format;
 		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -94,12 +100,18 @@ DirectX::ScratchImage Texture::LoadTexture(const std::string& filePath) {
 	DirectX::ScratchImage image{};
 	std::wstring filePathW = ConvertString(filePath);
 	HRESULT hr = DirectX::LoadFromWICFile(filePathW.c_str(), DirectX::WIC_FLAGS_FORCE_SRGB, nullptr, image);
-	assert(SUCCEEDED(hr));
+	if (!SUCCEEDED(hr)) {
+		ErrorCheck::GetInstance()->ErrorTextBox("LoadTexture() :  DirectX::LoadFromWICFile() failed", "Texture");
+		return DirectX::ScratchImage();
+	}
 
 	// ミップマップの作成
 	DirectX::ScratchImage mipImages{};
 	hr = DirectX::GenerateMipMaps(image.GetImages(), image.GetImageCount(), image.GetMetadata(), DirectX::TEX_FILTER_SRGB, 0, mipImages);
-	assert(SUCCEEDED(hr));
+	if (!SUCCEEDED(hr)) {
+		ErrorCheck::GetInstance()->ErrorTextBox("LoadTexture() :  DirectX::GenerateMipMaps failed", "Texture");
+		return DirectX::ScratchImage();
+	}
 
 
 	// ミップマップ付きのデータを返す
@@ -107,6 +119,10 @@ DirectX::ScratchImage Texture::LoadTexture(const std::string& filePath) {
 }
 
 ID3D12Resource* Texture::CreateTextureResource(const DirectX::TexMetadata& metaData) {
+	if (metaData.width == 0 || metaData.height == 0) {
+		return nullptr;
+	}
+
 	// metadataを基にResourceの設定
 	D3D12_RESOURCE_DESC resourceDesc{};
 	resourceDesc.Width = UINT(metaData.width);
@@ -131,8 +147,8 @@ ID3D12Resource* Texture::CreateTextureResource(const DirectX::TexMetadata& metaD
 		nullptr,
 		IID_PPV_ARGS(&resource)
 	);
-	assert(SUCCEEDED(hr));
 	if (hr != S_OK) {
+		ErrorCheck::GetInstance()->ErrorTextBox("CreateTextureResource() failed", "Texture");
 		return nullptr;
 	}
 	return resource;

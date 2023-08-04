@@ -2,6 +2,7 @@
 #include "Engine/Engine.h"
 #include <cassert>
 #include <wrl.h>
+#include "Engine/ErrorCheck/ErrorCheck.h"
 
 // ポインタをテンプレートパラメータに設定してはいけない
 template<class T>
@@ -65,7 +66,10 @@ public:
 		}
 		catch (bool err)
 		{
-			if(!err)assert(!"created view");
+			if (!err) {
+				assert(!"created view");
+				ErrorCheck::GetInstance()->ErrorTextBox("operator= Created view fail", "Const Buffer");
+			}
 		}
 	}
 

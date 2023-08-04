@@ -10,6 +10,7 @@
 #include "Mouse/Mouse.h"
 #include "AudioManager/AudioManager.h"
 #include "PipelineManager/PipelineManager.h"
+#include "ErrorCheck/ErrorCheck.h"
 
 #include "externals/imgui/imgui.h"
 #include "externals/imgui/imgui_impl_dx12.h"
@@ -60,6 +61,7 @@ Engine* Engine::engine = nullptr;
 void Engine::Initialize(int windowWidth, int windowHeight, const std::string& windowName) {
 	HRESULT hr =  CoInitializeEx(0, COINIT_MULTITHREADED);
 	if (hr != S_OK) {
+		ErrorCheck::GetInstance()->ErrorTextBox("CoInitializeEx failed", "Engine");
 		return;
 	}
 
@@ -131,6 +133,7 @@ void Engine::InitializeDirect3D() {
 	auto hr = CreateDXGIFactory(IID_PPV_ARGS(dxgiFactory.GetAddressOf()));
 	assert(SUCCEEDED(hr));
 	if (!SUCCEEDED(hr)) {
+		ErrorCheck::GetInstance()->ErrorTextBox("InitializeDirect3D() : CreateDXGIFactory() Failed", "Engine");
 		return;
 	}
 
@@ -143,6 +146,7 @@ void Engine::InitializeDirect3D() {
 		DXGI_ADAPTER_DESC3 adapterDesc{};
 		hr = useAdapter->GetDesc3(&adapterDesc);
 		if (hr != S_OK) {
+			ErrorCheck::GetInstance()->ErrorTextBox("InitializeDirect3D() : GetDesc3() Failed", "Engine");
 			return;
 		}
 
@@ -153,6 +157,7 @@ void Engine::InitializeDirect3D() {
 		useAdapter.Reset();
 	}
 	if (useAdapter == nullptr) {
+		ErrorCheck::GetInstance()->ErrorTextBox("InitializeDirect3D() : GPU not Found", "Engine");
 		return;
 	}
 
@@ -236,6 +241,7 @@ ID3D12DescriptorHeap* Engine::CreateDescriptorHeap(
 		return descriptorHeap;
 	}
 	assert(!"Failed");
+	ErrorCheck::GetInstance()->ErrorTextBox("CreateDescriptorHeap() Failed", "Engine");
 
 	return nullptr;
 }
@@ -246,16 +252,25 @@ void Engine::InitializeDirect12() {
 	D3D12_COMMAND_QUEUE_DESC commandQueueDesc{};
 	HRESULT hr = device->CreateCommandQueue(&commandQueueDesc, IID_PPV_ARGS(commandQueue.GetAddressOf()));
 	assert(SUCCEEDED(hr));
+	if (!SUCCEEDED(hr)) {
+		ErrorCheck::GetInstance()->ErrorTextBox("InitializeDirect12() : CreateCommandQueue() Failed", "Engine");
+	}
 
 	// コマンドアロケータを生成する
 	commandAllocator = nullptr;
 	hr = device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(commandAllocator.GetAddressOf()));
 	assert(SUCCEEDED(hr));
+	if (!SUCCEEDED(hr)) {
+		ErrorCheck::GetInstance()->ErrorTextBox("InitializeDirect12() : CreateCommandAllocator() Failed", "Engine");
+	}
 
 	// コマンドリストを作成する
 	commandList = nullptr;
 	hr = device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocator.Get(), nullptr, IID_PPV_ARGS(commandList.GetAddressOf()));
 	assert(SUCCEEDED(hr));
+	if (!SUCCEEDED(hr)) {
+		ErrorCheck::GetInstance()->ErrorTextBox("InitializeDirect12() : CreateCommandList() Failed", "Engine");
+	}
 
 
 	// スワップチェーンの作成
@@ -271,6 +286,9 @@ void Engine::InitializeDirect12() {
 
 	hr = dxgiFactory->CreateSwapChainForHwnd(commandQueue.Get(), WinApp::GetInstance()->GetHwnd(), &swapChainDesc, nullptr, nullptr, reinterpret_cast<IDXGISwapChain1**>(swapChain.GetAddressOf()));
 	assert(SUCCEEDED(hr));
+	if (!SUCCEEDED(hr)) {
+		ErrorCheck::GetInstance()->ErrorTextBox("InitializeDirect12() : CreateSwapChainForHwnd() Failed", "Engine");
+	}
 
 	dxgiFactory->MakeWindowAssociation(
 		WinApp::GetInstance()->GetHwnd(), DXGI_MWA_NO_WINDOW_CHANGES | DXGI_MWA_NO_ALT_ENTER);
@@ -302,6 +320,9 @@ void Engine::InitializeDirect12() {
 	for (UINT i = 0; i < backBufferNum.BufferCount; ++i) {
 		hr = swapChain->GetBuffer(i, IID_PPV_ARGS(swapChianResource[i].GetAddressOf()));
 		assert(SUCCEEDED(hr));
+		if (!SUCCEEDED(hr)) {
+			ErrorCheck::GetInstance()->ErrorTextBox("InitializeDirect12() : GetBuffer() Failed", "Engine");
+		}
 		rtvHandles[i].ptr = rtvStartHandle.ptr + (i * incrementRTVHeap);
 		device->CreateRenderTargetView(swapChianResource[i].Get(), &rtvDesc, rtvHandles[i]);
 	}
@@ -326,11 +347,17 @@ void Engine::InitializeDirect12() {
 	fenceVal = 0;
 	hr = device->CreateFence(fenceVal, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(fence.GetAddressOf()));
 	assert(SUCCEEDED(hr));
+	if (!SUCCEEDED(hr)) {
+		ErrorCheck::GetInstance()->ErrorTextBox("InitializeDirect12() : CreateFence() Failed", "Engine");
+	}
 
 	// FenceのSignalを持つためのイベントを作成する
 	fenceEvent = nullptr;
 	fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 	assert(fenceEvent != nullptr);
+	if (!(fenceEvent != nullptr)) {
+		ErrorCheck::GetInstance()->ErrorTextBox("InitializeDirect12() : CreateEvent() Failed", "Engine");
+	}
 }
 
 
@@ -343,6 +370,7 @@ void Engine::InitializeInput() {
 		reinterpret_cast<void**>(directInput.GetAddressOf()), nullptr);
 	assert(SUCCEEDED(hr));
 	if (hr != S_OK) {
+		ErrorCheck::GetInstance()->ErrorTextBox("InitializeInput() : DirectInput8Create() Failed", "Engine");
 		return;
 	}
 }
@@ -460,6 +488,7 @@ ID3D12Resource* Engine::CreateBufferResuorce(size_t sizeInBytes) {
 	HRESULT hr = engine->device->CreateCommittedResource(&uploadHeapPropaerties, D3D12_HEAP_FLAG_NONE, &resouceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&resuorce));
 	if (!SUCCEEDED(hr)) {
 		OutputDebugStringA("CreateCommittedResource Function Failed!!");
+		ErrorCheck::GetInstance()->ErrorTextBox("CreateBufferResuorce() : CreateCommittedResource() Failed", "Engine");
 		return nullptr;
 	}
 
@@ -494,6 +523,7 @@ ID3D12Resource* Engine::CreateDepthStencilTextureResource(int32_t width, int32_t
 			IID_PPV_ARGS(&resource))
 	)) {
 		assert(!"CreateDepthStencilTextureResource Failed");
+		ErrorCheck::GetInstance()->ErrorTextBox("CreateDepthStencilTextureResource() Failed", "Engine");
 	}
 
 	return resource;
@@ -511,6 +541,7 @@ void Engine::InitializeDraw() {
 	dsvHeap = nullptr;
 	if(!SUCCEEDED(device->CreateDescriptorHeap(&dsvHeapDesc, IID_PPV_ARGS(dsvHeap.GetAddressOf())))) {
 		assert(!"CreateDescriptorHeap failed");
+		ErrorCheck::GetInstance()->ErrorTextBox("InitializeDraw() : CreateDescriptorHeap()  Failed", "Engine");
 	}
 
 
@@ -559,7 +590,9 @@ bool Engine::WindowMassage() {
 		DispatchMessage(&msg);
 	}
 
-	return msg.message != WM_QUIT;
+	static auto err = ErrorCheck::GetInstance();
+
+	return msg.message != WM_QUIT && !(err->GetError());
 }
 
 void Engine::FrameStart() {
@@ -609,6 +642,11 @@ void Engine::FrameStart() {
 }
 
 void Engine::FrameEnd() {
+	static auto err = ErrorCheck::GetInstance();
+	if (err->GetError()) {
+		return;
+	}
+
 	// 描画先をRTVを設定する
 	UINT backBufferIndex = engine->swapChain->GetCurrentBackBufferIndex();
 	auto dsvH = engine->dsvHeap->GetCPUDescriptorHandleForHeapStart();
@@ -629,6 +667,9 @@ void Engine::FrameEnd() {
 	// コマンドリストを確定させる
 	HRESULT hr = engine->commandList->Close();
 	assert(SUCCEEDED(hr));
+	if (!SUCCEEDED(hr)) {
+		ErrorCheck::GetInstance()->ErrorTextBox("CommandList->Close() Failed", "Engine");
+	}
 
 	// GPUにコマンドリストの実行を行わせる
 	ID3D12CommandList* commandLists[] = { engine->commandList.Get()};
@@ -656,8 +697,14 @@ void Engine::FrameEnd() {
 	// 次フレーム用のコマンドリストを準備
 	hr = engine->commandAllocator->Reset();
 	assert(SUCCEEDED(hr));
+	if (!SUCCEEDED(hr)) {
+		ErrorCheck::GetInstance()->ErrorTextBox("CommandAllocator->Reset() Failed", "Engine");
+	}
 	hr = engine->commandList->Reset(engine->commandAllocator.Get(), nullptr);
 	assert(SUCCEEDED(hr));
+	if (!SUCCEEDED(hr)) {
+		ErrorCheck::GetInstance()->ErrorTextBox("CommandList->Reset() Failed", "Engine");
+	}
 
 	// このフレームで画像読み込みが発生していたら開放する
 	// またUnloadされていたらそれをコンテナから削除する

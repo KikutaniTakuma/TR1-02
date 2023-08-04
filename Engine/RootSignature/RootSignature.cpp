@@ -1,6 +1,6 @@
 #include "RootSignature.h"
 #include <cassert>
-
+#include "Engine/ErrorCheck/ErrorCheck.h"
 
 RootSignature::RootSignature():
 	rootSignature{},
@@ -84,7 +84,7 @@ void RootSignature::Create(const D3D12_ROOT_PARAMETER& rootParamater_, bool isTe
 	Microsoft::WRL::ComPtr<ID3DBlob> errorBlob;
 	HRESULT  hr = D3D12SerializeRootSignature(&descriptionRootSignature, D3D_ROOT_SIGNATURE_VERSION_1, signatureBlob.GetAddressOf(), errorBlob.GetAddressOf());
 	if (FAILED(hr)) {
-		OutputDebugStringA(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
+		ErrorCheck::GetInstance()->ErrorTextBox(reinterpret_cast<char*>(errorBlob->GetBufferPointer()), "RootSignature");
 		assert(false);
 	}
 	// バイナリをもとに生成
@@ -93,6 +93,9 @@ void RootSignature::Create(const D3D12_ROOT_PARAMETER& rootParamater_, bool isTe
 	}
 	hr = Engine::GetDevice()->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(rootSignature.GetAddressOf()));
 	assert(SUCCEEDED(hr));
+	if (!SUCCEEDED(hr)) {
+		ErrorCheck::GetInstance()->ErrorTextBox("Device::CreateRootSignature() failed", "RootSignature");
+	}
 	if (errorBlob) { errorBlob.Reset(); }
 	signatureBlob.Reset();
 }

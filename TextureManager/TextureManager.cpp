@@ -34,6 +34,9 @@ Texture* TextureManager::LoadTexture(const std::string& fileName) {
 	if (textures.empty()) {
 		auto tex = std::make_unique<Texture>();
 		tex->Load(fileName);
+		if (!tex->loadFlg) {
+			return nullptr;
+		}
 		
 		textures.insert(std::make_pair(fileName, std::move(tex)));
 
@@ -44,6 +47,9 @@ Texture* TextureManager::LoadTexture(const std::string& fileName) {
 		if (itr == textures.end()) {
 			auto tex = std::make_unique<Texture>();
 			tex->Load(fileName);
+			if (!tex->loadFlg) {
+				return nullptr;
+			}
 
 			textures.insert(std::make_pair(fileName, std::move(tex)));
 

@@ -1,6 +1,7 @@
 #include "RenderTarget.h"
 #include "Engine/Engine.h"
 #include "Engine/ConvertString/ConvertString.h"
+#include "Engine/ErrorCheck/ErrorCheck.h"
 #include <cassert>
 
 RenderTarget::RenderTarget():
@@ -35,7 +36,7 @@ RenderTarget::RenderTarget():
 			IID_PPV_ARGS(resource.GetAddressOf())
 		);
 	if (!SUCCEEDED(hr)) {
-		OutputDebugStringA("CreateCommittedResource Function Failed!!");
+		ErrorCheck::GetInstance()->ErrorTextBox("CreateCommittedResource Function Failed", "RenderTarget");
 		return;
 	}
 
@@ -104,7 +105,7 @@ RenderTarget::RenderTarget(uint16_t numDescriptor) :
 			IID_PPV_ARGS(resource.GetAddressOf())
 		);
 	if (!SUCCEEDED(hr)) {
-		OutputDebugStringA("CreateCommittedResource Function Failed!!");
+		ErrorCheck::GetInstance()->ErrorTextBox("CreateCommittedResource Function Failed", "RenderTarget");
 		return;
 	}
 

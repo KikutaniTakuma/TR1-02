@@ -1,8 +1,9 @@
-﻿#include "ShaderManager.h"
+#include "ShaderManager.h"
 #include "Engine/Engine.h"
 #include "Engine/ConvertString/ConvertString.h"
 #include <cassert>
 #include <format>
+#include "Engine/ErrorCheck/ErrorCheck.h"
 
 ShaderManager* ShaderManager::instance = nullptr;
 
@@ -18,38 +19,33 @@ ShaderManager::ShaderManager() {
 	dxcCompiler = nullptr;
 	HRESULT hr = DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(dxcUtils.GetAddressOf()));
 	assert(SUCCEEDED(hr));
+	if (!SUCCEEDED(hr)) {
+		ErrorCheck::GetInstance()->ErrorTextBox("DxcCreateInstance() dxcUtils failed","ShaderManager");
+	}
+
 	hr = DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(dxcCompiler.GetAddressOf()));
 	assert(SUCCEEDED(hr));
+	if (!SUCCEEDED(hr)) {
+		ErrorCheck::GetInstance()->ErrorTextBox("DxcCreateInstance() dxcCompiler failed", "ShaderManager");
+	}
 
 	includeHandler = nullptr;
 	hr = dxcUtils->CreateDefaultIncludeHandler(includeHandler.GetAddressOf());
 	assert(SUCCEEDED(hr));
+	if (!SUCCEEDED(hr)) {
+		ErrorCheck::GetInstance()->ErrorTextBox("CreateDefaultIncludeHandler() failed", "ShaderManager");
+	}
 }
 
 ShaderManager::~ShaderManager() {
-	/*for (auto& i : vertexShader) {
-		i.second.Reset();
-	}
-	for (auto& i : hullShader) {
-		i.second.Reset();
-	}
-	for (auto& i : domainShader) {
-		i.second.Reset();
-	}
-	for (auto& i : geometoryShader) {
-		i.second.Reset();
-	}
-	for (auto& i : pixelShader) {
-		i.second.Reset();
-	}
-	includeHandler.Reset();
-	dxcCompiler.Reset();
-	dxcUtils.Reset();*/
 }
 
 void ShaderManager::Initialize() {
 	instance = new ShaderManager();
 	assert(instance);
+	if (!instance) {
+		ErrorCheck::GetInstance()->ErrorTextBox("Instance failed", "ShaderManager");
+	}
 }
 
 void ShaderManager::Finalize() {
@@ -71,6 +67,9 @@ IDxcBlob* ShaderManager::CompilerShader(
 	HRESULT hr = dxcUtils->LoadFile(filePath.c_str(), nullptr, shaderSource.GetAddressOf());
 	// 読めなかったら止める
 	assert(SUCCEEDED(hr));
+	if (!SUCCEEDED(hr)) {
+		ErrorCheck::GetInstance()->ErrorTextBox("Shader Load failed", "ShaderManager");
+	}
 	// 読み込んだファイルの内容を設定する
 	DxcBuffer shaderSourceBuffer;
 	shaderSourceBuffer.Ptr = shaderSource->GetBufferPointer();
@@ -99,12 +98,16 @@ IDxcBlob* ShaderManager::CompilerShader(
 
 	// コンパイルエラーではなくdxcが起動できないなど致命的な状況
 	assert(SUCCEEDED(hr));
+	if (!SUCCEEDED(hr)) {
+		ErrorCheck::GetInstance()->ErrorTextBox("Danger!! Cannot use ""dxc""", "ShaderManager");
+	}
 
 	// 3. 警告・エラーが出てないか確認する
 	Microsoft::WRL::ComPtr<IDxcBlobUtf8> shaderError;
 	shaderResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(shaderError.GetAddressOf()), nullptr);
 	if (shaderError != nullptr && shaderError->GetStringLength() != 0) {
 		Log(shaderError->GetStringPointer());
+		ErrorCheck::GetInstance()->ErrorTextBox(shaderError->GetStringPointer(), "ShaderManager");
 		// 警告・エラーダメゼッタイ
 		assert(false);
 	}

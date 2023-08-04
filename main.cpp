@@ -29,8 +29,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	// ライブラリ初期化
 	Engine::Initialize(width, height, "DirectXGame");
-	// フルスクリーン化
-	WinApp::GetInstance()->SetFullscreen(true);
 #endif
 
 	// フォントロード
@@ -50,7 +48,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	bool fullscreen = false;
 
 	auto player = std::make_unique<Model>();
-	player->LoadObj("Resources/Cube.obj");
+	player->LoadObj("Resources/Ball.obj");
 	player->LoadShader();
 	player->CreateGraphicsPipeline();
 

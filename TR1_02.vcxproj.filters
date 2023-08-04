@@ -107,6 +107,9 @@
     <ClCompile Include="Line\Line.cpp">
       <Filter>Line</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\ErrorCheck\ErrorCheck.cpp">
+      <Filter>Engine\ErrorCheck</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -192,6 +195,9 @@
     </Filter>
     <Filter Include="AudioManager\Audio">
       <UniqueIdentifier>{7d34ec95-2a47-42f6-93fb-23ebe8cc0e42}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\ErrorCheck">
+      <UniqueIdentifier>{a8ce4ac6-d6d6-46ea-aa47-a5463509a0f9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -305,6 +311,9 @@
     </ClInclude>
     <ClInclude Include="Line\Line.h">
       <Filter>Line</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\ErrorCheck\ErrorCheck.h">
+      <Filter>Engine\ErrorCheck</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

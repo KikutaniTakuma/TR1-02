@@ -90,6 +90,10 @@ Pipeline* PipelineManager::Create() {
 			instance->isDepth
 		);
 
+		if (!pipeline->graphicsPipelineState) {
+			return nullptr;
+		}
+
 		instance->pipelines.push_back(std::move(pipeline));
 
 		return instance->pipelines.rbegin()->get();
@@ -127,6 +131,10 @@ Pipeline* PipelineManager::Create() {
 				instance->numRenderTarget,
 				instance->isDepth
 			);
+
+			if (!pipeline->graphicsPipelineState) {
+				return nullptr;
+			}
 
 			instance->pipelines.push_back(std::move(pipeline));
 

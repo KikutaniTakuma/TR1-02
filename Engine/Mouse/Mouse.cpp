@@ -2,6 +2,7 @@
 #include "Engine/Engine.h"
 #include "Engine/WinApp/WinApp.h"
 #include "externals/imgui/imgui.h"
+#include "Engine/ErrorCheck/ErrorCheck.h"
 #include <cassert>
 
 
@@ -22,25 +23,46 @@ Mouse::Mouse() :
 	mouse(),
 	mosueState(),
 	preMosueState(),
-	wheel(0)
+	wheel(0),
+	initalizeSucceeded(false)
 {
 	HRESULT hr = Engine::GetDirectInput()->CreateDevice(GUID_SysMouse, mouse.GetAddressOf(), NULL);
 	assert(SUCCEEDED(hr));
+	if (!SUCCEEDED(hr)) {
+		ErrorCheck::GetInstance()->ErrorTextBox("CreateDevice failed", "Mouse");
+		return;
+	}
 
 	hr = mouse->SetDataFormat(&c_dfDIMouse2);
 	assert(SUCCEEDED(hr));
+	if (!SUCCEEDED(hr)) {
+		ErrorCheck::GetInstance()->ErrorTextBox("SetDataFormat", "Mouse");
+		return;
+	}
 
 	hr = mouse->SetCooperativeLevel(WinApp::GetInstance()->GetHwnd(), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
 	assert(SUCCEEDED(hr));
+	if (!SUCCEEDED(hr)) {
+		ErrorCheck::GetInstance()->ErrorTextBox("SetCooperativeLevel", "Mouse");
+		return;
+	}
+
+	initalizeSucceeded = true;
 }
 
 Mouse::~Mouse() {
-	mouse->Unacquire();
+	if (mouse) {
+		mouse->Unacquire();
+	}
 }
 
 
 
 void Mouse::Input() {
+	if (!instance->initalizeSucceeded) {
+		return;
+	}
+
 	instance->preMosueState = instance->mosueState;
 
 	instance->mouse->Acquire();
@@ -52,6 +74,10 @@ void Mouse::Input() {
 }
 
 bool Mouse::Pushed(Mouse::Button button) {
+	if (!instance->initalizeSucceeded) {
+		return false;
+	}
+
 	if (!(instance->mosueState.rgbButtons[uint8_t(button)] & 0x80) &&
 		(instance->preMosueState.rgbButtons[uint8_t(button)] & 0x80))
 	{
@@ -62,6 +88,10 @@ bool Mouse::Pushed(Mouse::Button button) {
 }
 
 bool Mouse::LongPush(Mouse::Button button) {
+	if (!instance->initalizeSucceeded) {
+		return false;
+	}
+
 	if ((instance->mosueState.rgbButtons[uint8_t(button)] & 0x80) &&
 		(instance->preMosueState.rgbButtons[uint8_t(button)] & 0x80))
 	{
@@ -72,6 +102,10 @@ bool Mouse::LongPush(Mouse::Button button) {
 }
 
 bool Mouse::Releaed(Mouse::Button button) {
+	if (!instance->initalizeSucceeded) {
+		return false;
+	}
+
 	if ((instance->mosueState.rgbButtons[uint8_t(button)] & 0x80) &&
 		!(instance->preMosueState.rgbButtons[uint8_t(button)] & 0x80))
 	{
@@ -82,18 +116,31 @@ bool Mouse::Releaed(Mouse::Button button) {
 }
 
 Vector2 Mouse::GetVelocity() {
+	if (!instance->initalizeSucceeded) {
+		return Vector2();
+	}
 	return { static_cast<float>(instance->mosueState.lX), -static_cast<float>(instance->mosueState.lY) };
 }
 
 float Mouse::GetWheel() {
+	if (!instance->initalizeSucceeded) {
+		return 0.0f;
+	}
 	return static_cast<float>(instance->wheel);
 }
 
 float Mouse::GetWheelVelocity() {
+	if (!instance->initalizeSucceeded) {
+		return 0.0f;
+	}
 	return static_cast<float>(instance->mosueState.lZ);
 }
 
 Vector2 Mouse::GetPos() {
+	if (!instance->initalizeSucceeded) {
+		return Vector2();
+	}
+
 	POINT p{};
 	GetCursorPos(&p);
 	ScreenToClient(FindWindowW(WinApp::GetInstance()->GetWindowClassName().c_str(), nullptr), &p);

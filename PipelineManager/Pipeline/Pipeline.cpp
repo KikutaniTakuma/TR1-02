@@ -1,6 +1,7 @@
 #include "Pipeline.h"
 #include <cassert>
 #include <algorithm>
+#include "Engine/ErrorCheck/ErrorCheck.h"
 
 Pipeline::Pipeline():
 	graphicsPipelineState(),
@@ -208,12 +209,17 @@ void Pipeline::Create(
 	HRESULT hr = Engine::GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(graphicsPipelineState.GetAddressOf()));
 	assert(SUCCEEDED(hr));
 	if (!SUCCEEDED(hr)) {
+		ErrorCheck::GetInstance()->ErrorTextBox("Create() : CreateGraphicsPipelineState", "Pipeline");
 		return;
 	}
 }
 
 void Pipeline::Use() {
 	assert(graphicsPipelineState);
+	if (!graphicsPipelineState) {
+		ErrorCheck::GetInstance()->ErrorTextBox("Use() : GraphicsPipelineState is nullptr", "Pipeline");
+		return;
+	}
 	auto commandlist = Engine::GetCommandList();
 	commandlist->SetGraphicsRootSignature(rootSignature);
 	commandlist->SetPipelineState(graphicsPipelineState.Get());

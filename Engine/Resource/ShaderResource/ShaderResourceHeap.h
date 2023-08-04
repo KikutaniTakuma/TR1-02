@@ -6,6 +6,7 @@
 #include "TextureManager/Texture/Texture.h"
 #include <memory>
 #include <vector>
+#include "Engine/ErrorCheck/ErrorCheck.h"
 
 class ShaderResourceHeap {
 private:
@@ -33,6 +34,10 @@ public:
 	template<class T>
 	uint32_t CreateConstBufferView(ConstBuffer<T>& conBuf) {
 		assert(currentHadleIndex < heapSize);
+		if (currentHadleIndex >= heapSize) {
+			ErrorCheck::GetInstance()->ErrorTextBox("CreateConstBufferView failed\nOver HeapSize", "ShaderResourceHeap");
+		}
+
 		conBuf.CrerateView(heapHadles[currentHadleIndex].first);
 		currentHadleIndex++;
 
@@ -43,7 +48,13 @@ public:
 
 	inline uint32_t CreateTxtureView(Texture* tex) {
 		assert(tex != nullptr);
+		if (tex == nullptr || !*tex) {
+			return currentHadleIndex;
+		}
 		assert(currentHadleIndex < heapSize);
+		if (currentHadleIndex >= heapSize) {
+			ErrorCheck::GetInstance()->ErrorTextBox("CreateConstBufferView failed\nOver HeapSize", "ShaderResourceHeap");
+		}
 		tex->CreateSRVView(heapHadles[currentHadleIndex].first);
 		currentHadleIndex++;
 
@@ -54,6 +65,9 @@ public:
 	inline void CreateTxtureView(Texture* tex, uint32_t heapIndex) {
 		assert(tex != nullptr);
 		assert(heapIndex < heapSize);
+		if (currentHadleIndex >= heapSize) {
+			ErrorCheck::GetInstance()->ErrorTextBox("CreateConstBufferView failed\nOver HeapSize", "ShaderResourceHeap");
+		}
 		tex->CreateSRVView(heapHadles[heapIndex].first);
 	}
 

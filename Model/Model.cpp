@@ -10,6 +10,7 @@
 #include "Engine/ConvertString/ConvertString.h"
 #include "Engine/ShaderManager/ShaderManager.h"
 #include "externals/imgui/imgui.h"
+#include "Engine/ErrorCheck/ErrorCheck.h"
 
 
 Model::Model() :
@@ -103,6 +104,15 @@ void Model::LoadObj(const std::string& fileName) {
 							else { num[count] += ch; }
 						}
 					}
+
+					// エラーチェック
+					if (idnexItr == indcoes.rend()) {
+						//assert(!"Obj Load Error : Cannot Load Rectangles or more");
+						ErrorCheck::GetInstance()->ErrorTextBox("LoadObj() : Not supported for rectangles or more", "Model");
+						objFile.close();
+						return;
+					}
+
 					if (count == 2) {
 						idnexItr->vertNum = static_cast<uint32_t>(std::stoi(num[0]) - 1);
 						idnexItr->uvNum = static_cast<uint32_t>(std::stoi(num[1]) - 1);
@@ -174,6 +184,7 @@ void Model::LoadObj(const std::string& fileName) {
 void Model::LoadMtl(const std::string fileName) {
 	std::ifstream file(fileName);
 	assert(file);
+	if (!file) { ErrorCheck::GetInstance()->ErrorTextBox("LoadMtl() : Not Found mtlFile", "Model"); }
 
 	std::string lineBuf;
 	std::unordered_map<std::string, Texture*>::iterator texItr;
@@ -205,7 +216,7 @@ void Model::LoadMtl(const std::string fileName) {
 	}
 
 	for (auto& i : tex) {
-		if (i.second == nullptr) {
+		if (i.second == nullptr || !(*i.second)) {
 			i.second = TextureManager::GetInstance()->GetWhiteTex();
 			SRVHeap[i.first].CreateTxtureView(i.second);
 		}
@@ -275,6 +286,9 @@ void Model::Draw(const Mat4x4& viewProjectionMat, const Vector3& cameraPos) {
 
 	auto commandlist = Engine::GetCommandList();
 
+	if (!pipeline) {
+		ErrorCheck::GetInstance()->ErrorTextBox("pipeline is nullptr", "Model");
+	}
 	
 	for (auto& i : meshData) {
 		pipeline->Use();
