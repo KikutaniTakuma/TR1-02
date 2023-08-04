@@ -127,10 +127,10 @@ Vector3& Vector3::operator=(const Vector2& right) noexcept {
 }
 
 bool Vector3::operator==(const Vector3& right) const noexcept {
-	return x == right.x && y == right.y;
+	return x == right.x && y == right.y && z == right.z;
 }
 bool Vector3::operator!=(const Vector3& right) const noexcept {
-	return x != right.x || y != right.y;
+	return x != right.x || y != right.y || z != right.z;
 }
 
 float Vector3::Length() const noexcept {
