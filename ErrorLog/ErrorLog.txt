@@ -1,7 +1,84 @@
 
-2023/08/04 18:40:51 JST : ErrorCheck Start
-2023/08/04 18:40:51 : Model / LoadObj() : Not found objFile Resources/skydome/skydome.obj
+2023/08/04 21:29:23 JST : ErrorCheck Start
+2023/08/04 21:29:23 : Model / LoadObj() : Not found objFile : Resources/skydome/skydome.obj
+2023/08/04 21:29:26 JST : There was Error!!!!
 
-2023/08/04 18:41:10 JST : ErrorCheck Start
-2023/08/04 18:41:10 : Model / LoadObj() : Not found objFile Resources/skydome/skydome.obj
-2023/08/04 18:41:10 JST : There was Error!!!!
+2023/08/04 21:30:52 JST : ErrorCheck Start
+2023/08/04 21:30:52 : Model / LoadObj() : Not found objFile : Resources/skydome/skydome.obj
+2023/08/04 21:30:54 JST : There was Error!!!!
+
+2023/08/04 22:32:39 JST : ErrorCheck Start
+2023/08/04 22:32:39 : Model / LoadObj() : Not found objFile : Resources/skydome/skydome.obj
+2023/08/04 22:32:41 JST : There was Error!!!!
+
+2023/08/06 03:48:40 JST : ErrorCheck Start
+2023/08/06 03:48:40 : Engine / InitializeDirect12() : CreateSwapChainForHwnd() Failed
+
+2023/08/06 04:04:41 JST : ErrorCheck Start
+2023/08/06 04:04:48 JST : ErrorCheck End
+
+2023/08/06 04:14:06 JST : ErrorCheck Start
+2023/08/06 04:14:15 JST : ErrorCheck End
+
+2023/08/06 04:19:38 JST : ErrorCheck Start
+2023/08/06 04:20:56 JST : ErrorCheck End
+
+2023/08/06 04:23:25 JST : ErrorCheck Start
+
+2023/08/06 04:28:54 JST : ErrorCheck Start
+2023/08/06 04:29:04 JST : ErrorCheck End
+
+2023/08/06 04:34:42 JST : ErrorCheck Start
+2023/08/06 04:36:48 JST : ErrorCheck End
+
+2023/08/06 04:40:57 JST : ErrorCheck Start
+2023/08/06 04:41:08 JST : ErrorCheck End
+
+2023/08/06 04:43:56 JST : ErrorCheck Start
+2023/08/06 04:44:01 : Engine / FrameEnd() : CreateSwapChainForHwnd() Failed
+2023/08/06 04:44:03 JST : There was Error!!!!
+
+2023/08/06 05:16:00 JST : ErrorCheck Start
+2023/08/06 05:16:46 JST : ErrorCheck End
+
+2023/08/06 05:18:24 JST : ErrorCheck Start
+2023/08/06 05:19:17 JST : ErrorCheck End
+
+2023/08/06 05:19:47 JST : ErrorCheck Start
+2023/08/06 05:20:25 JST : ErrorCheck End
+
+2023/08/06 05:21:21 JST : ErrorCheck Start
+2023/08/06 05:23:53 JST : ErrorCheck End
+
+2023/08/06 05:31:35 JST : ErrorCheck Start
+2023/08/06 05:31:55 JST : ErrorCheck End
+
+2023/08/06 05:32:22 JST : ErrorCheck Start
+2023/08/06 05:32:26 JST : ErrorCheck End
+
+2023/08/06 05:32:48 JST : ErrorCheck Start
+2023/08/06 05:32:52 JST : ErrorCheck End
+
+2023/08/06 05:33:45 JST : ErrorCheck Start
+2023/08/06 05:33:50 JST : ErrorCheck End
+
+2023/08/06 05:34:12 JST : ErrorCheck Start
+2023/08/06 05:34:20 JST : ErrorCheck End
+
+2023/08/06 05:36:12 JST : ErrorCheck Start
+2023/08/06 05:36:26 JST : ErrorCheck End
+
+2023/08/06 05:37:18 JST : ErrorCheck Start
+2023/08/06 05:37:28 JST : ErrorCheck End
+
+2023/08/06 05:46:41 JST : ErrorCheck Start
+2023/08/06 05:46:48 JST : ErrorCheck End
+
+2023/08/06 05:48:24 JST : ErrorCheck Start
+2023/08/06 05:49:09 JST : ErrorCheck End
+
+2023/08/06 05:51:30 JST : ErrorCheck Start
+2023/08/06 05:51:38 JST : ErrorCheck End
+
+2023/08/06 05:53:17 JST : ErrorCheck Start
+2023/08/06 05:54:47 JST : ErrorCheck End

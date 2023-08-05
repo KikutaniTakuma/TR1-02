@@ -21,7 +21,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	// ライブラリ初期化
 #if _DEBUG
-	Engine::Initialize(1280, 720, "DirectXGame");
+	Engine::Initialize("DirectXGame");
 #else 
 	// 画面解像度取得
 	int32_t width = GetSystemMetrics(SM_CXSCREEN);
@@ -48,7 +48,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	bool fullscreen = false;
 
 	auto player = std::make_unique<Model>();
-	player->LoadObj("Resources/skydome/skydome.obj");
+	player->LoadObj("Resources/Watame/Watame.obj");
 	player->LoadShader();
 	player->CreateGraphicsPipeline();
 
@@ -104,6 +104,19 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		ImGui::DragFloat3("cameraScale", &camera2D.scale.x, 0.01f);
 		ImGui::DragFloat("cameraFoV", &camera2D.fov, 0.01f);
 		ImGui::End();
+
+		if (KeyInput::Pushed(DIK_1)) {
+			Engine::SetResolution(Engine::Resolution::HDTV);
+		}
+		if (KeyInput::Pushed(DIK_2)) {
+			Engine::SetResolution(Engine::Resolution::FHD);
+		}
+		if (KeyInput::Pushed(DIK_3)) {
+			Engine::SetResolution(Engine::Resolution::UHD);
+		}
+		if (KeyInput::Pushed(DIK_4)) {
+			Engine::SetResolution(Engine::Resolution::SHV);
+		}
 
 		camera.Update(Vector3());
 		camera2D.Update();

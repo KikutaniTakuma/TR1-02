@@ -4,24 +4,6 @@
 
 class Vector4 final {
 	/// <summary>
-	/// サブクラス
-	/// </summary>
-private:
-	struct Vector {
-		float x;
-		float y;
-		float z;
-		float w;
-	};
-
-	struct Color {
-		float r;
-		float g;
-		float b;
-		float a;
-	};
-
-	/// <summary>
 	/// コンストラクタ
 	/// </summary>
 public:
@@ -83,8 +65,18 @@ public:
 public:
 	union {
 		std::array<float, 4> m;
-		Vector4::Vector vec;
-		Vector4::Color color;
+		struct {
+			float x;
+			float y;
+			float z;
+			float w;
+		} vec;
+		struct {
+			float r;
+			float g;
+			float b;
+			float a;
+		} color;
 		__m128 m128;
 	};
 

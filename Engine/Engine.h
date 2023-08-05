@@ -31,6 +31,18 @@
 
 class Engine {
 public:
+	enum class Resolution {
+		HDTV, // 1280x720  720p
+		FHD,  // 1920x1080 2K
+		UHD,  // 2560x1440 4K
+		SHV,  // 3840x2160 8K
+
+		User, // Userのディスプレイ環境の解像度(メインディスプレイがFHDならFHDになる)。又、Debug時フルスクリーンならこれになる
+
+		ResolutionNum // 設定では使わない(これをセットした場合FHDになる)
+	};
+
+public:
 	/// <summary>
 	/// 静的関数
 	/// </summary>
@@ -52,10 +64,9 @@ public:
 	/// <summary>
 	/// 失敗した場合内部でassertで止められる
 	/// </summary>
-	/// <param name="windowWidth">Windowの横幅</param>
-	/// <param name="windowHeight">Windowの縦幅</param>
 	/// <param name="windowName">Windowの名前</param>
-	static void Initialize(int windowWidth, int windowHeight, const std::string& windowName);
+	/// <param name="resolution">画質設定</param>
+	static void Initialize(const std::string& windowName, Resolution resolution = Resolution::User);
 
 	static void Finalize();
 
@@ -223,6 +234,7 @@ private:
 private:
 	Microsoft::WRL::ComPtr<IDirectInput8> directInput;
 
+	
 
 
 /// <summary>
@@ -247,15 +259,19 @@ private:
 	/// 
 	/// 描画関係
 	/// 
-public:
+private:
 	void InitializeDraw();
+	void ChangeResolution();
 
+public:
+	static void SetResolution(Resolution set);
 
 private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvHeap;
 
-
+	Resolution resolution;
+	Resolution setResolution;
 
 	///
 	/// MainLoop

@@ -1,8 +1,11 @@
 #pragma once
 
 #include <Windows.h>
+#undef min
+#undef max
 #include <stdint.h>
 #include <string>
+#include "Math/Vector2/Vector2.h"
 
 class WinApp {
 private:
@@ -35,6 +38,14 @@ public:
 	}
 
 	void SetFullscreen(bool isFullscreen_);
+
+	inline bool GetIsFullscreen() const {
+		return isFullscreen;
+	}
+
+	Vector2 GetWindowSize() const {
+		return Vector2(float(windowRect.right), float(windowRect.bottom));
+	}
 
 
 private:

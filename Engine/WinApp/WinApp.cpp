@@ -36,10 +36,10 @@ BOOL UnadjustWindowRectEx(LPRECT prc, DWORD dwStyle, BOOL fMenu, DWORD dwExStyle
 LRESULT WinApp::WindowProcedure(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
 	WinApp* app = reinterpret_cast<WinApp*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 
-	if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam))
+	if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam)) {
 		return true;
+	}
 
-	// メッセージで分岐
 	switch (msg) {
 	case WM_DESTROY:        // ウィンドウが破棄された
 		PostQuitMessage(0); // OSに対して、アプリの終了を伝える
@@ -75,7 +75,8 @@ LRESULT WinApp::WindowProcedure(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 
 			AdjustWindowRectEx(
 				rect, GetWindowLong(hwnd, GWL_STYLE), GetMenu(hwnd) != 0,
-				GetWindowLong(hwnd, GWL_EXSTYLE));
+				GetWindowLong(hwnd, GWL_EXSTYLE)
+			);
 		}
 		break;
 	}
@@ -137,7 +138,8 @@ void WinApp::SetFullscreen(bool fullscreen) {
 			SetWindowLong(
 				hwnd, GWL_STYLE,
 				windowStyle &
-				~(WS_CAPTION | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SYSMENU | WS_THICKFRAME));
+				~(WS_CAPTION | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SYSMENU | WS_THICKFRAME)
+			);
 
 			RECT fullscreenRect{ 0 };
 			HMONITOR monitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
@@ -149,7 +151,8 @@ void WinApp::SetFullscreen(bool fullscreen) {
 
 			SetWindowPos(
 				hwnd, HWND_TOPMOST, fullscreenRect.left, fullscreenRect.top, fullscreenRect.right,
-				fullscreenRect.bottom, SWP_FRAMECHANGED | SWP_NOACTIVATE);
+				fullscreenRect.bottom, SWP_FRAMECHANGED | SWP_NOACTIVATE
+			);
 			ShowWindow(hwnd, SW_MAXIMIZE);
 
 		}
@@ -160,7 +163,8 @@ void WinApp::SetFullscreen(bool fullscreen) {
 			SetWindowPos(
 				hwnd, HWND_NOTOPMOST, windowRect.left, windowRect.top,
 				windowRect.right - windowRect.left, windowRect.bottom - windowRect.top,
-				SWP_FRAMECHANGED | SWP_NOACTIVATE);
+				SWP_FRAMECHANGED | SWP_NOACTIVATE
+			);
 
 			ShowWindow(hwnd, SW_NORMAL);
 		}

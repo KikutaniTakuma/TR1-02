@@ -58,7 +58,7 @@ void Engine::Debug::InitializeDebugLayer() {
 
 Engine* Engine::engine = nullptr;
 
-void Engine::Initialize(int windowWidth, int windowHeight, const std::string& windowName) {
+void Engine::Initialize(const std::string& windowName, Resolution resolution) {
 	HRESULT hr =  CoInitializeEx(0, COINIT_MULTITHREADED);
 	if (hr != S_OK) {
 		ErrorCheck::GetInstance()->ErrorTextBox("CoInitializeEx failed", "Engine");
@@ -68,12 +68,35 @@ void Engine::Initialize(int windowWidth, int windowHeight, const std::string& wi
 	engine = new Engine();
 	assert(engine);
 
-	engine->clientWidth = windowWidth;
-	engine->clientHeight = windowHeight;
+	switch (resolution)
+	{
+	case Engine::Resolution::HDTV:
+		engine->clientWidth = 1280;
+		engine->clientHeight = 720;
+		break;
+	case Engine::Resolution::FHD:
+	case Engine::Resolution::ResolutionNum:
+	default:
+		engine->clientWidth = 1980;
+		engine->clientHeight = 1080;
+		break;
+	case Engine::Resolution::UHD:
+		engine->clientWidth = 2560;
+		engine->clientHeight = 1440;
+		break;
+	case Engine::Resolution::SHV:
+		engine->clientWidth = 3840;
+		engine->clientHeight = 2160;
+		break;
+	case Engine::Resolution::User:
+		engine->clientWidth = GetSystemMetrics(SM_CXSCREEN);
+		engine->clientHeight = GetSystemMetrics(SM_CYSCREEN);
+		break;
+	}
 
 	// Window生成
 	auto&& windowTitle = ConvertString(windowName);
-	WinApp::GetInstance()->Create(windowTitle, windowWidth, windowHeight);
+	WinApp::GetInstance()->Create(windowTitle, engine->clientWidth, engine->clientHeight);
 
 #ifdef _DEBUG
 	// DebugLayer有効化
@@ -553,6 +576,40 @@ void Engine::InitializeDraw() {
 	device->CreateDepthStencilView(depthStencilResource.Get(), &dsvDesc, dsvHeap->GetCPUDescriptorHandleForHeapStart());
 }
 
+void Engine::ChangeResolution() {
+	switch (resolution)
+	{
+	case Engine::Resolution::HDTV:
+		clientWidth = 1280;
+		clientHeight = 720;
+		break;
+	case Engine::Resolution::FHD:
+	case Engine::Resolution::ResolutionNum:
+	default:
+		clientWidth = 1980;
+		clientHeight = 1080;
+		break;
+	case Engine::Resolution::UHD:
+		clientWidth = 2560;
+		clientHeight = 1440;
+		break;
+	case Engine::Resolution::SHV:
+		clientWidth = 3840;
+		clientHeight = 2160;
+		break;
+	case Engine::Resolution::User:
+		clientWidth = GetSystemMetrics(SM_CXSCREEN);
+		clientHeight = GetSystemMetrics(SM_CYSCREEN);
+		break;
+	}
+
+	swapChain->SetSourceSize(clientWidth, clientHeight);
+}
+
+void Engine::SetResolution(Resolution set) {
+	engine->setResolution = set;
+}
+
 void Engine::Barrier(ID3D12Resource* resource, D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after, UINT subResource) {
 	// TransitionBarrierの設定
 	D3D12_RESOURCE_BARRIER barrier{};
@@ -635,9 +692,9 @@ void Engine::FrameStart() {
 	D3D12_RECT scissorRect{};
 	// 基本的にビューポートと同じ矩形が構成されるようになる
 	scissorRect.left = 0;
-	scissorRect.right = engine->clientWidth;
+	scissorRect.right = LONG(WinApp::GetInstance()->GetWindowSize().x);
 	scissorRect.top = 0;
-	scissorRect.bottom = engine->clientHeight;
+	scissorRect.bottom = LONG(WinApp::GetInstance()->GetWindowSize().y);
 	engine->commandList->RSSetScissorRects(1, &scissorRect);
 }
 
@@ -709,6 +766,11 @@ void Engine::FrameEnd() {
 	// このフレームで画像読み込みが発生していたら開放する
 	// またUnloadされていたらそれをコンテナから削除する
 	TextureManager::GetInstance()->ReleaseIntermediateResource();
+
+	if (engine->resolution != engine->setResolution) {
+		engine->resolution = engine->setResolution;
+		engine->ChangeResolution();
+	}
 }
 
 
