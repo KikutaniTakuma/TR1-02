@@ -350,8 +350,8 @@ bool Engine::InitializeDirect12() {
 	DXGI_SWAP_CHAIN_DESC backBufferNum{};
 	hr = swapChain->GetDesc(&backBufferNum);
 	// SwapChainResource初期化
-	swapChianResource.reserve(backBufferNum.BufferCount);
-	swapChianResource.resize(backBufferNum.BufferCount);
+	swapChainResource.reserve(backBufferNum.BufferCount);
+	swapChainResource.resize(backBufferNum.BufferCount);
 
 	// RTVの設定
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
@@ -363,14 +363,14 @@ bool Engine::InitializeDirect12() {
 	auto rtvStartHandle = rtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 
 	for (UINT i = 0; i < backBufferNum.BufferCount; ++i) {
-		hr = swapChain->GetBuffer(i, IID_PPV_ARGS(swapChianResource[i].GetAddressOf()));
+		hr = swapChain->GetBuffer(i, IID_PPV_ARGS(swapChainResource[i].GetAddressOf()));
 		assert(SUCCEEDED(hr));
 		if (!SUCCEEDED(hr)) {
 			ErrorCheck::GetInstance()->ErrorTextBox("InitializeDirect12() : GetBuffer() Failed", "Engine");
 			return false;
 		}
 		rtvHandles[i].ptr = rtvStartHandle.ptr + (i * incrementRTVHeap);
-		device->CreateRenderTargetView(swapChianResource[i].Get(), &rtvDesc, rtvHandles[i]);
+		device->CreateRenderTargetView(swapChainResource[i].Get(), &rtvDesc, rtvHandles[i]);
 	}
 
 	// ImGuiの初期化
@@ -698,7 +698,7 @@ void Engine::FrameStart() {
 	UINT backBufferIndex = engine->swapChain->GetCurrentBackBufferIndex();
 
 	Barrier(
-		engine->swapChianResource[backBufferIndex].Get(),
+		engine->swapChainResource[backBufferIndex].Get(),
 		D3D12_RESOURCE_STATE_PRESENT, 
 		D3D12_RESOURCE_STATE_RENDER_TARGET
 	);
@@ -753,7 +753,7 @@ void Engine::FrameEnd() {
 	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), engine->commandList.Get());
 
 	Barrier(
-		engine->swapChianResource[backBufferIndex].Get(),
+		engine->swapChainResource[backBufferIndex].Get(),
 		D3D12_RESOURCE_STATE_RENDER_TARGET,
 		D3D12_RESOURCE_STATE_PRESENT
 	);

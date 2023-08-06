@@ -1,5 +1,7 @@
 #pragma once
 #include <Windows.h>
+#undef max
+#undef min
 #include <d3d12.h>
 #pragma comment(lib, "d3d12.lib")
 #include <dxgi1_6.h>
@@ -102,7 +104,7 @@ public:
 	}
 
 	static inline D3D12_RESOURCE_DESC GetSwapchainBufferDesc() {
-		return engine->swapChianResource[0]->GetDesc();
+		return engine->swapChainResource[0]->GetDesc();
 	}
 
 	static inline D3D12_CPU_DESCRIPTOR_HANDLE GetDsvHandle() {
@@ -210,7 +212,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList;
 
 	Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain;
-	std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> swapChianResource;
+	std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> swapChainResource;
 
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap;
 	std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> rtvHandles;

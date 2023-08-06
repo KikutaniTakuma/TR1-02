@@ -22,11 +22,11 @@ void PeraRender::Initialize(const std::string& vsFileName, const std::string& ps
 
 	CreateGraphicsPipeline();
 
-	PeraVertexData pv[4] = {
-		{{-1.0f,-1.0f, 0.1f }, {0.0f, 1.0f}},
-		{{-1.0f,1.0f, 0.1f }, {0.0f, 0.0f}},
-		{{1.0f,-1.0f, 0.1f }, {1.0f, 1.0f}},
-		{{1.0f,1.0f, 0.1f }, {1.0f, 0.0f}}
+	std::array<PeraVertexData, 4> pv = {
+		Vector3{ -1.0f,-1.0f, 0.1f }, Vector2{ 0.0f, 1.0f },
+		Vector3{ -1.0f, 1.0f, 0.1f }, Vector2{ 0.0f, 0.0f },
+		Vector3{  1.0f,-1.0f, 0.1f }, Vector2{ 1.0f, 1.0f },
+		Vector3{  1.0f, 1.0f, 0.1f }, Vector2{ 1.0f, 0.0f }
 	};
 
 	peraVertexResource = Engine::CreateBufferResuorce(sizeof(pv));
@@ -37,9 +37,7 @@ void PeraRender::Initialize(const std::string& vsFileName, const std::string& ps
 
 	PeraVertexData* mappedData = nullptr;
 	peraVertexResource->Map(0, nullptr, reinterpret_cast<void**>(&mappedData));
-	for (int32_t i = 0; i < _countof(pv); i++) {
-		mappedData[i] = pv[i];
-	}
+	std::copy(pv.begin(), pv.end(), mappedData);
 	peraVertexResource->Unmap(0, nullptr);
 }
 
