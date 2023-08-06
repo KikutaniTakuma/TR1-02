@@ -45,10 +45,10 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	bool fullscreen = false;
 
-	auto player = std::make_unique<Model>();
-	player->LoadObj("Resources/Watame/Watame.obj");
-	player->LoadShader();
-	player->CreateGraphicsPipeline();
+	auto watame = std::make_unique<Model>();
+	watame->LoadObj("Resources/Watame/Watame.obj");
+	watame->LoadShader();
+	watame->CreateGraphicsPipeline();
 
 	GlobalVariables::GetInstance()->LoadFile();
 
@@ -124,9 +124,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		camera.Update(Vector3());
 		camera2D.Update();
 
-		player->Update();
-		enemy->Update();
-
 		if (KeyInput::Pushed(DIK_P)) {
 			GlobalVariables::GetInstance()->SaveFile("Player");
 		}
@@ -140,10 +137,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// 
 		//pera->PreDraw();
 
-		player->Draw();
-		enemy->Draw();
-		skyDome->Draw(camera.GetViewProjection(), camera.pos);
-		ground->Draw(camera.GetViewProjection(),Pipeline::Normal);
+		watame->Draw(camera.GetViewProjection(), camera.pos);
 
 		//pera->Draw();
 		///
