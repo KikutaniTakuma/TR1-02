@@ -20,16 +20,11 @@
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	// ライブラリ初期化
-#if _DEBUG
-	Engine::Initialize("DirectXGame");
-#else 
-	// 画面解像度取得
-	int32_t width = GetSystemMetrics(SM_CXSCREEN);
-	int32_t height = GetSystemMetrics(SM_CYSCREEN);
+	if(!Engine::Initialize("DirectXGame")){
+		ErrorCheck::GetInstance()->ErrorTextBox("InitializeDirect3D() : Engine::Initialize() Failed", "WinMain");
+		return -1;
+	}
 
-	// ライブラリ初期化
-	Engine::Initialize(width, height, "DirectXGame");
-#endif
 
 	// フォントロード
 	Engine::LoadFont("Font/JapaneseGothic.spritefont");
@@ -128,11 +123,11 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		///
 		/// 描画処理
 		/// 
-		pera->PreDraw();
+		//pera->PreDraw();
 
 		player->Draw(camera.GetViewProjection(), camera.pos);
 
-		pera->Draw();
+		//pera->Draw();
 		///
 		/// 描画処理ここまで
 		/// 

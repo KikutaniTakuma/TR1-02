@@ -66,7 +66,7 @@ public:
 	/// </summary>
 	/// <param name="windowName">Windowの名前</param>
 	/// <param name="resolution">画質設定</param>
-	static void Initialize(const std::string& windowName, Resolution resolution = Resolution::User);
+	static bool Initialize(const std::string& windowName, Resolution resolution = Resolution::User);
 
 	static void Finalize();
 
@@ -167,7 +167,7 @@ private:
 	/// Dirct3D
 	/// 
 private:
-	void InitializeDirect3D();
+	bool InitializeDirect3D();
 
 private:
 	Microsoft::WRL::ComPtr<ID3D12Device> device;
@@ -202,7 +202,7 @@ public:
 	/// DirectX12
 	/// 
 private:
-	void InitializeDirect12();
+	bool InitializeDirect12();
 
 private:
 	Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue;
@@ -229,7 +229,7 @@ private:
 /// 入力関係
 /// </summary>
 private:
-	void InitializeInput();
+	bool InitializeInput();
 
 private:
 	Microsoft::WRL::ComPtr<IDirectInput8> directInput;
@@ -241,7 +241,7 @@ private:
 /// 文字表示関係
 /// </summary>
 private:
-	void InitializeSprite();
+	bool InitializeSprite();
 
 public:
 	static void LoadFont(const std::string& formatName);
@@ -260,7 +260,7 @@ private:
 	/// 描画関係
 	/// 
 private:
-	void InitializeDraw();
+	bool InitializeDraw();
 	void ChangeResolution();
 
 public:

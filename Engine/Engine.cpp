@@ -58,11 +58,11 @@ void Engine::Debug::InitializeDebugLayer() {
 
 Engine* Engine::engine = nullptr;
 
-void Engine::Initialize(const std::string& windowName, Resolution resolution) {
+bool Engine::Initialize(const std::string& windowName, Resolution resolution) {
 	HRESULT hr =  CoInitializeEx(0, COINIT_MULTITHREADED);
 	if (hr != S_OK) {
 		ErrorCheck::GetInstance()->ErrorTextBox("CoInitializeEx failed", "Engine");
-		return;
+		return false;
 	}
 
 	engine = new Engine();
@@ -104,17 +104,32 @@ void Engine::Initialize(const std::string& windowName, Resolution resolution) {
 #endif
 
 	// Direct3D生成
-	engine->InitializeDirect3D();
+	if (!engine->InitializeDirect3D()) {
+		ErrorCheck::GetInstance()->ErrorTextBox("Initialize() : InitializeDirect3D() Failed", "Engine");
+		return false;
+	}
 
 	// DirectX12生成
-	engine->InitializeDirect12();
+	if (!engine->InitializeDirect12()) {
+		ErrorCheck::GetInstance()->ErrorTextBox("Initialize() : InitializeDirect12() Failed", "Engine");
+		return false;
+	}
 
 	// InputDevice生成
-	engine->InitializeInput();
+	if (!engine->InitializeInput()) {
+		ErrorCheck::GetInstance()->ErrorTextBox("Initialize() : InitializeInput() Failed", "Engine");
+		return false;
+	}
 
-	engine->InitializeDraw();
+	if (!engine->InitializeDraw()) {
+		ErrorCheck::GetInstance()->ErrorTextBox("Initialize() : InitializeDraw() Failed", "Engine");
+		return false;
+	}
 
-	engine->InitializeSprite();
+	if (!engine->InitializeSprite()) {
+		ErrorCheck::GetInstance()->ErrorTextBox("Initialize() : InitializeSprite() Failed", "Engine");
+		return false;
+	}
 
 	KeyInput::Initialize();
 	Mouse::Initialize();
@@ -122,6 +137,8 @@ void Engine::Initialize(const std::string& windowName, Resolution resolution) {
 	TextureManager::Initialize();
 	AudioManager::Inititalize();
 	PipelineManager::Initialize();
+
+	return true;
 }
 
 void Engine::Finalize() {
@@ -151,13 +168,13 @@ UINT Engine::incrementSRVCBVUAVHeap = 0u;
 UINT Engine::incrementRTVHeap = 0u;
 UINT Engine::incrementDSVHeap = 0u;
 UINT Engine::incrementSAMPLER = 0u;
-void Engine::InitializeDirect3D() {
+bool Engine::InitializeDirect3D() {
 	// IDXGIFactory生成
 	auto hr = CreateDXGIFactory(IID_PPV_ARGS(dxgiFactory.GetAddressOf()));
 	assert(SUCCEEDED(hr));
 	if (!SUCCEEDED(hr)) {
 		ErrorCheck::GetInstance()->ErrorTextBox("InitializeDirect3D() : CreateDXGIFactory() Failed", "Engine");
-		return;
+		return false;
 	}
 
 	// 使用するグラボの設定
@@ -170,7 +187,7 @@ void Engine::InitializeDirect3D() {
 		hr = useAdapter->GetDesc3(&adapterDesc);
 		if (hr != S_OK) {
 			ErrorCheck::GetInstance()->ErrorTextBox("InitializeDirect3D() : GetDesc3() Failed", "Engine");
-			return;
+			return false;
 		}
 
 		if (!(adapterDesc.Flags & DXGI_ADAPTER_FLAG3_SOFTWARE)) {
@@ -181,7 +198,7 @@ void Engine::InitializeDirect3D() {
 	}
 	if (useAdapter == nullptr) {
 		ErrorCheck::GetInstance()->ErrorTextBox("InitializeDirect3D() : GPU not Found", "Engine");
-		return;
+		return false;
 	}
 
 
@@ -206,7 +223,7 @@ void Engine::InitializeDirect3D() {
 	}
 
 	if (device == nullptr) {
-		return;
+		return false;
 	}
 	Log("Complete create D3D12Device!!!\n");
 
@@ -243,6 +260,7 @@ void Engine::InitializeDirect3D() {
 	incrementRTVHeap = engine->device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	incrementDSVHeap = engine->device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 	incrementSAMPLER = engine->device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER);
+	return true;
 }
 
 
@@ -269,7 +287,7 @@ ID3D12DescriptorHeap* Engine::CreateDescriptorHeap(
 	return nullptr;
 }
 
-void Engine::InitializeDirect12() {
+bool Engine::InitializeDirect12() {
 	// コマンドキューを作成
 	commandQueue = nullptr;
 	D3D12_COMMAND_QUEUE_DESC commandQueueDesc{};
@@ -277,6 +295,7 @@ void Engine::InitializeDirect12() {
 	assert(SUCCEEDED(hr));
 	if (!SUCCEEDED(hr)) {
 		ErrorCheck::GetInstance()->ErrorTextBox("InitializeDirect12() : CreateCommandQueue() Failed", "Engine");
+		return false;
 	}
 
 	// コマンドアロケータを生成する
@@ -285,6 +304,7 @@ void Engine::InitializeDirect12() {
 	assert(SUCCEEDED(hr));
 	if (!SUCCEEDED(hr)) {
 		ErrorCheck::GetInstance()->ErrorTextBox("InitializeDirect12() : CreateCommandAllocator() Failed", "Engine");
+		return false;
 	}
 
 	// コマンドリストを作成する
@@ -293,6 +313,7 @@ void Engine::InitializeDirect12() {
 	assert(SUCCEEDED(hr));
 	if (!SUCCEEDED(hr)) {
 		ErrorCheck::GetInstance()->ErrorTextBox("InitializeDirect12() : CreateCommandList() Failed", "Engine");
+		return false;
 	}
 
 
@@ -311,6 +332,7 @@ void Engine::InitializeDirect12() {
 	assert(SUCCEEDED(hr));
 	if (!SUCCEEDED(hr)) {
 		ErrorCheck::GetInstance()->ErrorTextBox("InitializeDirect12() : CreateSwapChainForHwnd() Failed", "Engine");
+		return false;
 	}
 
 	dxgiFactory->MakeWindowAssociation(
@@ -345,6 +367,7 @@ void Engine::InitializeDirect12() {
 		assert(SUCCEEDED(hr));
 		if (!SUCCEEDED(hr)) {
 			ErrorCheck::GetInstance()->ErrorTextBox("InitializeDirect12() : GetBuffer() Failed", "Engine");
+			return false;
 		}
 		rtvHandles[i].ptr = rtvStartHandle.ptr + (i * incrementRTVHeap);
 		device->CreateRenderTargetView(swapChianResource[i].Get(), &rtvDesc, rtvHandles[i]);
@@ -372,6 +395,7 @@ void Engine::InitializeDirect12() {
 	assert(SUCCEEDED(hr));
 	if (!SUCCEEDED(hr)) {
 		ErrorCheck::GetInstance()->ErrorTextBox("InitializeDirect12() : CreateFence() Failed", "Engine");
+		return false;
 	}
 
 	// FenceのSignalを持つためのイベントを作成する
@@ -380,7 +404,9 @@ void Engine::InitializeDirect12() {
 	assert(fenceEvent != nullptr);
 	if (!(fenceEvent != nullptr)) {
 		ErrorCheck::GetInstance()->ErrorTextBox("InitializeDirect12() : CreateEvent() Failed", "Engine");
+		return false;
 	}
+	return true;
 }
 
 
@@ -388,14 +414,15 @@ void Engine::InitializeDirect12() {
 /// 入力関係
 /// 
 
-void Engine::InitializeInput() {
+bool Engine::InitializeInput() {
 	HRESULT hr = DirectInput8Create(WinApp::GetInstance()->getWNDCLASSEX().hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8,
 		reinterpret_cast<void**>(directInput.GetAddressOf()), nullptr);
 	assert(SUCCEEDED(hr));
 	if (hr != S_OK) {
 		ErrorCheck::GetInstance()->ErrorTextBox("InitializeInput() : DirectInput8Create() Failed", "Engine");
-		return;
+		return false;
 	}
+	return true;
 }
 
 
@@ -405,9 +432,11 @@ void Engine::InitializeInput() {
 /// <summary>
 /// 文字表示関係
 /// </summary>
-void Engine::InitializeSprite() {
+bool Engine::InitializeSprite() {
 	// GraphicsMemory初期化
 	gmemory.reset(new DirectX::GraphicsMemory(device.Get()));
+
+	return static_cast<bool>(gmemory);
 }
 
 void Engine::LoadFont(const std::string& formatName) {
@@ -552,10 +581,15 @@ ID3D12Resource* Engine::CreateDepthStencilTextureResource(int32_t width, int32_t
 	return resource;
 }
 
-void Engine::InitializeDraw() {
+bool Engine::InitializeDraw() {
 	// DepthStencilTextureをウィンドウサイズで作成
 	depthStencilResource = CreateDepthStencilTextureResource(clientWidth, clientHeight);
 	assert(depthStencilResource);
+	if (!depthStencilResource) {
+		assert(!"depthStencilResource failed");
+		ErrorCheck::GetInstance()->ErrorTextBox("InitializeDraw() : DepthStencilResource Create Failed", "Engine");
+		return false;
+	}
 
 	D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc{};
 	dsvHeapDesc.NumDescriptors = 1;
@@ -565,6 +599,7 @@ void Engine::InitializeDraw() {
 	if(!SUCCEEDED(device->CreateDescriptorHeap(&dsvHeapDesc, IID_PPV_ARGS(dsvHeap.GetAddressOf())))) {
 		assert(!"CreateDescriptorHeap failed");
 		ErrorCheck::GetInstance()->ErrorTextBox("InitializeDraw() : CreateDescriptorHeap()  Failed", "Engine");
+		return false;
 	}
 
 
@@ -574,6 +609,8 @@ void Engine::InitializeDraw() {
 	dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
 
 	device->CreateDepthStencilView(depthStencilResource.Get(), &dsvDesc, dsvHeap->GetCPUDescriptorHandleForHeapStart());
+
+	return true;
 }
 
 void Engine::ChangeResolution() {
@@ -649,7 +686,7 @@ bool Engine::WindowMassage() {
 
 	static auto err = ErrorCheck::GetInstance();
 
-	return msg.message != WM_QUIT && !(err->GetError());
+	return (msg.message != WM_QUIT) && !(err->GetError());
 }
 
 void Engine::FrameStart() {
