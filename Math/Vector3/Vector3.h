@@ -25,6 +25,8 @@ public:
 	Vector3& operator-=(const Vector3& right) noexcept;
 	Vector3 operator*(float scalar) const noexcept;
 	Vector3& operator*=(float scalar) noexcept;
+	Vector3 operator/(float scalar) const noexcept;
+	Vector3& operator/=(float scalar) noexcept;
 
 	Vector3 operator*(const class Mat4x4& mat) const noexcept;
 	Vector3& operator*=(const class Mat4x4& mat) noexcept;

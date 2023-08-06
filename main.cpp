@@ -16,6 +16,9 @@
 #include "StringOut/StringOut.h"
 #include "Line/Line.h"
 #include "Editor/Node/Node.h"
+#include "Player/Player.h"
+#include "Enemy/Enemy.h"
+#include "GlobalVariables/GlobalVariables.h"
 
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
@@ -30,10 +33,10 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	Engine::LoadFont("Font/JapaneseGothic.spritefont");
 
 	Camera camera;
+	camera.farClip = 5000.0f;
 	camera.pos = { 0.0f,0.0f,-10.0f };
-#if _DEBUG
+
 	camera.isDebug = true;
-#endif
 
 	Camera camera2D(Camera::Mode::Othographic);
 
@@ -47,6 +50,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	player->LoadShader();
 	player->CreateGraphicsPipeline();
 
+	GlobalVariables::GetInstance()->LoadFile();
 
 	/// 
 	/// メインループ
@@ -77,13 +81,17 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			WinApp::GetInstance()->SetFullscreen(fullscreen);
 		}
 
+		
+		GlobalVariables::GetInstance()->Update();
 
 		if (camera2D.isDebug) {
 			camera.isDebug = !camera2D.isDebug;
 		}
 		ImGui::Begin("Camera");
 		ImGui::Checkbox("Debug", &camera.isDebug);
-		ImGui::DragFloat3("cameraPos", &camera.pos.x, 0.01f);
+		static auto cameraPos =  camera.GetPos();
+		cameraPos =  camera.GetPos();
+		ImGui::Text("cameraPos : %.0f, %.0f, %.0f", cameraPos.x, cameraPos.y, cameraPos.z);
 		ImGui::DragFloat3("cameraRotate", &camera.rotate.x, 0.01f);
 		ImGui::DragFloat3("cameraScale", &camera.scale.x, 0.01f);
 		ImGui::DragFloat("cameraFoV", &camera.fov, 0.01f);
@@ -116,6 +124,13 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		camera.Update(Vector3());
 		camera2D.Update();
 
+		player->Update();
+		enemy->Update();
+
+		if (KeyInput::Pushed(DIK_P)) {
+			GlobalVariables::GetInstance()->SaveFile("Player");
+		}
+
 		///
 		/// 更新処理ここまで
 		/// 
@@ -125,7 +140,10 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// 
 		//pera->PreDraw();
 
-		player->Draw(camera.GetViewProjection(), camera.pos);
+		player->Draw();
+		enemy->Draw();
+		skyDome->Draw(camera.GetViewProjection(), camera.pos);
+		ground->Draw(camera.GetViewProjection(),Pipeline::Normal);
 
 		//pera->Draw();
 		///

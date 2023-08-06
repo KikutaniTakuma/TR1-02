@@ -93,12 +93,18 @@ public:
 
 	void Debug(const std::string& guiName);
 
+	void SetParent(Model* parent_) {
+		parent = parent_;
+	}
+
 public:
 	Vector3 pos;
 	Vector3 rotate;
 	Vector3 scale;
 
 	uint32_t color;
+	Model* parent;
+
 
 private:
 	std::unordered_map<std::string, ShaderResourceHeap> SRVHeap;

@@ -34,6 +34,10 @@ public:
 		return viewOthograohics;
 	}
 
+	const Vector3& GetPos() const {
+		return worldPos;
+	}
+
 	//void SetViewPort();
 
 public:
@@ -49,10 +53,12 @@ public:
 
 	Vector3 moveVec;
 	float moveSpd;
-	Vector2 moveRotate;
 	float moveRotateSpd;
 	Vector2 gazePointRotate;
 	float gazePointRotateSpd;
+
+private:
+	Vector3 worldPos;
 
 private:
 	static constexpr float kNearClip = 0.01f;

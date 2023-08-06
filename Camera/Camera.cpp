@@ -5,6 +5,7 @@
 #include "Engine/Gamepad/Gamepad.h"
 #include "externals/imgui/imgui.h"
 #include <numbers>
+#include <cmath>
 
 Camera::Camera() noexcept :
 	mode(Mode::Projecction),
@@ -15,7 +16,6 @@ Camera::Camera() noexcept :
 	drawScale(1.0f),
 	moveVec(),
 	moveSpd(0.02f),
-	moveRotate(),
 	moveRotateSpd(std::numbers::pi_v<float> / 720.0f),
 	gazePointRotate(),
 	gazePointRotateSpd(std::numbers::pi_v<float> / 90.0f),
@@ -35,7 +35,6 @@ Camera::Camera(Camera::Mode mode) noexcept :
 	drawScale(1.0f),
 	moveVec(),
 	moveSpd(0.02f),
-	moveRotate(),
 	moveRotateSpd(std::numbers::pi_v<float> / 720.0f),
 	gazePointRotate(),
 	gazePointRotateSpd(std::numbers::pi_v<float> / 9.0f),
@@ -65,7 +64,6 @@ Camera& Camera::operator=(const Camera& right) noexcept {
 
 	moveVec = right.moveVec;
 	moveSpd = right.moveSpd;
-	moveRotate = right.moveRotate;
 	moveRotateSpd = right.moveRotateSpd;
 	gazePointRotate = right.gazePointRotate;
 	gazePointRotateSpd = right.gazePointRotateSpd;
@@ -94,7 +92,6 @@ Camera& Camera::operator=(Camera&& right) noexcept {
 
 	moveVec = std::move(right.moveVec);
 	moveSpd = std::move(right.moveSpd);
-	moveRotate = std::move(right.moveRotate);
 	moveRotateSpd = std::move(right.moveRotateSpd);
 	gazePointRotate = std::move(right.gazePointRotate);
 	gazePointRotateSpd = std::move(right.gazePointRotateSpd);
@@ -123,11 +120,13 @@ void Camera::Update(const Vector3& gazePoint) {
 		{
 		case Camera::Mode::Projecction:
 		default:
-			moveSpd = 0.02f;
+			moveSpd = 0.5f;
 			if (Mouse::LongPush(Mouse::Button::Right) && (KeyInput::LongPush(DIK_LSHIFT) || KeyInput::LongPush(DIK_RSHIFT))) {
-				auto moveRotateBuf = Mouse::GetVelocity().Normalize() * moveRotateSpd;
-				moveRotateBuf.x *= -1.0f;
-				moveRotate += moveRotateBuf;
+				auto moveRotate = Mouse::GetVelocity().Normalize() * moveRotateSpd;
+				moveRotate.x *= -1.0f;
+
+				rotate.x -= std::atan(moveRotate.y);
+				rotate.y -= std::atan(moveRotate.x);
 			}
 			else if (Mouse::LongPush(Mouse::Button::Right)) {
 				auto moveRotateBuf = Mouse::GetVelocity().Normalize() * gazePointRotateSpd;
@@ -168,13 +167,17 @@ void Camera::Update(const Vector3& gazePoint) {
 			break;
 		}
 
-		view = VertMakeMatrixAffin(scale, rotate, pos) * HoriMakeMatrixRotateY(moveRotate.x) * HoriMakeMatrixRotateX(moveRotate.y);
-		view = VertMakeMatrixAffin(Vector3::identity, Vector3(gazePointRotate.y, gazePointRotate.x, 0.0f), Vector3()) * VertMakeMatrixTranslate(gazePoint) * view;
+		/*auto posTmp = pos + gazePoint;
+		posTmp *= */
+		view = VertMakeMatrixAffin(scale, rotate, pos);
+		view = VertMakeMatrixAffin(Vector3::identity, Vector3(gazePointRotate.y, gazePointRotate.x, 0.0f), gazePoint) * view;
+		worldPos = { view[0][3],view[1][3], view[2][3] };
 		view.Inverse();
 	}
 	else {
-		view.VertAffin(scale, rotate, pos);
-		view = VertMakeMatrixAffin(Vector3::identity, Vector3(gazePointRotate.y, gazePointRotate.x, 0.0f), Vector3()) * VertMakeMatrixTranslate(gazePoint) * view;
+		view.VertAffin(scale, rotate, pos + gazePoint);
+		view = VertMakeMatrixAffin(Vector3::identity, Vector3(gazePointRotate.y, gazePointRotate.x, 0.0f), pos + gazePoint) * view;
+		worldPos = { view[0][3],view[1][3], view[2][3] };
 		view.Inverse();
 	}
 	static auto engine = Engine::GetInstance();

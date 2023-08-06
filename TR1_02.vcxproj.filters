@@ -107,6 +107,15 @@
     <ClCompile Include="Line\Line.cpp">
       <Filter>Line</Filter>
     </ClCompile>
+    <ClCompile Include="Player\Player.cpp">
+      <Filter>Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Enemy\Enemy.cpp">
+      <Filter>Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="GlobalVariables\GlobalVariables.cpp">
+      <Filter>GlobalVariables</Filter>
+    </ClCompile>
     <ClCompile Include="Engine\ErrorCheck\ErrorCheck.cpp">
       <Filter>Engine\ErrorCheck</Filter>
     </ClCompile>
@@ -195,6 +204,15 @@
     </Filter>
     <Filter Include="AudioManager\Audio">
       <UniqueIdentifier>{7d34ec95-2a47-42f6-93fb-23ebe8cc0e42}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Player">
+      <UniqueIdentifier>{349c38cb-a1cb-44ee-8057-5821aeb241ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Enemy">
+      <UniqueIdentifier>{6913458b-b447-426b-8054-5e302d7e8c9c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GlobalVariables">
+      <UniqueIdentifier>{dff28833-6a2e-4902-9a4c-e0a7cb10934b}</UniqueIdentifier>
     </Filter>
     <Filter Include="Engine\ErrorCheck">
       <UniqueIdentifier>{a8ce4ac6-d6d6-46ea-aa47-a5463509a0f9}</UniqueIdentifier>
@@ -311,6 +329,15 @@
     </ClInclude>
     <ClInclude Include="Line\Line.h">
       <Filter>Line</Filter>
+    </ClInclude>
+    <ClInclude Include="Player\Player.h">
+      <Filter>Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Enemy\Enemy.h">
+      <Filter>Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="GlobalVariables\GlobalVariables.h">
+      <Filter>GlobalVariables</Filter>
     </ClInclude>
     <ClInclude Include="Engine\ErrorCheck\ErrorCheck.h">
       <Filter>Engine\ErrorCheck</Filter>

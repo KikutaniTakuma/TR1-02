@@ -1,6 +1,7 @@
 #include "Vector2.h"
 #include <assert.h>
 #include <cmath>
+#include <numbers>
 
 Vector2::Vector2() noexcept :
 	x(0.0f),
@@ -128,4 +129,20 @@ Vector2 Vector2::Normalize() const noexcept {
 		return *this;
 	}
 	return *this / Length();
+}
+
+float Vector2::GetRad() const noexcept {
+	float result = 0.0f;
+	if (*this == Vector2()) {
+		return 0.0f;
+	}
+
+	result = this->Dot(Vector2(1.0f, 0.0f)) / (this->Length() * Vector2(1.0f, 0.0f).Length());
+
+	if (y < 0.0f) {
+		return (2.0f * std::numbers::phi_v<float>) - std::asin(result);
+	}
+
+
+	return std::asin(result);
 }

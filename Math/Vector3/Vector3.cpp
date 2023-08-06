@@ -80,6 +80,17 @@ Vector3& Vector3::operator*=(float scalar) noexcept {
 	return *this;
 }
 
+Vector3 Vector3::operator/(float scalar) const noexcept {
+	Vector3 tmp(x / scalar, y / scalar, z / scalar);
+
+	return tmp;
+}
+Vector3& Vector3::operator/=(float scalar) noexcept {
+	*this = *this / scalar;
+
+	return *this;
+}
+
 Vector3 Vector3::operator*(const Mat4x4& mat) const noexcept {
 	Vector3 result;
 	Vector4 vec = { *this,1.0f };
@@ -164,7 +175,5 @@ Vector3 Vector3::Normalize() const noexcept {
 		return *this;
 	}
 
-	float nor = 1.0f / this->Length();
-
-	return *this * nor;
+	return *this / this->Length();
 }
