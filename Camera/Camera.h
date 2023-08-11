@@ -38,7 +38,14 @@ public:
 		return worldPos;
 	}
 
-	//void SetViewPort();
+	// 透視投影
+	inline const Mat4x4& GetViewProjectionVp() noexcept {
+		return viewProjecctionVp;
+	}
+	// 平衡投影
+	inline const Mat4x4& GetViewOthographicsVp() noexcept {
+		return viewOthograohicsVp;
+	}
 
 public:
 	Mode mode;
@@ -74,4 +81,7 @@ private:
 
 	Mat4x4 viewProjecction;
 	Mat4x4 viewOthograohics;
+
+	Mat4x4 viewProjecctionVp;
+	Mat4x4 viewOthograohicsVp;
 };

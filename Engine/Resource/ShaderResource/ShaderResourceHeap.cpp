@@ -30,11 +30,16 @@ ShaderResourceHeap::ShaderResourceHeap(const ShaderResourceHeap& right)
 	*this = right;
 }
 
+ShaderResourceHeap::ShaderResourceHeap(ShaderResourceHeap&& right) noexcept {
+	*this = std::move(right);
+}
+
 ShaderResourceHeap::ShaderResourceHeap(uint16_t numDescriptor) :
 	SRVHeap(),
 	heapOrder(0),
 	descriptorRanges(0),
 	heapSize(numDescriptor),
+	currentHadleIndex(0),
 	heapHadles(0)
 {
 	SRVHeap = Engine::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, numDescriptor, true);
@@ -52,19 +57,44 @@ ShaderResourceHeap::ShaderResourceHeap(uint16_t numDescriptor) :
 }
 
 ShaderResourceHeap::~ShaderResourceHeap() {
-	SRVHeap->Release();
-	SRVHeap.Reset();
+	if (SRVHeap) {
+		SRVHeap->Release();
+		SRVHeap.Reset();
+	}
 }
 
 ShaderResourceHeap& ShaderResourceHeap::operator=(const ShaderResourceHeap& right) {
-	auto&& pHeap = right.SRVHeap.Get();
-	SRVHeap = pHeap;
+	SRVHeap = right.SRVHeap;
 
 	heapOrder = right.heapOrder;
 	descriptorRanges = right.descriptorRanges;
 
 	heapSize = right.heapSize;
 	currentHadleIndex = right.currentHadleIndex;
+
+	heapHadles.clear();
+	heapHadles.reserve(heapSize);
+	heapHadles.push_back({ SRVHeap->GetCPUDescriptorHandleForHeapStart(),
+							SRVHeap->GetGPUDescriptorHandleForHeapStart() });
+	auto heapHandleFirstItr = heapHadles.begin();
+	for (uint32_t i = 1; i < heapSize; i++) {
+		auto hadleTmp = *heapHandleFirstItr;
+		hadleTmp.first.ptr += Engine::GetIncrementSRVCBVUAVHeap() * i;
+		hadleTmp.second.ptr += Engine::GetIncrementSRVCBVUAVHeap() * i;
+		heapHadles.push_back(hadleTmp);
+	}
+
+	return *this;
+}
+
+ShaderResourceHeap& ShaderResourceHeap::operator=(ShaderResourceHeap&& right) noexcept {
+	SRVHeap = std::move(right.SRVHeap);
+
+	heapOrder = std::move(right.heapOrder);
+	descriptorRanges = std::move(right.descriptorRanges);
+
+	heapSize = std::move(right.heapSize);
+	currentHadleIndex = std::move(right.currentHadleIndex);
 
 	heapHadles.clear();
 	heapHadles.reserve(heapSize);
@@ -198,4 +228,29 @@ D3D12_ROOT_PARAMETER ShaderResourceHeap::GetParameter() {
 	roootParamater.DescriptorTable.NumDescriptorRanges = UINT(descriptorRanges.size());
 
 	return roootParamater;
+}
+
+void ShaderResourceHeap::Reset() {
+	if (SRVHeap) {
+		SRVHeap->Release();
+		SRVHeap.Reset();
+	}
+
+	SRVHeap = Engine::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, heapSize, true);
+
+	heapHadles.clear();
+	heapHadles.reserve(heapSize);
+	heapHadles.push_back({ SRVHeap->GetCPUDescriptorHandleForHeapStart(),
+							SRVHeap->GetGPUDescriptorHandleForHeapStart() });
+	auto heapHandleFirstItr = heapHadles.begin();
+	for (uint32_t i = 1; i < heapSize; i++) {
+		auto hadleTmp = *heapHandleFirstItr;
+		hadleTmp.first.ptr += Engine::GetIncrementSRVCBVUAVHeap() * i;
+		hadleTmp.second.ptr += Engine::GetIncrementSRVCBVUAVHeap() * i;
+		heapHadles.push_back(hadleTmp);
+	}
+
+	currentHadleIndex = 0;
+	heapOrder.clear();
+	descriptorRanges.clear();
 }

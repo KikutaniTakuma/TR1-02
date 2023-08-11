@@ -1,13 +1,11 @@
 #pragma once
-#include <d3d12.h>
-#pragma comment(lib, "d3d12.lib")
-#include <dxcapi.h>
-#pragma comment(lib, "dxcompiler.lib")
 #include "Math/Mat4x4/Mat4x4.h"
 #include "Math/Vector2/Vector2.h"
 #include "Math/Vector3/Vector3.h"
 #include "Math/Vector4/Vector4.h"
 #include <string>
+#include <array>
+
 #include "Engine/ConstBuffer/ConstBuffer.h"
 #include "Engine/Resource/RenderTarget/RenderTarget.h"
 #include "PipelineManager/PipelineManager.h"
@@ -42,7 +40,7 @@ private:
 public:
 	void PreDraw();
 
-	void Draw();
+	void Draw(Pipeline::Blend blend, PeraRender* pera = nullptr);
 
 private:
 	RenderTarget render;
@@ -51,5 +49,5 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> peraVertexResource = nullptr;
 	Shader shader;
 
-	Pipeline* graphicsPipelineState;
+	std::array<Pipeline*, 3> piplines;
 };

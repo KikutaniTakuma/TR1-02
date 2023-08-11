@@ -4,6 +4,7 @@
 #include "Engine/Mouse/Mouse.h"
 #include "Engine/Gamepad/Gamepad.h"
 #include "externals/imgui/imgui.h"
+#include "Engine/WinApp/WinApp.h"
 #include <numbers>
 #include <cmath>
 
@@ -15,7 +16,7 @@ Camera::Camera() noexcept :
 	rotate(),
 	drawScale(1.0f),
 	moveVec(),
-	moveSpd(0.02f),
+	moveSpd(1.65f),
 	moveRotateSpd(std::numbers::pi_v<float> / 720.0f),
 	gazePointRotate(),
 	gazePointRotateSpd(std::numbers::pi_v<float> / 90.0f),
@@ -120,7 +121,7 @@ void Camera::Update(const Vector3& gazePoint) {
 		{
 		case Camera::Mode::Projecction:
 		default:
-			moveSpd = 0.5f;
+			moveSpd = 1.65f;
 			if (Mouse::LongPush(Mouse::Button::Right) && (KeyInput::LongPush(DIK_LSHIFT) || KeyInput::LongPush(DIK_RSHIFT))) {
 				auto moveRotate = Mouse::GetVelocity().Normalize() * moveRotateSpd;
 				moveRotate.x *= -1.0f;
@@ -134,13 +135,14 @@ void Camera::Update(const Vector3& gazePoint) {
 				gazePointRotate -= moveRotateBuf;
 			}
 			if (Mouse::LongPush(Mouse::Button::Middle)) {
-				moveVec = Mouse::GetVelocity().Normalize() * moveSpd;
+				moveVec = Mouse::GetVelocity().Normalize() * moveSpd * ImGui::GetIO().DeltaTime;
 				moveVec *= HoriMakeMatrixRotateX(rotate.x) * HoriMakeMatrixRotateY(rotate.y) * HoriMakeMatrixRotateZ(rotate.z);
 				pos -= moveVec;
 			}
 			if (Mouse::GetWheelVelocity() != 0.0f) {
 				moveVec.z = Mouse::GetWheelVelocity();
-				moveVec = moveVec.Normalize() * moveSpd;
+				moveSpd = 6.6f;
+				moveVec = moveVec.Normalize() * moveSpd * ImGui::GetIO().DeltaTime;
 				moveVec *= HoriMakeMatrixRotateX(rotate.x) * HoriMakeMatrixRotateY(rotate.y) * HoriMakeMatrixRotateZ(rotate.z);
 				pos += moveVec;
 			}
@@ -149,7 +151,7 @@ void Camera::Update(const Vector3& gazePoint) {
 			moveSpd = 15.0f;
 
 			if (Mouse::LongPush(Mouse::Button::Middle)) {
-				moveVec = Mouse::GetVelocity().Normalize() * moveSpd;
+				moveVec = Mouse::GetVelocity().Normalize() * moveSpd * ImGui::GetIO().DeltaTime;
 				moveVec *= HoriMakeMatrixRotateX(rotate.x) * HoriMakeMatrixRotateY(rotate.y) * HoriMakeMatrixRotateZ(rotate.z);
 				pos -= moveVec * drawScale;
 			}
@@ -183,6 +185,8 @@ void Camera::Update(const Vector3& gazePoint) {
 	static auto engine = Engine::GetInstance();
 	static const float aspect = static_cast<float>(engine->clientWidth) / static_cast<float>(engine->clientHeight);
 
+	const auto&& windowSize = WinApp::GetInstance()->GetWindowSize();
+
 	switch (mode)
 	{
 	case Camera::Mode::Projecction:
@@ -190,6 +194,8 @@ void Camera::Update(const Vector3& gazePoint) {
 		fov = std::clamp(fov, 0.0f, 1.0f);
 		projection.VertPerspectiveFov(fov, aspect, kNearClip, farClip);
 		viewProjecction = projection * view;
+
+		viewProjecctionVp = VertMakeMatrixViewPort(0.0f, 0.0f, windowSize.x, windowSize.y, 0.0f, 1.0f) * viewProjecction;
 		break;
 
 	case Camera::Mode::Othographic:
@@ -200,6 +206,9 @@ void Camera::Update(const Vector3& gazePoint) {
 			-static_cast<float>(engine->clientHeight) * 0.5f * drawScale,
 			kNearClip, farClip);
 		viewOthograohics = othograohics * view;
+
+		
+		viewOthograohicsVp = VertMakeMatrixViewPort(0.0f, 0.0f, windowSize.x, windowSize.y, 0.0f, 1.0f) * viewOthograohics;
 		break;
 	}
 }

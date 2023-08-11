@@ -119,6 +119,15 @@
     <ClCompile Include="Engine\ErrorCheck\ErrorCheck.cpp">
       <Filter>Engine\ErrorCheck</Filter>
     </ClCompile>
+    <ClCompile Include="SceneManager\SceneManager.cpp">
+      <Filter>SceneManager</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneManager\Scene\Scene.cpp">
+      <Filter>SceneManager\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="UIeditor\UIeditor.cpp">
+      <Filter>UIeditor</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -216,6 +225,15 @@
     </Filter>
     <Filter Include="Engine\ErrorCheck">
       <UniqueIdentifier>{a8ce4ac6-d6d6-46ea-aa47-a5463509a0f9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SceneManager">
+      <UniqueIdentifier>{97375dcf-2d60-496d-ae57-e588bbd43de9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SceneManager\Scene">
+      <UniqueIdentifier>{9f346f21-d0bd-4f2f-af5d-a176415f4715}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UIeditor">
+      <UniqueIdentifier>{c891625b-e73e-48c3-8e4b-9b85cd8aab89}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -341,6 +359,15 @@
     </ClInclude>
     <ClInclude Include="Engine\ErrorCheck\ErrorCheck.h">
       <Filter>Engine\ErrorCheck</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneManager\SceneManager.h">
+      <Filter>SceneManager</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneManager\Scene\Scene.h">
+      <Filter>SceneManager\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="UIeditor\UIeditor.h">
+      <Filter>UIeditor</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

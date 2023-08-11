@@ -25,7 +25,12 @@ public:
 
 public:
 	Texture2D();
+	Texture2D(const Texture2D&);
+	Texture2D(Texture2D&&) noexcept;
 	~Texture2D();
+
+	Texture2D& operator=(const Texture2D& right);
+
 
 public:
 	void Initialize(
@@ -42,12 +47,17 @@ public:
 	void LoadTexture(const std::string& fileName);
 
 public:
+	void Update();
+
 	void Draw(
 		const Mat4x4& viewProjection,
 		Pipeline::Blend blend = Pipeline::Blend::None
 	);
 
 	void Debug(const std::string& guiName);
+
+	bool Colision(const Vector2& pos2D);
+	bool Colision(const Texture2D& tex2D);
 
 public:
 	Vector2 scale;
@@ -56,6 +66,8 @@ public:
 
 	Vector2 uvPibot;
 	Vector2 uvSize;
+
+	std::array<Vector3, 4> worldPos;
 
 private:
 	ShaderResourceHeap SRVHeap;

@@ -85,8 +85,6 @@ public:
 		const std::string& domain = {}
 	);
 
-	void Update();
-
 	void Draw(const Mat4x4& viewProjectionMat, const Vector3& cameraPos);
 
 	void CreateGraphicsPipeline();

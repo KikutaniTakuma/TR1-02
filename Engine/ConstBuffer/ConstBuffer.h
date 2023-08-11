@@ -46,31 +46,28 @@ public:
 	}
 
 	inline ConstBuffer<T>& operator=(const ConstBuffer& right) {
-		try {
-			if (bufferResource) {
-				bufferResource->Release();
-				bufferResource.Reset();
-			}
-			bufferResource = Engine::CreateBufferResuorce((sizeof(T) + 0xff) & ~0xff);
-			cbvDesc.BufferLocation = bufferResource->GetGPUVirtualAddress();
-			cbvDesc.SizeInBytes = UINT(bufferResource->GetDesc().Width);
 
-			if (isWright) {
-				bufferResource->Map(0, nullptr, reinterpret_cast<void**>(&data));
-			}
-			roootParamater = right.roootParamater;
-
-			*data = *right.data;
-
-			throw(isCreateView);
+		if (bufferResource) {
+			bufferResource->Release();
+			bufferResource.Reset();
 		}
-		catch (bool err)
-		{
-			if (!err) {
-				assert(!"created view");
-				ErrorCheck::GetInstance()->ErrorTextBox("operator= Created view fail", "Const Buffer");
-			}
+		bufferResource = Engine::CreateBufferResuorce((sizeof(T) + 0xff) & ~0xff);
+		cbvDesc.BufferLocation = bufferResource->GetGPUVirtualAddress();
+		cbvDesc.SizeInBytes = UINT(bufferResource->GetDesc().Width);
+
+		if (isWright) {
+			bufferResource->Map(0, nullptr, reinterpret_cast<void**>(&data));
 		}
+		roootParamater = right.roootParamater;
+
+		*data = *right.data;
+
+		if (!isCreateView) {
+			assert(!"created view");
+			ErrorCheck::GetInstance()->ErrorTextBox("operator= Created view fail", "Const Buffer");
+		}
+
+		return *this;
 	}
 
 public:

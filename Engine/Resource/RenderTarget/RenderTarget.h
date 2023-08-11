@@ -1,19 +1,20 @@
-﻿#pragma once
-#include <wrl.h>
-#include <d3d12.h>
-#pragma comment(lib, "d3d12.lib")
+#pragma once
 #include "Engine/ConstBuffer/ConstBuffer.h"
 
 class RenderTarget {
 public:
 	// ディスクリプタの大きさはデフォルトコンストラクタで4
 	RenderTarget();
+	RenderTarget(uint32_t width, uint32_t height);
 	RenderTarget(uint16_t numDescriptor);
+	RenderTarget(uint16_t numDescriptor, uint32_t width, uint32_t height);
 	~RenderTarget();
 
 public:
 	// レンダーターゲットに設定する
 	void SetThisRenderTarget();
+
+	void ChangeResourceState();
 
 	// メインレンダーターゲットに変更(RenderTarget::SetThisTarget()を使ったら必ず呼ばなければならない)
 	void SetMainRenderTarget();
@@ -33,4 +34,6 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> SRVHeap;
 
 	D3D12_CPU_DESCRIPTOR_HANDLE srvHeapHandle;
+
+	bool isResourceStateChange;
 };

@@ -81,8 +81,8 @@ bool Mouse::Pushed(Mouse::Button button) {
 		return false;
 	}
 
-	if (!(instance->mosueState.rgbButtons[uint8_t(button)] & 0x80) &&
-		(instance->preMosueState.rgbButtons[uint8_t(button)] & 0x80))
+	if ((instance->mosueState.rgbButtons[uint8_t(button)] & 0x80) &&
+		!(instance->preMosueState.rgbButtons[uint8_t(button)] & 0x80))
 	{
 		return true;
 	}
@@ -109,8 +109,8 @@ bool Mouse::Releaed(Mouse::Button button) {
 		return false;
 	}
 
-	if ((instance->mosueState.rgbButtons[uint8_t(button)] & 0x80) &&
-		!(instance->preMosueState.rgbButtons[uint8_t(button)] & 0x80))
+	if (!(instance->mosueState.rgbButtons[uint8_t(button)] & 0x80) &&
+		(instance->preMosueState.rgbButtons[uint8_t(button)] & 0x80))
 	{
 		return true;
 	}

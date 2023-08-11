@@ -58,7 +58,7 @@ public:
 	/// ステイタスの設定
 	/// </summary>
 	/// <param name="blend_">ブレンドの設定</param>
-	/// <param name="solidState_">ソリッド設定/param>
+	/// <param name="solidState_">ソリッド設定</param>
 	/// <param name="cullMode_">カリング設定</param>
 	/// <param name="numRenderTarget_">レンダーターゲットの数</param>
 	static void SetState(

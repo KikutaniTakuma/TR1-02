@@ -9,6 +9,7 @@ public:
 	Vector3() noexcept;
 	Vector3(float x, float y, float z) noexcept;
 	Vector3(const Vector3& right) noexcept;
+	Vector3(const class Vector2& right) noexcept;
 	Vector3(Vector3&& right) noexcept;
 public:
 	~Vector3() = default;

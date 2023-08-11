@@ -10,7 +10,7 @@ PeraRender::PeraRender():
 	peraVertexResource(nullptr),
 	peraVertexView(),
 	shader{},
-	graphicsPipelineState(nullptr)
+	piplines{nullptr, nullptr}
 {}
 
 PeraRender::~PeraRender() {
@@ -75,7 +75,13 @@ void PeraRender::CreateGraphicsPipeline() {
 
 	PipelineManager::IsDepth(false);
 
-	graphicsPipelineState = PipelineManager::Create();
+	piplines[0] = PipelineManager::Create();
+
+	PipelineManager::SetState(Pipeline::Normal, Pipeline::SolidState::Solid);
+	piplines[1] = PipelineManager::Create();
+
+	PipelineManager::SetState(Pipeline::Add, Pipeline::SolidState::Solid);
+	piplines[2] = PipelineManager::Create();
 
 	PipelineManager::StateReset();
 }
@@ -84,12 +90,34 @@ void PeraRender::PreDraw() {
 	render.SetThisRenderTarget();
 }
 
-void PeraRender::Draw() {
-	// 描画先をメインレンダーターゲットに変更
-	render.SetMainRenderTarget();
+void PeraRender::Draw(Pipeline::Blend blend, PeraRender* pera) {
+	if (!!pera) {
+		pera->PreDraw();
+		render.ChangeResourceState();
+	}
+	else {
+		// 描画先をメインレンダーターゲットに変更
+		render.SetMainRenderTarget();
+	}
 
 	// 各種描画コマンドを積む
-	graphicsPipelineState->Use();
+	switch (blend){
+	case Pipeline::None:
+	case Pipeline::Sub:
+	case Pipeline::Mul:
+	case Pipeline::BlendTypeNum:
+	default:
+		piplines[0]->Use();
+		break;
+
+	case Pipeline::Normal:
+		piplines[1]->Use();
+		break;
+
+	case Pipeline::Add:
+		piplines[2]->Use();
+		break;
+	}
 	Engine::GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 	Engine::GetCommandList()->IASetVertexBuffers(0, 1, &peraVertexView);
 	render.UseThisRenderTargetShaderResource();

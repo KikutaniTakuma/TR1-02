@@ -20,9 +20,69 @@ Texture2D::Texture2D() :
 	tex(nullptr)
 {}
 
+Texture2D::Texture2D(const Texture2D& right) :
+	scale(Vector2::identity),
+	rotate(),
+	pos({ 0.0f,0.0f,0.01f }),
+	uvPibot(),
+	uvSize(Vector2::identity),
+	SRVHeap(16),
+	SRVHandle{},
+	vertexView(),
+	vertexResource(nullptr),
+	indexView(),
+	indexResource(nullptr),
+	shader(),
+	graphicsPipelineState(),
+	tex(nullptr)
+{
+	*this = right;
+}
+Texture2D::Texture2D(Texture2D&& right) noexcept :
+	scale(Vector2::identity),
+	rotate(),
+	pos({ 0.0f,0.0f,0.01f }),
+	uvPibot(),
+	uvSize(Vector2::identity),
+	SRVHeap(16),
+	SRVHandle{},
+	vertexView(),
+	vertexResource(nullptr),
+	indexView(),
+	indexResource(nullptr),
+	shader(),
+	graphicsPipelineState(),
+	tex(nullptr)
+{
+	*this = right;
+}
+
 Texture2D::~Texture2D() {
 	if (indexResource)indexResource->Release();
 	if (vertexResource)vertexResource->Release();
+}
+
+Texture2D& Texture2D::operator=(const Texture2D& right) {
+	scale = right.scale;
+	rotate = right.rotate;
+	pos = right.pos;
+
+	uvPibot = right.uvPibot;
+	uvSize = right.uvSize;
+
+	worldPos = right.worldPos;
+
+	SRVHeap.Reset();
+
+	tex = nullptr;
+
+	LoadTexture(right.tex->GetFileName());
+	Initialize();
+
+	*wvpMat = *right.wvpMat;
+	*color = *right.color;
+
+	return *this;
 }
 
 void Texture2D::Initialize(const std::string& vsFileName, const std::string& psFileName) {
@@ -92,6 +152,26 @@ void Texture2D::LoadTexture(const std::string& fileName) {
 	}
 }
 
+void Texture2D::Update() {
+	std::array<Vector3, 4> pv = {
+		Vector3{ -0.5f,  0.5f, 0.1f },
+		Vector3{  0.5f,  0.5f, 0.1f },
+		Vector3{  0.5f, -0.5f, 0.1f },
+		Vector3{ -0.5f, -0.5f, 0.1f },
+	};
+
+	std::copy(pv.begin(), pv.end(), worldPos.begin());
+	auto&& worldMat = 
+		HoriMakeMatrixAffin(
+		Vector3(scale.x * tex->getSize().x, scale.y * tex->getSize().y, 1.0f),
+		rotate,
+		pos
+	);
+	for (auto& i : worldPos) {
+		i *= worldMat;
+	}
+}
+
 void Texture2D::Draw(
 	const Mat4x4& viewProjection,
 	Pipeline::Blend blend
@@ -99,26 +179,19 @@ void Texture2D::Draw(
 	const Vector2& uv0 = { uvPibot.x, uvPibot.y + uvSize.y }; const Vector2& uv1 = uvSize + uvPibot;
 	const Vector2& uv2 = { uvPibot.x + uvSize.x, uvPibot.y }; const Vector2& uv3 = uvPibot;
 
-	VertexData pv[4] = {
-		{ { -0.5f,  0.5f, 0.1f }, uv3 },
-		{ {  0.5f,  0.5f, 0.1f }, uv2 },
-		{ {  0.5f, -0.5f, 0.1f }, uv1 },
-		{ { -0.5f, -0.5f, 0.1f }, uv0 },
+	std::array<VertexData, 4> pv = {
+		worldPos[0], uv3,
+		worldPos[1], uv2,
+		worldPos[2], uv1,
+		worldPos[3], uv0,
 	};
 
 	VertexData* mappedData = nullptr;
 	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&mappedData));
-	for (int32_t i = 0; i < _countof(pv); i++) {
-		mappedData[i] = pv[i];
-	}
+	std::copy(pv.begin(), pv.end(), mappedData);
 	vertexResource->Unmap(0, nullptr);
 
-	*wvpMat = viewProjection *
-		VertMakeMatrixAffin(
-			Vector3(scale.x * tex->getSize().x, scale.y * tex->getSize().y, 1.0f),
-			rotate,
-			pos
-		);
+	*wvpMat = viewProjection;
 
 	auto commandlist = Engine::GetCommandList();
 
@@ -146,4 +219,75 @@ void Texture2D::Debug(const std::string& guiName) {
 	ImGui::DragFloat2("uvSize", &uvSize.x, 0.01f);
 	ImGui::ColorEdit4("SphereColor", &color->color.r);
 	ImGui::End();
+}
+
+bool Texture2D::Colision(const Vector2& pos2D) {
+	Vector2 max;
+	Vector2 min;
+	max.x = std::max_element(worldPos.begin(), worldPos.end(),
+		[](const Vector3& left, const Vector3& right) {
+			return left.x < right.x;
+		})->x;
+	max.y = std::max_element(worldPos.begin(), worldPos.end(),
+		[](const Vector3& left, const Vector3& right) {
+			return left.y < right.y;
+		})->y;
+	min.x = std::min_element(worldPos.begin(), worldPos.end(),
+		[](const Vector3& left, const Vector3& right) {
+			return left.x < right.x;
+		})->x;
+	min.y = std::min_element(worldPos.begin(), worldPos.end(),
+		[](const Vector3& left, const Vector3& right) {
+			return left.y < right.y;
+		})->y;
+
+	if (min.x < pos2D.x && pos2D.x < max.x) {
+		if (min.y < pos2D.y && pos2D.y < max.y) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool Texture2D::Colision(const Texture2D& tex2D) {
+	Vector3 max;
+	Vector3 min;
+	max.x = std::max_element(worldPos.begin(), worldPos.end(),
+		[](const Vector3& left, const Vector3& right) {
+			return left.x < right.x;
+		})->x;
+	max.y = std::max_element(worldPos.begin(), worldPos.end(),
+		[](const Vector3& left, const Vector3& right) {
+			return left.y < right.y;
+		})->y;
+	max.z = std::max_element(worldPos.begin(), worldPos.end(),
+		[](const Vector3& left, const Vector3& right) {
+			return left.z < right.z;
+		})->z;
+	min.x = std::min_element(worldPos.begin(), worldPos.end(),
+		[](const Vector3& left, const Vector3& right) {
+			return left.x < right.x;
+		})->x;
+	min.y = std::min_element(worldPos.begin(), worldPos.end(),
+		[](const Vector3& left, const Vector3& right) {
+			return left.y < right.y;
+		})->y;
+	min.z = std::min_element(worldPos.begin(), worldPos.end(),
+		[](const Vector3& left, const Vector3& right) {
+			return left.z < right.z;
+		})->z;
+
+
+	for (auto& i : tex2D.worldPos) {
+		if (min.x < i.x && i.x < max.x) {
+			if (min.y < i.y && i.y < max.y) {
+				if (min.z < i.z && i.z < max.z) {
+					return true;
+				}
+			}
+		}
+	}
+
+	return false;
 }

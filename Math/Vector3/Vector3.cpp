@@ -21,6 +21,11 @@ Vector3::Vector3(const Vector3& right) noexcept
 {
 	*this = right;
 }
+Vector3::Vector3(const Vector2& right) noexcept {
+	x = right.x;
+	y = right.y;
+	z = 0.0f;
+}
 
 Vector3::Vector3(Vector3&& right) noexcept
 {
@@ -140,7 +145,6 @@ Vector3& Vector3::operator*=(const Mat4x4& mat) noexcept {
 Vector3& Vector3::operator=(const Vector2& right) noexcept {
 	x = right.x;
 	y = right.y;
-	z = 0.0f;
 
 	return *this;
 }

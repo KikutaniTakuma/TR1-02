@@ -6,11 +6,6 @@
 #include <fstream>
 #include <Windows.h> 
 
-GlobalVariables* GlobalVariables::GetInstance() {
-	static GlobalVariables instance;
-	return &instance;
-}
-
 void GlobalVariables::CreateGroup(const std::string& groupName) {
 	datas[groupName];
 }
@@ -30,6 +25,11 @@ void GlobalVariables::SetValue(const std::string& groupName, const std::string& 
 	Item item = value;
 	gruop[key] = value;
 }
+void GlobalVariables::SetValue(const std::string& groupName, const std::string& key, const std::string& value) {
+	auto& gruop = datas[groupName];
+	Item item = value;
+	gruop[key] = value;
+}
 
 void GlobalVariables::Update() {
 	if (!ImGui::Begin(" Global Variables", nullptr, ImGuiWindowFlags_MenuBar)) {
@@ -39,6 +39,7 @@ void GlobalVariables::Update() {
 	if (!ImGui::BeginMenuBar()) {
 		return;
 	}
+	
 
 	for (auto itrGroup = datas.begin(); itrGroup != datas.end(); itrGroup++) {
 		const std::string& groupName = itrGroup->first;
@@ -106,15 +107,25 @@ void GlobalVariables::SaveFile(const std::string& groupName) {
 			auto tmp = std::get<Vector3>(item);
 			root[groupName][itemName] = nlohmann::json::array({ tmp.x, tmp.y, tmp.z });
 		}
+		else if (std::holds_alternative<std::string>(item)) {
+			root[groupName][itemName] = std::get<std::string>(item);
+		}
 	}
 
-	const std::filesystem::path kDirectoryPath = "./AL_Resouce/ GlobalVariables/";
+	const std::filesystem::path kDirectoryPath = "./Datas/";
 
 	if (!std::filesystem::exists(kDirectoryPath)) {
 		std::filesystem::create_directory(kDirectoryPath);
 	}
 
-	auto filePath = kDirectoryPath.string() + groupName + ".json";
+	std::string groupNameTmp;
+	for (auto& i : groupName) {
+		if (i == '\0') {
+			break;
+		}
+		groupNameTmp += i;
+	}
+	auto filePath = (kDirectoryPath.string() + groupNameTmp) + std::string(".json");
 
 	std::ofstream file(filePath);
 
@@ -129,7 +140,7 @@ void GlobalVariables::SaveFile(const std::string& groupName) {
 }
 
 void GlobalVariables::LoadFile() {
-	const std::filesystem::path kDirectoryPath = "./AL_Resouce/ GlobalVariables/";
+	const std::filesystem::path kDirectoryPath = "./Datas/";
 
 	if (!std::filesystem::exists(kDirectoryPath)) {
 		return;
@@ -150,8 +161,8 @@ void GlobalVariables::LoadFile() {
 }
 
 void GlobalVariables::LoadFile(const std::string& groupName) {
-	const std::filesystem::path kDirectoryPath = "./AL_Resouce/ GlobalVariables/";
-	std::string filePath = kDirectoryPath.string() + groupName + ".json";
+	const std::filesystem::path kDirectoryPath = "./Datas/";
+	std::string filePath = kDirectoryPath.string() + groupName + std::string(".json");
 
 	std::ifstream file(filePath);
 
@@ -184,6 +195,10 @@ void GlobalVariables::LoadFile(const std::string& groupName) {
 			Vector3 value = { itemItr->at(0),itemItr->at(1),itemItr->at(2) };
 			SetValue(groupName, itemName, value);
 		}
+		else if (itemItr->is_string()) {
+			std::string value = itemItr->get<std::string>();
+			SetValue(groupName, itemName, value);
+		}
 
 	}
 }
@@ -206,6 +221,15 @@ void GlobalVariables::AddItem(const std::string& groupName, const std::string& k
 	}
 }
 void GlobalVariables::AddItem(const std::string& groupName, const std::string& key, const Vector3& value) {
+	auto& gruop = datas[groupName];
+	auto itemItr = gruop.find(key);
+	gruop[key] = value;
+	if (itemItr == gruop.end()) {
+		Item item = value;
+		gruop[key] = value;
+	}
+}
+void GlobalVariables::AddItem(const std::string& groupName, const std::string& key, const std::string& value) {
 	auto& gruop = datas[groupName];
 	auto itemItr = gruop.find(key);
 	gruop[key] = value;
@@ -259,5 +283,21 @@ Vector3 GlobalVariables::GetVector3Value(const std::string& groupName, const std
 		assert(!"GlobalVariables::GetVector3Value() errar Don't have Vector3");
 
 		return Vector3();
+	}
+}
+std::string GlobalVariables::GetStringValue(const std::string& groupName, const std::string& key) const {
+	auto dataItr = datas.find(groupName);
+	assert(dataItr != datas.end());
+	const Group& group = dataItr->second;
+	auto itemItr = group.find(key);
+	assert(itemItr != group.end());
+	const Item& item = itemItr->second;
+	if (std::holds_alternative<std::string>(item)) {
+		return std::get<std::string>(item);
+	}
+	else {
+		assert(!"GlobalVariables::GetStringValue() errar Don't have Vector3");
+
+		return std::string();
 	}
 }

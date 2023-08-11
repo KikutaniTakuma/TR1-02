@@ -16,15 +16,20 @@
 #include "StringOut/StringOut.h"
 #include "Line/Line.h"
 #include "Editor/Node/Node.h"
-#include "Player/Player.h"
+//#include "Player/Player.h"
 #include "Enemy/Enemy.h"
 #include "GlobalVariables/GlobalVariables.h"
+#include "SceneManager/Scene/Scene.h"
+#include "UIeditor/UIeditor.h"
 
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	// ライブラリ初期化
 	if(!Engine::Initialize("DirectXGame")){
-		ErrorCheck::GetInstance()->ErrorTextBox("InitializeDirect3D() : Engine::Initialize() Failed", "WinMain");
+		ErrorCheck::GetInstance()->ErrorTextBox(
+			"InitializeDirect3D() : Engine::Initialize() Failed", 
+			"WinMain"
+		);
 		return -1;
 	}
 
@@ -40,8 +45,36 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	Camera camera2D(Camera::Mode::Othographic);
 
+	// シーンをレンダリング
 	auto pera = std::make_unique<PeraRender>();
-	pera->Initialize("PostShader/Post.VS.hlsl", "PostShader/PostNone.PS.hlsl");
+	pera->Initialize(
+		"PostShader/Post.VS.hlsl", 
+		"PostShader/PostNone.PS.hlsl"
+	);
+	// 輝度を抽出
+	auto luminance = std::make_unique<PeraRender>();
+	luminance->Initialize(
+		"PostShader/Post.VS.hlsl",
+		"PostShader/PostLuminance.PS.hlsl"
+	);
+	// ブラーをかける
+	auto averaging = std::make_unique<PeraRender>();
+	averaging->Initialize(
+		"PostShader/Post.VS.hlsl",
+		"PostShader/PostAveraging.PS.hlsl"
+	);
+	// ブラーをかける
+	auto averaging2 = std::make_unique<PeraRender>();
+	averaging2->Initialize(
+		"PostShader/Post.VS.hlsl",
+		"PostShader/PostAveraging.PS.hlsl"
+	);
+	//ブラーをかけたものと普通に描画したものを合成する
+	auto add = std::make_unique<PeraRender>();
+	add->Initialize(
+		"PostShader/Post.VS.hlsl",
+		"PostShader/PostNone.PS.hlsl"
+	);
 
 	bool fullscreen = false;
 
@@ -50,7 +83,15 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	watame->LoadShader();
 	watame->CreateGraphicsPipeline();
 
-	GlobalVariables::GetInstance()->LoadFile();
+	//UIeditor::GetInstance()->LoadFile();
+
+	//UIeditor::GetInstance()->Add("./Resources/uvChecker.png");
+	/*Texture2D tex;
+	tex.LoadTexture("./Resources/uvChecker.png");
+	tex.Initialize();
+
+	Texture2D tex2 = tex;*/
+
 
 	/// 
 	/// メインループ
@@ -76,13 +117,11 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// 更新処理
 		/// 
 
-		if (KeyInput::Releaed(DIK_F11) || ((KeyInput::LongPush(DIK_LALT) || KeyInput::LongPush(DIK_RALT)) && KeyInput::Releaed(DIK_RETURN))) {
+		if (KeyInput::Releaed(DIK_F11) || 
+			((KeyInput::LongPush(DIK_LALT) || KeyInput::LongPush(DIK_RALT)) && KeyInput::Releaed(DIK_RETURN))) {
 			fullscreen = !fullscreen;
 			WinApp::GetInstance()->SetFullscreen(fullscreen);
 		}
-
-		
-		GlobalVariables::GetInstance()->Update();
 
 		if (camera2D.isDebug) {
 			camera.isDebug = !camera2D.isDebug;
@@ -108,25 +147,12 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		ImGui::DragFloat("cameraFoV", &camera2D.fov, 0.01f);
 		ImGui::End();
 
-		if (KeyInput::Pushed(DIK_1)) {
-			Engine::SetResolution(Engine::Resolution::HDTV);
-		}
-		if (KeyInput::Pushed(DIK_2)) {
-			Engine::SetResolution(Engine::Resolution::FHD);
-		}
-		if (KeyInput::Pushed(DIK_3)) {
-			Engine::SetResolution(Engine::Resolution::UHD);
-		}
-		if (KeyInput::Pushed(DIK_4)) {
-			Engine::SetResolution(Engine::Resolution::SHV);
-		}
-
 		camera.Update(Vector3());
 		camera2D.Update();
 
-		if (KeyInput::Pushed(DIK_P)) {
-			GlobalVariables::GetInstance()->SaveFile("Player");
-		}
+		//UIeditor::GetInstance()->Update(camera2D.GetViewOthographicsVp());
+
+		//tex2.Update();
 
 		///
 		/// 更新処理ここまで
@@ -135,11 +161,28 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		///
 		/// 描画処理
 		/// 
-		//pera->PreDraw();
+		watame->Draw(camera.GetViewProjection(), camera.pos);
+		pera->PreDraw();
 
 		watame->Draw(camera.GetViewProjection(), camera.pos);
 
-		//pera->Draw();
+		// peraに描画されたやつから輝度を抽出するレンダーに描画
+		pera->Draw(Pipeline::None, luminance.get());
+
+		// 輝度を抽出したものをブラーをかけるものに描画
+		luminance->Draw(Pipeline::None, averaging.get());
+
+		// 平均化ブラーを更に平均化ブラーをかけるものに描画
+		averaging->Draw(Pipeline::None, averaging2.get());
+
+		// 平均化ブラーしたものを加算合成
+		averaging2->Draw(Pipeline::Add);
+
+
+
+		//UIeditor::GetInstance()->Draw(camera2D.GetViewOthographics());
+		//tex2.Draw(camera2D.GetViewOthographics());
+		//Gamepad::Debug();
 		///
 		/// 描画処理ここまで
 		/// 

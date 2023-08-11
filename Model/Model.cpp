@@ -274,10 +274,6 @@ void Model::CreateGraphicsPipeline() {
 	}
 }
 
-void Model::Update() {
-
-}
-
 void Model::Draw(const Mat4x4& viewProjectionMat, const Vector3& cameraPos) {
 	assert(createGPFlg);
 

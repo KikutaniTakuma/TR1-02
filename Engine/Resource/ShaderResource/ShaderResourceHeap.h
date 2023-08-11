@@ -19,10 +19,12 @@ private:
 public:
 	ShaderResourceHeap();
 	ShaderResourceHeap(const ShaderResourceHeap& right);
+	ShaderResourceHeap(ShaderResourceHeap&& right) noexcept;
 	ShaderResourceHeap(uint16_t numDescriptor);
 	~ShaderResourceHeap();
 public:
 	ShaderResourceHeap& operator=(const ShaderResourceHeap& right);
+	ShaderResourceHeap& operator=(ShaderResourceHeap&& right) noexcept;
 
 public:
 	void InitializeReset();
@@ -83,6 +85,8 @@ public:
 	inline UINT GetSize() const {
 		return heapSize;
 	}
+
+	void Reset();
 
 private:
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> SRVHeap;
