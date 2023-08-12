@@ -87,7 +87,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	//UIeditor::GetInstance()->Add("./Resources/uvChecker.png");
 	Texture2D tex;
-	tex.ThreadLoadTexture("./Resources/uvChecker.png");
+	tex.LoadTexture("./Resources/uvChecker.png");
 	tex.Initialize();
 
 	/*std::vector<Texture*> texs;

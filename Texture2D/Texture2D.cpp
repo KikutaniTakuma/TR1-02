@@ -141,22 +141,9 @@ void Texture2D::CreateGraphicsPipeline() {
 }
 
 void Texture2D::LoadTexture(const std::string& fileName) {
-	if (!tex) {
-		tex = TextureManager::GetInstance()->LoadTexture(fileName);
+	tex = TextureManager::GetInstance()->LoadTexture(fileName);
 
-		SRVHeap.Reset();
-		SRVHandle = SRVHeap.CreateTxtureView(tex);
-		SRVHeap.CreateConstBufferView(wvpMat);
-		SRVHeap.CreateConstBufferView(color);
-		CreateGraphicsPipeline();
-	}
-	else if (tex) {
-		tex = TextureManager::GetInstance()->LoadTexture(fileName);
-
-		SRVHeap.CreateTxtureView(tex, SRVHandle);
-	}
-
-	isLoad = true;
+	isLoad = false;
 }
 
 void Texture2D::ThreadLoadTexture(const std::string& fileName) {
