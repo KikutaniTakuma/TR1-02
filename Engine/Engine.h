@@ -34,8 +34,8 @@
 class Engine {
 public:
 	enum class Resolution {
-		HDTV, // 1280x720  720p
-		FHD,  // 1920x1080 2K
+		HD,   // 1280x720  720p
+		FHD,  // 1920x1080 1080p
 		UHD,  // 2560x1440 4K
 		SHV,  // 3840x2160 8K
 

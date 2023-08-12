@@ -16,9 +16,6 @@ void TextureManager::Initialize() {
 }
 
 void TextureManager::Finalize() {
-	if (instance->load.joinable()) {
-		instance->load.join();
-	}
 	delete instance;
 	instance = nullptr;
 }
@@ -28,11 +25,24 @@ TextureManager::TextureManager() :
 	thisFrameLoadFlg(false),
 	threadTextureBuff(),
 	load(),
-	isThreadFinish(false)
+	isThreadFinish(false),
+	fence(),
+	fenceVal(0),
+	fenceEvent(nullptr)
 {
+	// コマンドキューを作成
+	commandQueue = nullptr;
+	D3D12_COMMAND_QUEUE_DESC commandQueueDesc{};
+	HRESULT hr = Engine::GetDevice()->CreateCommandQueue(&commandQueueDesc, IID_PPV_ARGS(commandQueue.GetAddressOf()));
+	assert(SUCCEEDED(hr));
+	if (!SUCCEEDED(hr)) {
+		ErrorCheck::GetInstance()->ErrorTextBox("TextureManager() : CreateCommandQueue() Failed", "TextureManager");
+		return;
+	}
+
 	// コマンドアロケータを生成する
 	commandAllocator = nullptr;
-	HRESULT hr = Engine::GetDevice()->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(commandAllocator.GetAddressOf()));
+	hr = Engine::GetDevice()->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(commandAllocator.GetAddressOf()));
 	assert(SUCCEEDED(hr));
 	if (!SUCCEEDED(hr)) {
 		ErrorCheck::GetInstance()->ErrorTextBox("TextureManager() : CreateCommandAllocator() Failed", "TextureManager");
@@ -47,9 +57,32 @@ TextureManager::TextureManager() :
 		ErrorCheck::GetInstance()->ErrorTextBox("TextureManager() : CreateCommandList() Failed", "TextureManager");
 		return;
 	}
+
+	// 初期値0でFenceを作る
+	fence = nullptr;
+	fenceVal = 0;
+	hr = Engine::GetDevice()->CreateFence(fenceVal, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(fence.GetAddressOf()));
+	assert(SUCCEEDED(hr));
+	if (!SUCCEEDED(hr)) {
+		ErrorCheck::GetInstance()->ErrorTextBox("TextureManager() : CreateFence() Failed", "TextureManager");
+		return;
+	}
+
+	// FenceのSignalを持つためのイベントを作成する
+	fenceEvent = nullptr;
+	fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+	assert(fenceEvent != nullptr);
+	if (!(fenceEvent != nullptr)) {
+		ErrorCheck::GetInstance()->ErrorTextBox("TextureManager() : CreateEvent() Failed", "TextureManager");
+		return;
+	}
 }
 
 TextureManager::~TextureManager() {
+	if (load.joinable()) {
+		load.join();
+	}
+	CloseHandle(fenceEvent);
 	textures.clear();
 }
 
@@ -154,19 +187,38 @@ void TextureManager::ReleaseIntermediateResource() {
 }
 
 void TextureManager::ResetCommandList() {
-	// 次フレーム用のコマンドリストを準備
-	auto hr = commandAllocator->Reset();
-	assert(SUCCEEDED(hr));
-	if (!SUCCEEDED(hr)) {
-		ErrorCheck::GetInstance()->ErrorTextBox("CommandAllocator->Reset() Failed", "Engine");
-	}
-	hr = commandList->Reset(commandAllocator.Get(), nullptr);
-	assert(SUCCEEDED(hr));
-	if (!SUCCEEDED(hr)) {
-		ErrorCheck::GetInstance()->ErrorTextBox("CommandList->Reset() Failed", "Engine");
-	}
+	if (isThreadFinish) {
+		commandList->Close();
+		ID3D12CommandList* commandLists[] = { commandList.Get() };
+		commandQueue->ExecuteCommandLists(_countof(commandLists), commandLists);
+		// Fenceの値を更新
+		fenceVal++;
+		// GPUがここまでたどり着いたときに、Fenceの値を指定した値に代入するようにSignalを送る
+		commandQueue->Signal(fence.Get(), fenceVal);
 
-	load.join();
+		// Fenceの値が指定したSigna値にたどり着いているか確認する
+		// GetCompletedValueの初期値はFence作成時に渡した初期値
+		if (fence->GetCompletedValue() < fenceVal) {
+			// 指定したSignal値にたどり着いていないので、たどり着くまで待つようにイベントを設定する
+			fence->SetEventOnCompletion(fenceVal, fenceEvent);
+			// イベントを待つ
+			WaitForSingleObject(fenceEvent, INFINITE);
+		}
 
-	isThreadFinish = false;
+		load.join();
+
+		// 次フレーム用のコマンドリストを準備
+		auto hr = commandAllocator->Reset();
+		assert(SUCCEEDED(hr));
+		if (!SUCCEEDED(hr)) {
+			ErrorCheck::GetInstance()->ErrorTextBox("CommandAllocator->Reset() Failed", "Engine");
+		}
+		hr = commandList->Reset(commandAllocator.Get(), nullptr);
+		assert(SUCCEEDED(hr));
+		if (!SUCCEEDED(hr)) {
+			ErrorCheck::GetInstance()->ErrorTextBox("CommandList->Reset() Failed", "Engine");
+		}
+
+		isThreadFinish = false;
+	}
 }

@@ -60,8 +60,13 @@ public:
 
 
 private:
+	Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue;
 	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator;
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList;
+
+	Microsoft::WRL::ComPtr<ID3D12Fence> fence;
+	uint64_t fenceVal;
+	HANDLE fenceEvent;
 
 	/// <summary>
 	/// Textureのコンテナ(キー値: ファイルネーム  コンテナデータ型: Texture*)

@@ -70,7 +70,7 @@ bool Engine::Initialize(const std::string& windowName, Resolution resolution) {
 
 	switch (resolution)
 	{
-	case Engine::Resolution::HDTV:
+	case Engine::Resolution::HD:
 		engine->clientWidth = 1280;
 		engine->clientHeight = 720;
 		break;
@@ -616,7 +616,7 @@ bool Engine::InitializeDraw() {
 void Engine::ChangeResolution() {
 	switch (resolution)
 	{
-	case Engine::Resolution::HDTV:
+	case Engine::Resolution::HD:
 		clientWidth = 1280;
 		clientHeight = 720;
 		break;
@@ -767,18 +767,10 @@ void Engine::FrameEnd() {
 	}
 
 	// GPUにコマンドリストの実行を行わせる
-	if (TextureManager::GetInstance()->ThreadLoadFinish()) {
-		TextureManager::GetInstance()->GetCommandList()->Close();
-		ID3D12CommandList* commandLists[] = {
-			engine->commandList.Get(),
-			TextureManager::GetInstance()->GetCommandList()
-		};
-		engine->commandQueue->ExecuteCommandLists(_countof(commandLists), commandLists);
-	}
-	else {
-		ID3D12CommandList* commandLists[] = { engine->commandList.Get() };
-		engine->commandQueue->ExecuteCommandLists(_countof(commandLists), commandLists);
-	}
+
+	ID3D12CommandList* commandLists[] = { engine->commandList.Get() };
+	engine->commandQueue->ExecuteCommandLists(_countof(commandLists), commandLists);
+
 
 	// GPUとOSに画面の交換を行うように通知する
 	engine->swapChain->Present(1, 0);
@@ -810,9 +802,9 @@ void Engine::FrameEnd() {
 	if (!SUCCEEDED(hr)) {
 		ErrorCheck::GetInstance()->ErrorTextBox("CommandList->Reset() Failed", "Engine");
 	}
-	if (TextureManager::GetInstance()->ThreadLoadFinish()) {
+	
 		TextureManager::GetInstance()->ResetCommandList();
-	}
+	
 
 	// このフレームで画像読み込みが発生していたら開放する
 	// またUnloadされていたらそれをコンテナから削除する
