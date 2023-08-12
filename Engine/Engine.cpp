@@ -803,7 +803,8 @@ void Engine::FrameEnd() {
 		ErrorCheck::GetInstance()->ErrorTextBox("CommandList->Reset() Failed", "Engine");
 	}
 	
-		TextureManager::GetInstance()->ResetCommandList();
+	TextureManager::GetInstance()->ThreadLoadTexture();
+	TextureManager::GetInstance()->ResetCommandList();
 	
 
 	// このフレームで画像読み込みが発生していたら開放する

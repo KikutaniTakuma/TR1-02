@@ -25,7 +25,7 @@
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	// ライブラリ初期化
-	if(!Engine::Initialize("DirectXGame")){
+	if(!Engine::Initialize("DirectXGame",Engine::Resolution::HD)){
 		ErrorCheck::GetInstance()->ErrorTextBox(
 			"InitializeDirect3D() : Engine::Initialize() Failed", 
 			"WinMain"
@@ -86,13 +86,11 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	//UIeditor::GetInstance()->LoadFile();
 
 	//UIeditor::GetInstance()->Add("./Resources/uvChecker.png");
-	/*Texture2D tex;
-	tex.LoadTexture("./Resources/uvChecker.png");
+	Texture2D tex;
+	tex.ThreadLoadTexture("./Resources/uvChecker.png");
 	tex.Initialize();
 
-	Texture2D tex2 = tex;*/
-
-	std::vector<Texture*> texs;
+	/*std::vector<Texture*> texs;
 	texs.resize(100);
 
 	Texture* tex = nullptr;
@@ -100,7 +98,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	for (auto& i : texs) {
 		TextureManager::GetInstance()->LoadTexture("./Resources/uvChecker.png", &i);
-	}
+	}*/
 
 	//TextureManager::GetInstance()->ThreadLoadTexture();
 
@@ -162,8 +160,10 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		camera2D.Update();
 		
 		if (KeyInput::Pushed(DIK_SPACE)) {
-			TextureManager::GetInstance()->LoadTexture("./Resources/watame4k.png", &tex);
+			tex.ThreadLoadTexture("./Resources/watame4k.png");
 		}
+
+		tex.Update();
 
 		//UIeditor::GetInstance()->Update(camera2D.GetViewOthographicsVp());
 
@@ -178,7 +178,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// 
 		//watame->Draw(camera.GetViewProjection(), camera.pos);
 		//pera->PreDraw();
-		TextureManager::GetInstance()->ThreadLoadTexture();
+		
 		//watame->Draw(camera.GetViewProjection(), camera.pos);
 
 		//// peraに描画されたやつから輝度を抽出するレンダーに描画
@@ -196,7 +196,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 
 		//UIeditor::GetInstance()->Draw(camera2D.GetViewOthographics());
-		//tex2.Draw(camera2D.GetViewOthographics());
+		tex.Draw(camera2D.GetViewOthographics());
 		//Gamepad::Debug();
 
 		///

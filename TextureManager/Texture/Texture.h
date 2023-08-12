@@ -60,6 +60,11 @@ public:
 private:
 	void ReleaseIntermediateResource();
 
+public:
+	bool CanUse() const {
+		return !static_cast<bool>(intermediateResource);
+	}
+
 
 /// <summary>
 /// メンバ関数

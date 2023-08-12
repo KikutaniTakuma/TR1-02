@@ -17,7 +17,9 @@ Texture2D::Texture2D() :
 	indexResource(nullptr),
 	shader(),
 	graphicsPipelineState(),
-	tex(nullptr)
+	tex(nullptr),
+	isFirstLoad(true),
+	isLoad(false)
 {}
 
 Texture2D::Texture2D(const Texture2D& right) :
@@ -34,7 +36,9 @@ Texture2D::Texture2D(const Texture2D& right) :
 	indexResource(nullptr),
 	shader(),
 	graphicsPipelineState(),
-	tex(nullptr)
+	tex(nullptr),
+	isFirstLoad(true),
+	isLoad(false)
 {
 	*this = right;
 }
@@ -52,7 +56,9 @@ Texture2D::Texture2D(Texture2D&& right) noexcept :
 	indexResource(nullptr),
 	shader(),
 	graphicsPipelineState(),
-	tex(nullptr)
+	tex(nullptr),
+	isFirstLoad(true),
+	isLoad(false)
 {
 	*this = right;
 }
@@ -86,7 +92,7 @@ Texture2D& Texture2D::operator=(const Texture2D& right) {
 }
 
 void Texture2D::Initialize(const std::string& vsFileName, const std::string& psFileName) {
-	CreateShader(vsFileName, psFileName);
+	LoadShader(vsFileName, psFileName);
 
 	vertexResource = Engine::CreateBufferResuorce(sizeof(VertexData) * 4);
 
@@ -111,14 +117,9 @@ void Texture2D::Initialize(const std::string& vsFileName, const std::string& psF
 
 
 	*color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
-
-	SRVHeap.CreateConstBufferView(wvpMat);
-	SRVHeap.CreateConstBufferView(color);
-
-	CreateGraphicsPipeline();
 }
 
-void Texture2D::CreateShader(const std::string& vsFileName, const std::string& psFileName) {
+void Texture2D::LoadShader(const std::string& vsFileName, const std::string& psFileName) {
 	shader.vertex = ShaderManager::LoadVertexShader(vsFileName);
 	assert(shader.vertex);
 	shader.pixel = ShaderManager::LoadPixelShader(psFileName);
@@ -143,32 +144,61 @@ void Texture2D::LoadTexture(const std::string& fileName) {
 	if (!tex) {
 		tex = TextureManager::GetInstance()->LoadTexture(fileName);
 
+		SRVHeap.Reset();
 		SRVHandle = SRVHeap.CreateTxtureView(tex);
+		SRVHeap.CreateConstBufferView(wvpMat);
+		SRVHeap.CreateConstBufferView(color);
+		CreateGraphicsPipeline();
 	}
 	else if (tex) {
 		tex = TextureManager::GetInstance()->LoadTexture(fileName);
 
 		SRVHeap.CreateTxtureView(tex, SRVHandle);
 	}
+
+	isLoad = true;
+}
+
+void Texture2D::ThreadLoadTexture(const std::string& fileName) {
+	tex = nullptr;
+	TextureManager::GetInstance()->LoadTexture(fileName, &tex);
+	isLoad = false;
 }
 
 void Texture2D::Update() {
-	std::array<Vector3, 4> pv = {
-		Vector3{ -0.5f,  0.5f, 0.1f },
-		Vector3{  0.5f,  0.5f, 0.1f },
-		Vector3{  0.5f, -0.5f, 0.1f },
-		Vector3{ -0.5f, -0.5f, 0.1f },
-	};
+	if (tex && tex->CanUse() && !isLoad) {
+		if (isFirstLoad) {
+			SRVHeap.Reset();
+			SRVHandle = SRVHeap.CreateTxtureView(tex);
+			SRVHeap.CreateConstBufferView(wvpMat);
+			SRVHeap.CreateConstBufferView(color);
+			CreateGraphicsPipeline();
+			isFirstLoad = false;
+		}
+		else {
+			SRVHeap.CreateTxtureView(tex, SRVHandle);
+		}
+		isLoad = true;
+	}
 
-	std::copy(pv.begin(), pv.end(), worldPos.begin());
-	auto&& worldMat = 
-		HoriMakeMatrixAffin(
-		Vector3(scale.x * tex->getSize().x, scale.y * tex->getSize().y, 1.0f),
-		rotate,
-		pos
-	);
-	for (auto& i : worldPos) {
-		i *= worldMat;
+	if (tex && isLoad) {
+		std::array<Vector3, 4> pv = {
+			Vector3{ -0.5f,  0.5f, 0.1f },
+			Vector3{  0.5f,  0.5f, 0.1f },
+			Vector3{  0.5f, -0.5f, 0.1f },
+			Vector3{ -0.5f, -0.5f, 0.1f },
+		};
+
+		std::copy(pv.begin(), pv.end(), worldPos.begin());
+		auto&& worldMat =
+			HoriMakeMatrixAffin(
+				Vector3(scale.x * tex->getSize().x, scale.y * tex->getSize().y, 1.0f),
+				rotate,
+				pos
+			);
+		for (auto& i : worldPos) {
+			i *= worldMat;
+		}
 	}
 }
 
@@ -176,38 +206,40 @@ void Texture2D::Draw(
 	const Mat4x4& viewProjection,
 	Pipeline::Blend blend
 ) {
-	const Vector2& uv0 = { uvPibot.x, uvPibot.y + uvSize.y }; const Vector2& uv1 = uvSize + uvPibot;
-	const Vector2& uv2 = { uvPibot.x + uvSize.x, uvPibot.y }; const Vector2& uv3 = uvPibot;
+	if (tex && isLoad) {
+		const Vector2& uv0 = { uvPibot.x, uvPibot.y + uvSize.y }; const Vector2& uv1 = uvSize + uvPibot;
+		const Vector2& uv2 = { uvPibot.x + uvSize.x, uvPibot.y }; const Vector2& uv3 = uvPibot;
 
-	std::array<VertexData, 4> pv = {
-		worldPos[0], uv3,
-		worldPos[1], uv2,
-		worldPos[2], uv1,
-		worldPos[3], uv0,
-	};
+		std::array<VertexData, 4> pv = {
+			worldPos[0], uv3,
+			worldPos[1], uv2,
+			worldPos[2], uv1,
+			worldPos[3], uv0,
+		};
 
-	VertexData* mappedData = nullptr;
-	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&mappedData));
-	std::copy(pv.begin(), pv.end(), mappedData);
-	vertexResource->Unmap(0, nullptr);
+		VertexData* mappedData = nullptr;
+		vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&mappedData));
+		std::copy(pv.begin(), pv.end(), mappedData);
+		vertexResource->Unmap(0, nullptr);
 
-	*wvpMat = viewProjection;
+		*wvpMat = viewProjection;
 
-	auto commandlist = Engine::GetCommandList();
+		auto commandlist = Engine::GetCommandList();
 
-	for (auto& i : graphicsPipelineState) {
-		if (!i) {
-			ErrorCheck::GetInstance()->ErrorTextBox("pipeline is nullptr", "Model");
-			return;
+		for (auto& i : graphicsPipelineState) {
+			if (!i) {
+				ErrorCheck::GetInstance()->ErrorTextBox("pipeline is nullptr", "Model");
+				return;
+			}
 		}
-	}
 
-	// 各種描画コマンドを積む
-	graphicsPipelineState[blend]->Use();
-	SRVHeap.Use();
-	commandlist->IASetVertexBuffers(0, 1, &vertexView);
-	commandlist->IASetIndexBuffer(&indexView);
-	commandlist->DrawIndexedInstanced(6, 1, 0, 0, 0);
+		// 各種描画コマンドを積む
+		graphicsPipelineState[blend]->Use();
+		SRVHeap.Use();
+		commandlist->IASetVertexBuffers(0, 1, &vertexView);
+		commandlist->IASetIndexBuffer(&indexView);
+		commandlist->DrawIndexedInstanced(6, 1, 0, 0, 0);
+	}
 }
 
 void Texture2D::Debug(const std::string& guiName) {

@@ -39,12 +39,13 @@ public:
 	);
 
 private:
-	void CreateShader(const std::string& vsFileName, const std::string& psFileName);
+	void LoadShader(const std::string& vsFileName, const std::string& psFileName);
 
 	void CreateGraphicsPipeline();
 
 public:
 	void LoadTexture(const std::string& fileName);
+	void ThreadLoadTexture(const std::string& fileName);
 
 public:
 	void Update();
@@ -88,4 +89,6 @@ private:
 	ConstBuffer<Vector4> color;
 
 	Texture* tex;
+	bool isFirstLoad;
+	bool isLoad;
 };
