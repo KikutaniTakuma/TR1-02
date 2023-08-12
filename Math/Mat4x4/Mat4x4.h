@@ -4,9 +4,6 @@
 #include <string>
 #include "Math/Vector4/Vector4.h"
 
-static const int kRowHeight = 20;
-static const int kColumnWidth = 60;
-
 class Vector3;
 
 class Mat4x4 final {
@@ -81,8 +78,8 @@ public:
 /// 静的定数
 /// </summary>
 private:
-	static const int HEIGHT = 4;
-	static const int WIDTH = 4;
+	static constexpr int32_t HEIGHT = 4;
+	static constexpr int32_t WIDTH = 4;
 
 /// <summary>
 /// メンバ変数
