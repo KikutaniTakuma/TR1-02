@@ -212,7 +212,8 @@ bool UIeditor::Add(const std::string& fileName_) {
 }
 
 UIeditor::UIeditor():
-	textures(0)
+	textures(0),
+	isCreate(false)
 {
 	texItr = textures.end();
 }

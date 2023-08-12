@@ -30,7 +30,7 @@ public:
 
 private:
 	std::unordered_map<std::string, Texture2D> textures;
-	std::unordered_map<std::string, Texture2D>::iterator texItr;
+	decltype(textures)::iterator texItr;
 
 	bool isCreate;
 	std::string groupNameAdd;
