@@ -760,15 +760,25 @@ void Engine::FrameEnd() {
 
 	// コマンドリストを確定させる
 	HRESULT hr = engine->commandList->Close();
+	engine->isCommandListClose = true;
 	assert(SUCCEEDED(hr));
 	if (!SUCCEEDED(hr)) {
 		ErrorCheck::GetInstance()->ErrorTextBox("CommandList->Close() Failed", "Engine");
 	}
 
 	// GPUにコマンドリストの実行を行わせる
-	ID3D12CommandList* commandLists[] = { engine->commandList.Get()};
-	engine->commandQueue->ExecuteCommandLists(_countof(commandLists), commandLists);
-
+	if (TextureManager::GetInstance()->ThreadLoadFinish()) {
+		TextureManager::GetInstance()->GetCommandList()->Close();
+		ID3D12CommandList* commandLists[] = {
+			engine->commandList.Get(),
+			TextureManager::GetInstance()->GetCommandList()
+		};
+		engine->commandQueue->ExecuteCommandLists(_countof(commandLists), commandLists);
+	}
+	else {
+		ID3D12CommandList* commandLists[] = { engine->commandList.Get() };
+		engine->commandQueue->ExecuteCommandLists(_countof(commandLists), commandLists);
+	}
 
 	// GPUとOSに画面の交換を行うように通知する
 	engine->swapChain->Present(1, 0);
@@ -795,9 +805,13 @@ void Engine::FrameEnd() {
 		ErrorCheck::GetInstance()->ErrorTextBox("CommandAllocator->Reset() Failed", "Engine");
 	}
 	hr = engine->commandList->Reset(engine->commandAllocator.Get(), nullptr);
+	engine->isCommandListClose = false;
 	assert(SUCCEEDED(hr));
 	if (!SUCCEEDED(hr)) {
 		ErrorCheck::GetInstance()->ErrorTextBox("CommandList->Reset() Failed", "Engine");
+	}
+	if (TextureManager::GetInstance()->ThreadLoadFinish()) {
+		TextureManager::GetInstance()->ResetCommandList();
 	}
 
 	// このフレームで画像読み込みが発生していたら開放する

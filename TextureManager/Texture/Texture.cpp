@@ -41,7 +41,8 @@ void Texture::Load(const std::string& filePath) {
 		const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
 		size = { static_cast<float>(metadata.width),static_cast<float>(metadata.height) };
 		textureResouce = CreateTextureResource(metadata);
-		if (textureResouce) {
+
+		if (textureResouce && !Engine::GetIsCloseCommandList()) {
 			intermediateResource = UploadTextureData(textureResouce.Get(), mipImages);
 		}
 		else {
@@ -58,21 +59,29 @@ void Texture::Load(const std::string& filePath) {
 	}
 }
 
-void Texture::ThreadLoad(const std::string& filePath) {
+void Texture::Load(const std::string& filePath, ID3D12GraphicsCommandList* commandList) {
 	if (!loadFlg && !threadLoadFlg) {
-		threadLoadFlg = true;
-
 		this->fileName = filePath;
 
 		DirectX::ScratchImage mipImages = LoadTexture(filePath);
 		const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
+		size = { static_cast<float>(metadata.width),static_cast<float>(metadata.height) };
 		textureResouce = CreateTextureResource(metadata);
-		intermediateResource = UploadTextureData(textureResouce.Get(), mipImages);
+
+		if (textureResouce) {
+			intermediateResource = UploadTextureData(textureResouce.Get(), mipImages, commandList);
+		}
+		else {
+			return;
+		}
 
 		srvDesc.Format = metadata.format;
 		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 		srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
+
+		// load済み
+		loadFlg = true;
 	}
 }
 
@@ -169,6 +178,35 @@ ID3D12Resource* Texture::UploadTextureData(ID3D12Resource* texture, const Direct
 		D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES
 	);
 	
+	return resource;
+}
+
+[[nodiscard]]
+ID3D12Resource* Texture::UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages, ID3D12GraphicsCommandList* commandList) {
+	std::vector<D3D12_SUBRESOURCE_DATA> subresources;
+	DirectX::PrepareUpload(Engine::GetDevice(), mipImages.GetImages(), mipImages.GetImageCount(), mipImages.GetMetadata(), subresources);
+	uint64_t intermediateSize = GetRequiredIntermediateSize(texture, 0, UINT(subresources.size()));
+	ID3D12Resource* resource = Engine::CreateBufferResuorce(intermediateSize);
+	UpdateSubresources(commandList, texture, resource, 0, 0, UINT(subresources.size()), subresources.data());
+	// Textureへの転送後は利用できるよう、D3D12_STATE_COPY_DESTからD3D12_RESOURCE_STATE_GENERIC_READへResouceStateを変更する
+	
+	// TransitionBarrierの設定
+	D3D12_RESOURCE_BARRIER barrier{};
+	// 今回のバリアはTransition
+	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	// Noneにしておく
+	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	// バリアを張る対象のリソース
+	barrier.Transition.pResource = texture;
+	// subResourceの設定
+	barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+	// 遷移前(現在)のResouceState
+	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+	// 遷移後のResouceState
+	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;
+	// TransitionBarrierを張る
+	commandList->ResourceBarrier(1, &barrier);
+
 	return resource;
 }
 

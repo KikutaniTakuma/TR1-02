@@ -2,8 +2,8 @@
 
 #include <d3d12.h>
 
-#include "externals//DirectXTex/DirectXTex.h"
-#include "externals//DirectXTex/d3dx12.h"
+#include "externals/DirectXTex/DirectXTex.h"
+#include "externals/DirectXTex/d3dx12.h"
 #include <wrl.h>
 
 #include <string>
@@ -38,13 +38,15 @@ public:
 /// </summary>
 private:
 	void Load(const std::string& filePath);
-	void ThreadLoad(const std::string& filePath);
+	void Load(const std::string& filePath, ID3D12GraphicsCommandList* commandList);
 	void Unload();
 
 	DirectX::ScratchImage LoadTexture(const std::string& filePath);
 	ID3D12Resource* CreateTextureResource(const DirectX::TexMetadata& metaData);
 	[[nodiscard]]
 	ID3D12Resource* UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages);
+	[[nodiscard]]
+	ID3D12Resource* UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages, ID3D12GraphicsCommandList* commandList);
 
 /// <summary>
 /// View作成関数

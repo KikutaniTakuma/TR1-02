@@ -132,6 +132,10 @@ public:
 		return engine->fontHeap[fontName];
 	}
 
+	static inline bool GetIsCloseCommandList() {
+		return engine->isCommandListClose;
+	}
+
 
 	///
 	/// Window生成用
@@ -210,6 +214,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue;
 	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator;
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList;
+	bool isCommandListClose = false;
 
 	Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain;
 	std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> swapChainResource;
