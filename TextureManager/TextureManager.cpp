@@ -91,7 +91,7 @@ Texture* TextureManager::LoadTexture(const std::string& fileName) {
 	if (textures.empty()) {
 		auto tex = std::make_unique<Texture>();
 		tex->Load(fileName);
-		if (!tex->loadFlg) {
+		if (!tex->isLoad) {
 			return nullptr;
 		}
 		
@@ -104,7 +104,7 @@ Texture* TextureManager::LoadTexture(const std::string& fileName) {
 		if (itr == textures.end()) {
 			auto tex = std::make_unique<Texture>();
 			tex->Load(fileName);
-			if (!tex->loadFlg) {
+			if (!tex->isLoad) {
 				return nullptr;
 			}
 
@@ -121,7 +121,7 @@ Texture* TextureManager::LoadTexture(const std::string& fileName, ID3D12Graphics
 	if (textures.empty()) {
 		auto tex = std::make_unique<Texture>();
 		tex->Load(fileName, commandList_);
-		if (!tex->loadFlg) {
+		if (!tex->isLoad) {
 			return nullptr;
 		}
 
@@ -134,7 +134,7 @@ Texture* TextureManager::LoadTexture(const std::string& fileName, ID3D12Graphics
 		if (itr == textures.end()) {
 			auto tex = std::make_unique<Texture>();
 			tex->Load(fileName, commandList_);
-			if (!tex->loadFlg) {
+			if (!tex->isLoad) {
 				return nullptr;
 			}
 

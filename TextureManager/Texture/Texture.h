@@ -25,11 +25,11 @@ public:
 
 public:
 	inline explicit operator bool() const noexcept {
-		return loadFlg;
+		return isLoad;
 	}
 
 	inline bool operator!() const noexcept {
-		return !loadFlg;
+		return !isLoad;
 	}
 
 
@@ -62,7 +62,7 @@ private:
 
 public:
 	bool CanUse() const {
-		return !static_cast<bool>(intermediateResource);
+		return static_cast<bool>(textureResouce) && !static_cast<bool>(intermediateResource) && isLoad;
 	}
 
 
@@ -75,7 +75,7 @@ private:
 
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc;
 
-	bool loadFlg;
+	bool isLoad;
 	bool threadLoadFlg;
 
 	Vector2 size;

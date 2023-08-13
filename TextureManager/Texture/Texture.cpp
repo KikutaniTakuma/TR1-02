@@ -9,7 +9,7 @@ Texture::Texture():
 	textureResouce(nullptr),
 	intermediateResource(nullptr),
 	srvDesc(),
-	loadFlg(false),
+	isLoad(false),
 	threadLoadFlg(false),
 	size(),
 	fileName()
@@ -27,14 +27,14 @@ Texture& Texture::operator=(Texture&& tex) noexcept {
 	this->textureResouce = std::move(tex.textureResouce);
 	this->intermediateResource = std::move(tex.intermediateResource);
 	this->srvDesc = tex.srvDesc;
-	loadFlg = tex.loadFlg;
+	isLoad = tex.isLoad;
 	fileName = tex.fileName;
 
 	return *this;
 }
 
 void Texture::Load(const std::string& filePath) {
-	if (!loadFlg && !threadLoadFlg) {
+	if (!isLoad && !threadLoadFlg) {
 		this->fileName = filePath;
 
 		DirectX::ScratchImage mipImages = LoadTexture(filePath);
@@ -55,12 +55,12 @@ void Texture::Load(const std::string& filePath) {
 		srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
 
 		// load済み
-		loadFlg = true;
+		isLoad = true;
 	}
 }
 
 void Texture::Load(const std::string& filePath, ID3D12GraphicsCommandList* commandList) {
-	if (!loadFlg && !threadLoadFlg) {
+	if (!isLoad && !threadLoadFlg) {
 		this->fileName = filePath;
 
 		DirectX::ScratchImage mipImages = LoadTexture(filePath);
@@ -81,12 +81,12 @@ void Texture::Load(const std::string& filePath, ID3D12GraphicsCommandList* comma
 		srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
 
 		// load済み
-		loadFlg = true;
+		isLoad = true;
 	}
 }
 
 void Texture::Unload() {
-	if (loadFlg) {
+	if (isLoad) {
 		srvDesc = {};
 
 		if (intermediateResource) {
@@ -99,7 +99,7 @@ void Texture::Unload() {
 		}
 
 		// Unload済み
-		loadFlg = false;
+		isLoad = false;
 	}
 }
 
