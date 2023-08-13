@@ -21,6 +21,7 @@
 #include "GlobalVariables/GlobalVariables.h"
 #include "SceneManager/Scene/Scene.h"
 #include "UIeditor/UIeditor.h"
+#include <filesystem>
 
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
@@ -90,17 +91,15 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	tex.LoadTexture("./Resources/uvChecker.png");
 	tex.Initialize();
 
-	/*std::vector<Texture*> texs;
-	texs.resize(100);
+	std::list<Texture2D> texs;
 
-	Texture* tex = nullptr;
-	
-
-	for (auto& i : texs) {
-		TextureManager::GetInstance()->LoadTexture("./Resources/uvChecker.png", &i);
-	}*/
-
-	//TextureManager::GetInstance()->ThreadLoadTexture();
+	for (auto i : std::filesystem::directory_iterator("./Resources/")) {
+		if (i.path().extension() == ".png") {
+			texs.push_back(Texture2D());
+			texs.back().Initialize();
+			texs.back().ThreadLoadTexture(i.path().string());
+		}
+	}
 
 	/// 
 	/// メインループ
@@ -165,6 +164,10 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		tex.Update();
 
+		for (auto& i : texs) {
+			i.Update();
+		}
+
 		//UIeditor::GetInstance()->Update(camera2D.GetViewOthographicsVp());
 
 		//tex2.Update();
@@ -196,8 +199,12 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 
 		//UIeditor::GetInstance()->Draw(camera2D.GetViewOthographics());
-		tex.Draw(camera2D.GetViewOthographics());
+		//tex.Draw(camera2D.GetViewOthographics());
 		//Gamepad::Debug();
+
+		for (auto& i : texs) {
+			i.Draw(camera2D.GetViewOthographics());
+		}
 
 		///
 		/// 描画処理ここまで

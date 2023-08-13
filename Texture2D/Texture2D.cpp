@@ -82,8 +82,10 @@ Texture2D& Texture2D::operator=(const Texture2D& right) {
 
 	tex = nullptr;
 
-	LoadTexture(right.tex->GetFileName());
-	Initialize();
+	if (right.isLoad) {
+		ThreadLoadTexture(right.tex->GetFileName());
+		Initialize();
+	}
 
 	*wvpMat = *right.wvpMat;
 	*color = *right.color;
