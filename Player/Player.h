@@ -12,7 +12,8 @@ public:
 	};
 
 public:
-	Player();
+	Player() = delete;
+	Player(class GlobalVariables* data_);
 	Player(const Player&) = default;
 	~Player() = default;
 	Player& operator=(const Player&) = default;
@@ -59,4 +60,6 @@ private:
 
 	float attack;
 	float attackSpd;
+
+	class GlobalVariables* data;
 };

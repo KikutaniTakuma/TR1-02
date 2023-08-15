@@ -11,6 +11,7 @@ public:
 
 public:
 	GlobalVariables() = default;
+	GlobalVariables(const std::string& fileNmae);
 	GlobalVariables(const GlobalVariables&) = delete;
 	GlobalVariables(GlobalVariables&&) noexcept = delete;
 	~GlobalVariables() = default;
@@ -47,4 +48,6 @@ protected:
 
 	bool isCreate;
 	std::string groupNameAdd;
+
+	std::string dataFileNmae;
 };

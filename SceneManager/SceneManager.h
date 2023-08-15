@@ -17,6 +17,9 @@ private:
 public:
 	static SceneManager* GetInstance();
 
+public:
+	void Update();
+
 private:
-	std::unordered_map<std::string, std::unique_ptr<Scene>> scenes;
+	std::unordered_map<std::string, Scene> scenes;
 };

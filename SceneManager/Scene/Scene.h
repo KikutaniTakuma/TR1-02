@@ -4,17 +4,20 @@
 #include "Player/Player.h"
 #include "Camera/Camera.h"
 #include "Texture2D/Texture2D.h"
+#include "GlobalVariables/GlobalVariables.h"
 
 class Scene {
 public:
-	Scene();
+	Scene(const std::string& sceneName_);
 	~Scene() = default;
 
 	Scene& operator=(const Scene&) = default;
 	Scene& operator=(Scene&&) noexcept = default;
 
 public:
-	//bool InitializePlayer();
+	bool InitializePlayer();
+
+	void Editor();
 
 	void Update();
 
@@ -23,14 +26,17 @@ public:
 private:
 	std::string sceneName;
 
-	//std::unique_ptr<Player> player;
+	std::unique_ptr<Player> player;
 
-	std::list<std::unique_ptr<Enemy>> enemys;
+	std::list<Enemy> enemys;
 
-	std::list<std::unique_ptr<Model>> objects;
+	std::list<Model> objects;
 
-	std::list<std::unique_ptr<Texture2D>> objects2D;
+	std::list<Texture2D> objects2D;
 
 	Camera camera;
 	Camera camera2D;
+
+	// Editor
+	GlobalVariables globalVariables;
 };

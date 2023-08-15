@@ -6,6 +6,13 @@
 #include <fstream>
 #include <Windows.h> 
 
+GlobalVariables::GlobalVariables(const std::string& fileNmae) :
+	datas(),
+	isCreate(false),
+	groupNameAdd(),
+	dataFileNmae(fileNmae)
+{}
+
 void GlobalVariables::CreateGroup(const std::string& groupName) {
 	datas[groupName];
 }
@@ -112,7 +119,7 @@ void GlobalVariables::SaveFile(const std::string& groupName) {
 		}
 	}
 
-	const std::filesystem::path kDirectoryPath = "./Datas/";
+	const std::filesystem::path kDirectoryPath = "./Datas/" + dataFileNmae;
 
 	if (!std::filesystem::exists(kDirectoryPath)) {
 		std::filesystem::create_directory(kDirectoryPath);
@@ -140,7 +147,7 @@ void GlobalVariables::SaveFile(const std::string& groupName) {
 }
 
 void GlobalVariables::LoadFile() {
-	const std::filesystem::path kDirectoryPath = "./Datas/";
+	const std::filesystem::path kDirectoryPath = "./Datas/" + dataFileNmae;
 
 	if (!std::filesystem::exists(kDirectoryPath)) {
 		return;
@@ -161,7 +168,7 @@ void GlobalVariables::LoadFile() {
 }
 
 void GlobalVariables::LoadFile(const std::string& groupName) {
-	const std::filesystem::path kDirectoryPath = "./Datas/";
+	const std::filesystem::path kDirectoryPath = "./Datas/" + dataFileNmae;
 	std::string filePath = kDirectoryPath.string() + groupName + std::string(".json");
 
 	std::ifstream file(filePath);

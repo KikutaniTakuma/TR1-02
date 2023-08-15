@@ -7,7 +7,7 @@
 #include "externals/nlohmann/json.hpp"
 #include "GlobalVariables/GlobalVariables.h"
 
-Player::Player():
+Player::Player(GlobalVariables* data_):
 	spd(10.0f),
 	moveVec(),
 	pos(),
@@ -55,31 +55,31 @@ Player::Player():
 	weapon->CreateGraphicsPipeline();
 	weapon->SetParent(model.begin()->get());
 
+	data = data_;
 	const std::string groupName = "Player";
 	const std::string groupName2 = "PlayerParts";
-	GlobalVariables::GetInstance()->CreateGroup(groupName);
-	GlobalVariables::GetInstance()->AddItem(groupName2, "Body Translation", model[0]->pos);
-	GlobalVariables::GetInstance()->AddItem(groupName2, "Head Translation", model[1]->pos);
-	GlobalVariables::GetInstance()->AddItem(groupName2, "LeftArm Translation", model[2]->pos);
-	GlobalVariables::GetInstance()->AddItem(groupName2, "RightArm Translation", model[3]->pos);
-	GlobalVariables::GetInstance()->AddItem(groupName, "Speed", spd);
-	GlobalVariables::GetInstance()->AddItem(groupName, "freqSpd", freqSpd);
-	GlobalVariables::GetInstance()->AddItem(groupName, "armFreqSpd", armFreqSpd);
-	GlobalVariables::GetInstance()->AddItem(groupName, "attackSpd", attackSpd);
+	data->CreateGroup(groupName);
+	data->AddItem(groupName2, "Body Translation", model[0]->pos);
+	data->AddItem(groupName2, "Head Translation", model[1]->pos);
+	data->AddItem(groupName2, "LeftArm Translation", model[2]->pos);
+	data->AddItem(groupName2, "RightArm Translation", model[3]->pos);
+	data->AddItem(groupName, "Speed", spd);
+	data->AddItem(groupName, "freqSpd", freqSpd);
+	data->AddItem(groupName, "armFreqSpd", armFreqSpd);
+	data->AddItem(groupName, "attackSpd", attackSpd);
 }
 
 void Player::ApplyGlobalVariables() {
 	const std::string groupName = "Player";
 	const std::string groupName2 = "PlayerParts";
-	auto globalVariables = GlobalVariables::GetInstance();
-	model[0]->pos = globalVariables->GetVector3Value(groupName2, "Body Translation");
-	model[1]->pos = globalVariables->GetVector3Value(groupName2, "Head Translation");
-	model[2]->pos = globalVariables->GetVector3Value(groupName2, "LeftArm Translation");
-	model[3]->pos = globalVariables->GetVector3Value(groupName2, "RightArm Translation");
-	spd = globalVariables->GetFloatValue(groupName, "Speed");
-	freqSpd = globalVariables->GetFloatValue(groupName, "freqSpd");
-	armFreqSpd = globalVariables->GetFloatValue(groupName, "armFreqSpd");
-	attackSpd = globalVariables->GetFloatValue(groupName, "attackSpd");
+	model[0]->pos = data->GetVector3Value(groupName2, "Body Translation");
+	model[1]->pos = data->GetVector3Value(groupName2, "Head Translation");
+	model[2]->pos = data->GetVector3Value(groupName2, "LeftArm Translation");
+	model[3]->pos = data->GetVector3Value(groupName2, "RightArm Translation");
+	spd = data->GetFloatValue(groupName, "Speed");
+	freqSpd = data->GetFloatValue(groupName, "freqSpd");
+	armFreqSpd = data->GetFloatValue(groupName, "armFreqSpd");
+	attackSpd = data->GetFloatValue(groupName, "attackSpd");
 }
 
 void Player::Animation() {
