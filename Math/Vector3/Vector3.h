@@ -49,10 +49,17 @@ public:
 	Vector3 Normalize() const noexcept;
 
 /// <summary>
+/// フレンド関数
+/// </summary>
+public:
+	friend Vector3 NormalizeToRad(const Vector3& vec);
+
+/// <summary>
 /// 静的定数
 /// </summary>
 public:
 	static const Vector3 identity;
+	static const Vector3 zero;
 	static const Vector3 xIdy;
 	static const Vector3 yIdy;
 	static const Vector3 zIdy;

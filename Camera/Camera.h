@@ -24,6 +24,7 @@ public:
 
 public:
 	void Update(const Vector3& gazePoint = {});
+	void Update(const Mat4x4& worldMat);
 
 	// 透視投影
 	inline const Mat4x4& GetViewProjection() noexcept {

@@ -32,10 +32,11 @@ Vector3::Vector3(Vector3&& right) noexcept
 	*this = std::move(right);
 }
 
-Vector3 const Vector3::identity = {1.0f,1.0f,1.0f};
-Vector3 const Vector3::xIdy = { 1.0f,0.0f,0.0f };
-Vector3 const Vector3::yIdy = { 0.0f,1.0f,0.0f };
-Vector3 const Vector3::zIdy = { 0.0f,0.0f,1.0f };
+const Vector3 Vector3::identity = { 1.0f,1.0f,1.0f };
+const Vector3 Vector3::zero = { 0.0f, 0.0f,0.0f };
+const Vector3 Vector3::xIdy = { 1.0f,0.0f,0.0f };
+const Vector3 Vector3::yIdy = { 0.0f,1.0f,0.0f };
+const Vector3 Vector3::zIdy = { 0.0f,0.0f,1.0f };
 
 Vector3& Vector3::operator=(const Vector3& right) noexcept {
 	x = right.x;
@@ -175,9 +176,22 @@ Vector3 Vector3::Cross(const Vector3& right) const noexcept {
 }
 
 Vector3 Vector3::Normalize() const noexcept {
-	if (*this == Vector3()) {
-		return *this;
+	if (*this == Vector3::zero) {
+		return Vector3::zero;
 	}
 
 	return *this / this->Length();
+}
+
+Vector3 NormalizeToRad(const Vector3& vec) {
+	if (vec == Vector3::zero) {
+		return Vector3::zero;
+	}
+
+	Vector3 result;
+	result.z = std::atan2f(vec.y, vec.x);
+	result.y = std::atan2f(vec.z, vec.x);
+	result.x = std::atan2f(vec.y, vec.z);
+
+	return result;
 }

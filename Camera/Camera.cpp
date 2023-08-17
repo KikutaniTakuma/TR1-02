@@ -212,3 +212,40 @@ void Camera::Update(const Vector3& gazePoint) {
 		break;
 	}
 }
+
+void Camera::Update(const Mat4x4& worldMat) {
+	view.VertAffin(scale, rotate, pos);
+	view = view * worldMat;
+	worldPos = { view[0][3],view[1][3], view[2][3] };
+	view.Inverse();
+
+	static auto engine = Engine::GetInstance();
+	static const float aspect = static_cast<float>(engine->clientWidth) / static_cast<float>(engine->clientHeight);
+
+	const auto&& windowSize = WinApp::GetInstance()->GetWindowSize();
+
+	switch (mode)
+	{
+	case Camera::Mode::Projecction:
+	default:
+		fov = std::clamp(fov, 0.0f, 1.0f);
+		projection.VertPerspectiveFov(fov, aspect, kNearClip, farClip);
+		viewProjecction = projection * view;
+
+		viewProjecctionVp = VertMakeMatrixViewPort(0.0f, 0.0f, windowSize.x, windowSize.y, 0.0f, 1.0f) * viewProjecction;
+		break;
+
+	case Camera::Mode::Othographic:
+		othograohics.VertOrthographic(
+			-static_cast<float>(engine->clientWidth) * 0.5f * drawScale,
+			static_cast<float>(engine->clientHeight) * 0.5f * drawScale,
+			static_cast<float>(engine->clientWidth) * 0.5f * drawScale,
+			-static_cast<float>(engine->clientHeight) * 0.5f * drawScale,
+			kNearClip, farClip);
+		viewOthograohics = othograohics * view;
+
+
+		viewOthograohicsVp = VertMakeMatrixViewPort(0.0f, 0.0f, windowSize.x, windowSize.y, 0.0f, 1.0f) * viewOthograohics;
+		break;
+	}
+}

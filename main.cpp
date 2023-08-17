@@ -46,60 +46,43 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	Camera camera2D(Camera::Mode::Othographic);
 
-	//// シーンをレンダリング
-	//auto pera = std::make_unique<PeraRender>();
-	//pera->Initialize(
-	//	"PostShader/Post.VS.hlsl", 
-	//	"PostShader/PostNone.PS.hlsl"
-	//);
-	//// 輝度を抽出
-	//auto luminance = std::make_unique<PeraRender>();
-	//luminance->Initialize(
-	//	"PostShader/Post.VS.hlsl",
-	//	"PostShader/PostLuminance.PS.hlsl"
-	//);
-	//// ブラーをかける
-	//auto averaging = std::make_unique<PeraRender>();
-	//averaging->Initialize(
-	//	"PostShader/Post.VS.hlsl",
-	//	"PostShader/PostAveraging.PS.hlsl"
-	//);
-	//// ブラーをかける
-	//auto averaging2 = std::make_unique<PeraRender>();
-	//averaging2->Initialize(
-	//	"PostShader/Post.VS.hlsl",
-	//	"PostShader/PostAveraging.PS.hlsl"
-	//);
-	////ブラーをかけたものと普通に描画したものを合成する
-	//auto add = std::make_unique<PeraRender>();
-	//add->Initialize(
-	//	"PostShader/Post.VS.hlsl",
-	//	"PostShader/PostNone.PS.hlsl"
-	//);
+	// シーンをレンダリング
+	auto pera = std::make_unique<PeraRender>();
+	pera->Initialize(
+		"PostShader/Post.VS.hlsl", 
+		"PostShader/PostNone.PS.hlsl"
+	);
+	// 輝度を抽出
+	auto luminance = std::make_unique<PeraRender>();
+	luminance->Initialize(
+		"PostShader/Post.VS.hlsl",
+		"PostShader/PostLuminance.PS.hlsl"
+	);
+	// ブラーをかける
+	auto averaging = std::make_unique<PeraRender>();
+	averaging->Initialize(
+		"PostShader/Post.VS.hlsl",
+		"PostShader/PostAveraging.PS.hlsl"
+	);
+	// ブラーをかける
+	auto averaging2 = std::make_unique<PeraRender>();
+	averaging2->Initialize(
+		"PostShader/Post.VS.hlsl",
+		"PostShader/PostAveraging.PS.hlsl"
+	);
+	//ブラーをかけたものと普通に描画したものを合成する
+	auto add = std::make_unique<PeraRender>();
+	add->Initialize(
+		"PostShader/Post.VS.hlsl",
+		"PostShader/PostNone.PS.hlsl"
+	);
 
 	bool fullscreen = false;
 
-	//auto watame = std::make_unique<Model>();
-	//watame->LoadObj("Resources/Watame/Watame.obj");
-	//watame->LoadShader();
-	//watame->CreateGraphicsPipeline();
-
-	//UIeditor::GetInstance()->LoadFile();
-
-	//UIeditor::GetInstance()->Add("./Resources/uvChecker.png");
-	Texture2D tex;
-	tex.LoadTexture("./Resources/uvChecker.png");
-	tex.Initialize();
-
-	std::list<Texture2D> texs;
-
-	for (auto i : std::filesystem::directory_iterator("./Resources/")) {
-		if (i.path().extension() == ".png") {
-			texs.push_back(Texture2D());
-			texs.back().Initialize();
-			texs.back().ThreadLoadTexture(i.path().string());
-		}
-	}
+	auto watame = std::make_unique<Model>();
+	watame->LoadObj("Resources/Watame/Watame.obj");
+	watame->LoadShader();
+	watame->CreateGraphicsPipeline();
 
 	/// 
 	/// メインループ
@@ -157,20 +140,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		camera.Update(Vector3());
 		camera2D.Update();
-		
-		if (KeyInput::Pushed(DIK_SPACE)) {
-			tex.ThreadLoadTexture("./Resources/watame4k.png");
-		}
-
-		tex.Update();
-
-		for (auto& i : texs) {
-			i.Update();
-		}
-
-		//UIeditor::GetInstance()->Update(camera2D.GetViewOthographicsVp());
-
-		//tex2.Update();
 
 		///
 		/// 更新処理ここまで
@@ -179,32 +148,22 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		///
 		/// 描画処理
 		/// 
-		//watame->Draw(camera.GetViewProjection(), camera.pos);
-		//pera->PreDraw();
+		watame->Draw(camera.GetViewProjection(), camera.pos);
+		pera->PreDraw();
 		
-		//watame->Draw(camera.GetViewProjection(), camera.pos);
+		watame->Draw(camera.GetViewProjection(), camera.pos);
 
-		//// peraに描画されたやつから輝度を抽出するレンダーに描画
-		//pera->Draw(Pipeline::None, luminance.get());
+		// peraに描画されたやつから輝度を抽出するレンダーに描画
+		pera->Draw(Pipeline::None, luminance.get());
 
-		//// 輝度を抽出したものをブラーをかけるものに描画
-		//luminance->Draw(Pipeline::None, averaging.get());
+		// 輝度を抽出したものをブラーをかけるものに描画
+		luminance->Draw(Pipeline::None, averaging.get());
 
-		//// 平均化ブラーを更に平均化ブラーをかけるものに描画
-		//averaging->Draw(Pipeline::None, averaging2.get());
+		// 平均化ブラーを更に平均化ブラーをかけるものに描画
+		averaging->Draw(Pipeline::None, averaging2.get());
 
-		//// 平均化ブラーしたものを加算合成
-		//averaging2->Draw(Pipeline::Add);
-
-
-
-		//UIeditor::GetInstance()->Draw(camera2D.GetViewOthographics());
-		//tex.Draw(camera2D.GetViewOthographics());
-		//Gamepad::Debug();
-
-		for (auto& i : texs) {
-			i.Draw(camera2D.GetViewOthographics());
-		}
+		// 平均化ブラーしたものを加算合成
+		averaging2->Draw(Pipeline::Add);
 
 		///
 		/// 描画処理ここまで

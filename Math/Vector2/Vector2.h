@@ -49,6 +49,7 @@ public:
 /// </summary>
 public:
 	static const Vector2 identity;
+	static const Vector2 zero;
 	static const Vector2 xIdy;
 	static const Vector2 yIdy;
 

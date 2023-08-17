@@ -21,6 +21,7 @@ Vector2::Vector2(Vector2&& right) noexcept {
 }
 
 const Vector2 Vector2::identity = { 1.0f,1.0f };
+const Vector2 Vector2::zero = {0.0f, 0.0f};
 const Vector2 Vector2::xIdy = { 1.0f,0.0f };
 const Vector2 Vector2::yIdy = { 0.0f,1.0f };
 
@@ -125,7 +126,7 @@ float Vector2::Length() const noexcept {
 }
 
 Vector2 Vector2::Normalize() const noexcept {
-	if (*this == Vector2()) {
+	if (*this == Vector2::zero) {
 		return *this;
 	}
 	return *this / Length();
@@ -133,16 +134,13 @@ Vector2 Vector2::Normalize() const noexcept {
 
 float Vector2::GetRad() const noexcept {
 	float result = 0.0f;
-	if (*this == Vector2()) {
+	if (*this == Vector2::zero) {
 		return 0.0f;
 	}
 
-	result = this->Dot(Vector2(1.0f, 0.0f)) / (this->Length() * Vector2(1.0f, 0.0f).Length());
+	Vector2 normalize = this->Normalize();
 
-	if (y < 0.0f) {
-		return (2.0f * std::numbers::phi_v<float>) - std::asin(result);
-	}
+	result = std::atan2f(normalize.y, normalize.x);
 
-
-	return std::asin(result);
+	return result;
 }
