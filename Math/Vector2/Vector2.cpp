@@ -133,14 +133,9 @@ Vector2 Vector2::Normalize() const noexcept {
 }
 
 float Vector2::GetRad() const noexcept {
-	float result = 0.0f;
 	if (*this == Vector2::zero) {
 		return 0.0f;
 	}
 
-	Vector2 normalize = this->Normalize();
-
-	result = std::atan2f(normalize.y, normalize.x);
-
-	return result;
+	return std::atan2(y, x);
 }

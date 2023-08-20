@@ -183,15 +183,15 @@ Vector3 Vector3::Normalize() const noexcept {
 	return *this / this->Length();
 }
 
-Vector3 NormalizeToRad(const Vector3& vec) {
-	if (vec == Vector3::zero) {
+Vector3 Vector3::GetRad() const noexcept {
+	if (*this == Vector3::zero) {
 		return Vector3::zero;
 	}
 
 	Vector3 result;
-	result.z = std::atan2f(vec.y, vec.x);
-	result.y = std::atan2f(vec.z, vec.x);
-	result.x = std::atan2f(vec.y, vec.z);
+	result.z = std::atan2(y, x);
+	result.y = std::atan2(z, x);
+	result.x = std::atan2(y, z);
 
 	return result;
 }
