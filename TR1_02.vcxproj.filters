@@ -128,6 +128,9 @@
     <ClCompile Include="UIeditor\UIeditor.cpp">
       <Filter>UIeditor</Filter>
     </ClCompile>
+    <ClCompile Include="Player\Bullet\Bullet.cpp">
+      <Filter>Player\Bullet</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -234,6 +237,9 @@
     </Filter>
     <Filter Include="UIeditor">
       <UniqueIdentifier>{c891625b-e73e-48c3-8e4b-9b85cd8aab89}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Player\Bullet">
+      <UniqueIdentifier>{c6f59de6-0979-425a-b701-0605843e2e73}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -368,6 +374,9 @@
     </ClInclude>
     <ClInclude Include="UIeditor\UIeditor.h">
       <Filter>UIeditor</Filter>
+    </ClInclude>
+    <ClInclude Include="Player\Bullet\Bullet.h">
+      <Filter>Player\Bullet</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

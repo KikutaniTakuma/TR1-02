@@ -55,6 +55,7 @@ Player::Player(GlobalVariables* data_):
 	weapon->CreateGraphicsPipeline();
 	weapon->SetParent(model.begin()->get());
 
+	assert(data_);
 	data = data_;
 	const std::string groupName = "Player";
 	const std::string groupName2 = "PlayerParts";

@@ -2,6 +2,7 @@
 #include "Model/Model.h"
 #include <memory>
 #include "Camera/Camera.h"
+#include <list>
 #include <vector>
 
 class Player {

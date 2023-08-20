@@ -184,6 +184,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="PeraRender\PeraRender.cpp" />
     <ClCompile Include="PipelineManager\PipelineManager.cpp" />
     <ClCompile Include="PipelineManager\Pipeline\Pipeline.cpp" />
+    <ClCompile Include="Player\Bullet\Bullet.cpp" />
     <ClCompile Include="Player\Player.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
@@ -233,6 +234,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="PeraRender\PeraRender.h" />
     <ClInclude Include="PipelineManager\PipelineManager.h" />
     <ClInclude Include="PipelineManager\Pipeline\Pipeline.h" />
+    <ClInclude Include="Player\Bullet\Bullet.h" />
     <ClInclude Include="Player\Player.h" />
     <ClInclude Include="SceneManager\SceneManager.h" />
     <ClInclude Include="SceneManager\Scene\Scene.h" />
