@@ -18,6 +18,13 @@ public:
 /// 演算子のオーバーロード
 /// </summary>
 public:
+	// 単項演算子
+	Vector3 operator+() const noexcept;
+	Vector3 operator-() const noexcept;
+
+
+	// 二項演算子
+
 	Vector3& operator=(const Vector3& right) noexcept;
 	Vector3& operator=(Vector3&& right) noexcept;
 	Vector3 operator+(const Vector3& right) const noexcept;
@@ -35,6 +42,8 @@ public:
 
 	Vector3& operator=(const class Vector2& right) noexcept;
 
+
+	// 等比演算子
 
 	bool operator==(const Vector3& right) const noexcept;
 	bool operator!=(const Vector3& right) const noexcept;

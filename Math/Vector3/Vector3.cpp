@@ -38,6 +38,13 @@ const Vector3 Vector3::xIdy = { 1.0f,0.0f,0.0f };
 const Vector3 Vector3::yIdy = { 0.0f,1.0f,0.0f };
 const Vector3 Vector3::zIdy = { 0.0f,0.0f,1.0f };
 
+Vector3 Vector3::operator+() const noexcept {
+	return *this;
+}
+Vector3 Vector3::operator-() const noexcept {
+	return Vector3(-x, -y, -z);
+}
+
 Vector3& Vector3::operator=(const Vector3& right) noexcept {
 	x = right.x;
 	y = right.y;

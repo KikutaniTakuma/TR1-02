@@ -13,17 +13,23 @@ public:
 	Bullet& operator=(Bullet&& right) noexcept;
 
 public:
-	void Initialize(const Vector3 pos);
+	void Initialize(const Vector3& pos_, const Vector3& rotate_);
 	void Update();
-	void Draw(const Mat4x4& viewProjection);
-	void Finalize();
+	void Draw(const Mat4x4& viewProjection, const Vector3& cameraPos);
 
-	void Collision(const Bullet& bullet);
+	bool Collision(const Bullet& bullet);
 
 private:
-	static std::unique_ptr<Model> model;
+	static std::pair<size_t, std::unique_ptr<Model>> model;
 	bool isCollision;
 	float spd;
 	Vector3 moveVec;
 	float radius;
+
+	Vector3 attenuation;
+	float attenuationSpd;
+
+	Vector3 pos;
+	Vector3 size;
+	Vector3 rotate;
 };
