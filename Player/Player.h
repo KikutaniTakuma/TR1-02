@@ -4,6 +4,7 @@
 #include "Camera/Camera.h"
 #include <list>
 #include <vector>
+#include "Bullet/Bullet.h"
 
 class Player {
 public:
@@ -16,7 +17,7 @@ public:
 	Player() = delete;
 	Player(class GlobalVariables* data_);
 	Player(const Player&) = default;
-	~Player() = default;
+	~Player();
 	Player& operator=(const Player&) = default;
 
 public:
@@ -63,4 +64,6 @@ private:
 	float attackSpd;
 
 	class GlobalVariables* data;
+
+	std::list<Bullet> bullets;
 };

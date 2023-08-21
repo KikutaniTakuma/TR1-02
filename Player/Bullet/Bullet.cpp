@@ -1,6 +1,18 @@
 #include "Bullet.h"
+#include "externals/imgui/imgui.h"
 
-std::pair<size_t, std::unique_ptr<Model>> Bullet::model = { 0, nullptr };
+std::unique_ptr<Model> Bullet::model;
+
+void Bullet::LoadModel() {
+	if (!model) {
+		model->LoadObj("./Resources/Ball.obj");
+		model->LoadShader();
+		model->CreateGraphicsPipeline();
+	}
+}
+void Bullet::UnloadModel() {
+	model.reset();
+}
 
 Bullet::Bullet():
 	isCollision(false),
@@ -10,11 +22,10 @@ Bullet::Bullet():
 	attenuation(),
 	attenuationSpd(radius * 0.5f)
 {
-	model.first++;
-	if (!model.second) {
-		model.second->LoadObj("./Resources/Ball.obj");
-		model.second->LoadShader();
-		model.second->CreateGraphicsPipeline();
+	if (!model) {
+		model->LoadObj("./Resources/Ball.obj");
+		model->LoadShader();
+		model->CreateGraphicsPipeline();
 	}
 }
 
@@ -26,11 +37,10 @@ Bullet::Bullet(const Bullet& right) :
 	attenuation(),
 	attenuationSpd(radius * 0.5f)
 {
-	model.first++;
-	if (!model.second) {
-		model.second->LoadObj("./Resources/Ball.obj");
-		model.second->LoadShader();
-		model.second->CreateGraphicsPipeline();
+	if (!model) {
+		model->LoadObj("./Resources/Ball.obj");
+		model->LoadShader();
+		model->CreateGraphicsPipeline();
 	}
 
 	*this = right;
@@ -43,21 +53,17 @@ Bullet::Bullet(Bullet&& right) noexcept :
 	attenuation(),
 	attenuationSpd(radius * 0.5f)
 {
-	model.first++;
-	if (!model.second) {
-		model.second->LoadObj("./Resources/Ball.obj");
-		model.second->LoadShader();
-		model.second->CreateGraphicsPipeline();
+	if (!model) {
+		model->LoadObj("./Resources/Ball.obj");
+		model->LoadShader();
+		model->CreateGraphicsPipeline();
 	}
 
 	*this = std::move(right);
 }
 
 Bullet::~Bullet() {
-	model.first--;
-	if (model.first == 0) {
-		model.second.reset();
-	}
+	
 }
 
 Bullet& Bullet::operator=(const Bullet& right) {
@@ -88,14 +94,14 @@ void Bullet::Initialize(const Vector3& pos_, const Vector3& rotate_) {
 	attenuation *= attenuationSpd;
 }
 void Bullet::Update() {
-	pos += moveVec;
-	moveVec -= attenuation;
+	pos += moveVec * ImGui::GetIO().DeltaTime;
+	moveVec -= attenuation * ImGui::GetIO().DeltaTime;
 }
 void Bullet::Draw(const Mat4x4& viewProjection, const Vector3& cameraPos) {
-	model.second->pos = pos;
-	model.second->scale = size;
+	model->pos = pos;
+	model->scale = size;
 
-	model.second->Draw(viewProjection, cameraPos);
+	model->Draw(viewProjection, cameraPos);
 }
 
 bool Bullet::Collision(const Bullet& bullet) {

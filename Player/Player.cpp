@@ -19,7 +19,8 @@ Player::Player(GlobalVariables* data_):
 	weapon(),
 	behavior(Behavior::Normal),
 	attack(0.0f),
-	attackSpd(std::numbers::pi_v<float> / 2.0f)
+	attackSpd(std::numbers::pi_v<float> / 2.0f),
+	bullets(0)
 {
 	model.push_back(std::make_unique<Model>());
 	auto itr = model.rbegin();
@@ -68,6 +69,12 @@ Player::Player(GlobalVariables* data_):
 	data->AddItem(groupName, "freqSpd", freqSpd);
 	data->AddItem(groupName, "armFreqSpd", armFreqSpd);
 	data->AddItem(groupName, "attackSpd", attackSpd);
+
+	Bullet::LoadModel();
+}
+
+Player::~Player() {
+	Bullet::UnloadModel();
 }
 
 void Player::ApplyGlobalVariables() {
@@ -156,13 +163,20 @@ void Player::Update() {
 		isMove = true;
 	}
 
-	if (KeyInput::Pushed(DIK_SPACE)) {
+	if (KeyInput::Pushed(DIK_SPACE) || Gamepad::Pushed(Gamepad::Button::X)) {
 		behavior = Behavior::Attack;
 
 		armFreq = 0.0f;
 
 		model[2]->rotate.y = 0.0f;
 		model[3]->rotate.y = 0.0f;
+
+		bullets.push_back(Bullet());
+		//bullets.back().Initialize(pos)
+	}
+
+	for (auto& bullet : bullets) {
+		bullet.Update();
 	}
 	
 	/*Vector2 moveRotate;

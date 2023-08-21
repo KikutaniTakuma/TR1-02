@@ -19,8 +19,11 @@ public:
 
 	bool Collision(const Bullet& bullet);
 
+	static void LoadModel();
+	static void UnloadModel();
+
 private:
-	static std::pair<size_t, std::unique_ptr<Model>> model;
+	static std::unique_ptr<Model> model;
 	bool isCollision;
 	float spd;
 	Vector3 moveVec;
