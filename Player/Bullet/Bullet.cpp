@@ -5,7 +5,8 @@ std::unique_ptr<Model> Bullet::model;
 
 void Bullet::LoadModel() {
 	if (!model) {
-		model->LoadObj("./Resources/Ball.obj");
+		model = std::make_unique<Model>();
+		model->LoadObj("./Resources/Cube.obj");
 		model->LoadShader();
 		model->CreateGraphicsPipeline();
 	}
@@ -16,11 +17,14 @@ void Bullet::UnloadModel() {
 
 Bullet::Bullet():
 	isCollision(false),
-	spd(50.0f),
+	spd(5.0f),
 	moveVec(),
 	radius(5.0f),
 	attenuation(),
-	attenuationSpd(radius * 0.5f)
+	attenuationSpd(radius * 0.5f),
+	pos(),
+	size(Vector3::identity),
+	rotate()
 {
 	if (!model) {
 		model->LoadObj("./Resources/Ball.obj");
@@ -31,11 +35,14 @@ Bullet::Bullet():
 
 Bullet::Bullet(const Bullet& right) :
 	isCollision(false),
-	spd(50.0f),
+	spd(5.0f),
 	moveVec(Vector3::zero),
 	radius(5.0f),
 	attenuation(),
-	attenuationSpd(radius * 0.5f)
+	attenuationSpd(radius * 0.5f),
+	pos(),
+	size(Vector3::identity),
+	rotate()
 {
 	if (!model) {
 		model->LoadObj("./Resources/Ball.obj");
@@ -47,11 +54,14 @@ Bullet::Bullet(const Bullet& right) :
 }
 Bullet::Bullet(Bullet&& right) noexcept :
 	isCollision(false),
-	spd(50.0f),
+	spd(5.0f),
 	moveVec(Vector3::zero),
 	radius(5.0f),
 	attenuation(),
-	attenuationSpd(radius * 0.5f)
+	attenuationSpd(radius * 0.5f),
+	pos(),
+	size(Vector3::identity),
+	rotate()
 {
 	if (!model) {
 		model->LoadObj("./Resources/Ball.obj");
@@ -94,8 +104,12 @@ void Bullet::Initialize(const Vector3& pos_, const Vector3& rotate_) {
 	attenuation *= attenuationSpd;
 }
 void Bullet::Update() {
-	pos += moveVec * ImGui::GetIO().DeltaTime;
-	moveVec -= attenuation * ImGui::GetIO().DeltaTime;
+	if (moveVec.Length() >= 0.01f) {
+		pos += moveVec * ImGui::GetIO().DeltaTime;
+		moveVec += attenuation * ImGui::GetIO().DeltaTime;
+	}
+
+	model->Update();
 }
 void Bullet::Draw(const Mat4x4& viewProjection, const Vector3& cameraPos) {
 	model->pos = pos;

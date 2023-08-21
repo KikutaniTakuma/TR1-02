@@ -12,63 +12,13 @@ Player::Player(GlobalVariables* data_):
 	moveVec(),
 	pos(),
 	camera(nullptr),
-	freqSpd(std::numbers::pi_v<float>),
-	freq(0.0f),
-	armFreqSpd(std::numbers::pi_v<float> / 2.0f),
-	armFreq(0.0f),
-	weapon(),
-	behavior(Behavior::Normal),
-	attack(0.0f),
-	attackSpd(std::numbers::pi_v<float> / 2.0f),
 	bullets(0)
 {
-	model.push_back(std::make_unique<Model>());
-	auto itr = model.rbegin();
-	(*itr)->LoadObj("AL_Resouce/PlayerDivision/PlayerBody.obj");
-	(*itr)->LoadShader();
-	(*itr)->CreateGraphicsPipeline();
-
-	model.push_back(std::make_unique<Model>());
-	itr = model.rbegin();
-	(*itr)->LoadObj("AL_Resouce/PlayerDivision/PlayerHead.obj");
-	(*itr)->LoadShader();
-	(*itr)->CreateGraphicsPipeline();
-	(*itr)->SetParent(model.begin()->get());
-	
-
-	model.push_back(std::make_unique<Model>());
-	itr = model.rbegin();
-	(*itr)->LoadObj("AL_Resouce/PlayerDivision/PlayerLeftArm.obj");
-	(*itr)->LoadShader();
-	(*itr)->CreateGraphicsPipeline();
-	(*itr)->SetParent(model.begin()->get());
-
-	model.push_back(std::make_unique<Model>());
-	itr = model.rbegin();
-	(*itr)->LoadObj("AL_Resouce/PlayerDivision/PlayerRightArm.obj");
-	(*itr)->LoadShader();
-	(*itr)->CreateGraphicsPipeline();
-	(*itr)->SetParent(model.begin()->get());
-
-	weapon = std::make_unique<Model>();
-	weapon->LoadObj("AL_Resouce/Weapon/Hammer.obj");
-	weapon->LoadShader();
-	weapon->CreateGraphicsPipeline();
-	weapon->SetParent(model.begin()->get());
-
-	assert(data_);
 	data = data_;
-	const std::string groupName = "Player";
-	const std::string groupName2 = "PlayerParts";
-	data->CreateGroup(groupName);
-	data->AddItem(groupName2, "Body Translation", model[0]->pos);
-	data->AddItem(groupName2, "Head Translation", model[1]->pos);
-	data->AddItem(groupName2, "LeftArm Translation", model[2]->pos);
-	data->AddItem(groupName2, "RightArm Translation", model[3]->pos);
-	data->AddItem(groupName, "Speed", spd);
-	data->AddItem(groupName, "freqSpd", freqSpd);
-	data->AddItem(groupName, "armFreqSpd", armFreqSpd);
-	data->AddItem(groupName, "attackSpd", attackSpd);
+	model = std::make_unique<Model>();
+	model->LoadObj("Resources/Cube.obj");
+	model->LoadShader();
+	model->CreateGraphicsPipeline();
 
 	Bullet::LoadModel();
 }
@@ -80,135 +30,57 @@ Player::~Player() {
 void Player::ApplyGlobalVariables() {
 	const std::string groupName = "Player";
 	const std::string groupName2 = "PlayerParts";
-	model[0]->pos = data->GetVector3Value(groupName2, "Body Translation");
-	model[1]->pos = data->GetVector3Value(groupName2, "Head Translation");
-	model[2]->pos = data->GetVector3Value(groupName2, "LeftArm Translation");
-	model[3]->pos = data->GetVector3Value(groupName2, "RightArm Translation");
+	model->pos = data->GetVector3Value(groupName2, "Body Translation");
 	spd = data->GetFloatValue(groupName, "Speed");
-	freqSpd = data->GetFloatValue(groupName, "freqSpd");
-	armFreqSpd = data->GetFloatValue(groupName, "armFreqSpd");
-	attackSpd = data->GetFloatValue(groupName, "attackSpd");
 }
 
 void Player::Animation() {
-	freq += freqSpd * ImGui::GetIO().DeltaTime;
-	model[0]->pos.y = std::sin(freq) + 2.5f;
-
-	if (freq > (std::numbers::pi_v<float> *2.0f)) {
-		freq = 0.0f;
-	}
-
-	switch (behavior)
-	{
-	case Player::Behavior::Normal:
-	default:
-		armFreq += armFreqSpd * ImGui::GetIO().DeltaTime;
-
-		if (armFreq > std::numbers::pi_v<float> *2.0f) {
-			armFreq = 0.0f;
-		}
-
-		model[2]->rotate.y = armFreq;
-		model[3]->rotate.y = armFreq;
-		break;
-	case Player::Behavior::Attack:
-		armFreq += attackSpd  * ImGui::GetIO().DeltaTime;
-
-		if (armFreq > (std::numbers::pi_v<float> * 0.5f)) {
-			armFreq = 0.0f;
-			behavior = Behavior::Normal;
-
-			model[2]->rotate.x = 0.0f;
-			model[3]->rotate.x = 0.0f;
-			break;
-		}
-
-		model[2]->rotate.x = armFreq + std::numbers::pi_v<float>;
-		model[3]->rotate.x = armFreq + std::numbers::pi_v<float>;
-
-		weapon->rotate.x = armFreq;
-		break;
-	}
+	
 }
 
 void Player::Update() {
-	ApplyGlobalVariables();
+	//ApplyGlobalVariables();
 	moveVec = {};
-	bool isMove = false;
-	Animation();
+	//Animation();
 
 	if (KeyInput::LongPush(DIK_W)) {
 		moveVec.z += spd;
-		isMove = true;
 	}
 	if (KeyInput::LongPush(DIK_A)) {
 		moveVec.x -= spd;
-		isMove = true;
 	}
 	if (KeyInput::LongPush(DIK_S)) {
 		moveVec.z -= spd;
-		isMove = true;
 	}
 	if (KeyInput::LongPush(DIK_D)) {
 		moveVec.x += spd;
-		isMove = true;
 	}
 
-	if (Gamepad::GetStick(Gamepad::Stick::LEFT_X) > 0.15f || Gamepad::GetStick(Gamepad::Stick::LEFT_X) < -0.15f) {
+	if (Gamepad::GetStick(Gamepad::Stick::LEFT_X) > 0.2f || Gamepad::GetStick(Gamepad::Stick::LEFT_X) < -0.2f) {
 		moveVec.x += spd * Gamepad::GetStick(Gamepad::Stick::LEFT_X);
-		isMove = true;
 	}
-	if (Gamepad::GetStick(Gamepad::Stick::LEFT_Y) > 0.15f || Gamepad::GetStick(Gamepad::Stick::LEFT_Y) < -0.15f) {
-		moveVec.z += spd * Gamepad::GetStick(Gamepad::Stick::LEFT_Y);
-		isMove = true;
-	}
+
+	pos += moveVec.Normalize() * spd * ImGui::GetIO().DeltaTime;
+
+	model->pos = pos;
 
 	if (KeyInput::Pushed(DIK_SPACE) || Gamepad::Pushed(Gamepad::Button::X)) {
-		behavior = Behavior::Attack;
-
-		armFreq = 0.0f;
-
-		model[2]->rotate.y = 0.0f;
-		model[3]->rotate.y = 0.0f;
-
-		bullets.push_back(Bullet());
-		//bullets.back().Initialize(pos)
+ 		bullets.push_back(Bullet());
+		bullets.back().Initialize(pos, moveVec.GetRad());
 	}
 
 	for (auto& bullet : bullets) {
 		bullet.Update();
 	}
-	
-	/*Vector2 moveRotate;
-	moveRotate.x = moveVec.x;
-	moveRotate.y = moveVec.z;
 
-	moveRotate.Rotate(camera->gazePointRotate.x);
-	ImGui::Begin("Hoge");
-	ImGui::DragFloat2("Hoge", &camera->gazePointRotate.x);
-	ImGui::End();
-	moveVec.x = moveRotate.x;
-	moveVec.z = moveRotate.y;*/
-
-	pos += moveVec.Normalize() * spd * ImGui::GetIO().DeltaTime;
-
-	model[0]->pos += pos;
-
-	if (isMove) {
-		Vector2 rotate;
-		rotate.x = moveVec.x;
-		rotate.y = moveVec.z;
-		
-		model[0]->rotate.y = rotate.GetRad();
-	}
+	camera->Update(VertMakeMatrixAffin(model->scale, model->rotate, model->pos));
+	model->Update();
 }
 
 void Player::Draw() {
-	for (auto& i : model) {
-		i->Draw(camera->GetViewProjection(), camera->pos);
-	}
-	if (behavior == Behavior::Attack) {
-		weapon->Draw(camera->GetViewProjection(), camera->pos);
+	model->Draw(camera->GetViewProjection(), camera->pos);
+	for (auto& bullet : bullets) {
+		bullet.Draw(camera->GetViewProjection(), camera->pos);
 	}
 }
 

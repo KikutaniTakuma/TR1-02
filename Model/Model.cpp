@@ -29,7 +29,8 @@ Model::Model() :
 	dirLig(),
 	colorBuf(),
 	SRVHeap(),
-	tex(0)
+	tex(0),
+	drawIndexNumber(0)
 {
 	// 単位行列を書き込んでおく
 	wvpData->worldMat = MakeMatrixIndentity();
@@ -179,8 +180,6 @@ void Model::LoadObj(const std::string& fileName) {
 
 
 			meshData[i.first].vertNum = static_cast<uint32_t>(indexDatas[i.first].size());
-
-			meshData[i.first].vertexBuffer->Unmap(0, nullptr);
 		}
 		loadObjFlg = true;
 	}
@@ -274,6 +273,10 @@ void Model::CreateGraphicsPipeline() {
 	}
 }
 
+void Model::Update() {
+	drawIndexNumber = 0;
+}
+
 void Model::Draw(const Mat4x4& viewProjectionMat, const Vector3& cameraPos) {
 	assert(createGPFlg);
 
@@ -294,7 +297,9 @@ void Model::Draw(const Mat4x4& viewProjectionMat, const Vector3& cameraPos) {
 	if (!pipeline) {
 		ErrorCheck::GetInstance()->ErrorTextBox("pipeline is nullptr", "Model");
 	}
-	
+
+	[[maybe_unused]]size_t indexVertex = 0;
+
 	for (auto& i : meshData) {
 		pipeline->Use();
 		SRVHeap[i.first].Use();
@@ -303,6 +308,8 @@ void Model::Draw(const Mat4x4& viewProjectionMat, const Vector3& cameraPos) {
 
 		commandlist->DrawInstanced(i.second.vertNum, 1, 0, 0);
 	}
+
+	drawIndexNumber++;
 }
 
 void Model::Debug(const std::string& guiName) {

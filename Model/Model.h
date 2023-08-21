@@ -85,6 +85,8 @@ public:
 		const std::string& domain = {}
 	);
 
+	void Update();
+
 	void Draw(const Mat4x4& viewProjectionMat, const Vector3& cameraPos);
 
 	void CreateGraphicsPipeline();
@@ -124,4 +126,6 @@ private:
 	ConstBuffer<Vector4> colorBuf;
 
 	std::unordered_map<std::string, Texture*> tex;
+
+	UINT drawIndexNumber;
 };

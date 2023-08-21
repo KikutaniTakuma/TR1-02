@@ -26,7 +26,7 @@ public:
 	void Draw();
 
 	inline Vector3 GetPos() const {
-		return (*model.begin())->pos;
+		return model->pos;
 	}
 
 	inline void SetCamera(Camera* camera_) {
@@ -41,8 +41,7 @@ private:
 	void ApplyGlobalVariables();
 
 private:
-	std::vector<std::unique_ptr<Model>> model;
-	std::unique_ptr<Model> weapon;
+	std::unique_ptr<Model> model;
 
 	float spd;
 
@@ -51,17 +50,6 @@ private:
 	Vector3 pos;
 
 	Camera* camera;
-
-	float freqSpd;
-	float freq;
-
-	float armFreqSpd;
-	float armFreq;
-
-	Behavior behavior;
-
-	float attack;
-	float attackSpd;
 
 	class GlobalVariables* data;
 
