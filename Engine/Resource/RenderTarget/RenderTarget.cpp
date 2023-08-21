@@ -9,7 +9,9 @@ RenderTarget::RenderTarget():
 	RTVHeap(),
 	SRVHeap(),
 	srvHeapHandle(),
-	isResourceStateChange(false)
+	isResourceStateChange(false),
+	width(Engine::GetInstance()->clientWidth),
+	height(Engine::GetInstance()->clientHeight)
 {
 	auto resDesc = Engine::GetSwapchainBufferDesc();
 
@@ -72,12 +74,14 @@ RenderTarget::RenderTarget():
 	srvHeapHandle.ptr += Engine::GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 }
 
-RenderTarget::RenderTarget(uint32_t width, uint32_t height) :
+RenderTarget::RenderTarget(uint32_t width_, uint32_t height_) :
 	resource(),
 	RTVHeap(),
 	SRVHeap(),
 	srvHeapHandle(),
-	isResourceStateChange(false)
+	isResourceStateChange(false),
+	width(width_),
+	height(height_)
 {
 	auto resDesc = Engine::GetSwapchainBufferDesc();
 	resDesc.Width = width;
@@ -148,7 +152,9 @@ RenderTarget::RenderTarget(uint16_t numDescriptor) :
 	RTVHeap(),
 	SRVHeap(),
 	srvHeapHandle(),
-	isResourceStateChange(false)
+	isResourceStateChange(false),
+	width(Engine::GetInstance()->clientWidth),
+	height(Engine::GetInstance()->clientHeight)
 {
 	auto resDesc = Engine::GetSwapchainBufferDesc();
 
@@ -211,12 +217,14 @@ RenderTarget::RenderTarget(uint16_t numDescriptor) :
 	srvHeapHandle.ptr += Engine::GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 }
 
-RenderTarget::RenderTarget(uint16_t numDescriptor, uint32_t width, uint32_t height) :
+RenderTarget::RenderTarget(uint16_t numDescriptor, uint32_t width_, uint32_t height_) :
 	resource(),
 	RTVHeap(),
 	SRVHeap(),
 	srvHeapHandle(),
-	isResourceStateChange(false)
+	isResourceStateChange(false),
+	width(width_),
+	height(height_)
 {
 	auto resDesc = Engine::GetSwapchainBufferDesc();
 	resDesc.Width = width;
@@ -306,6 +314,7 @@ void RenderTarget::SetThisRenderTarget() {
 
 	Vector4 clearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
 	Engine::GetCommandList()->ClearRenderTargetView(rtvHeapHandle, clearColor.m.data(), 0, nullptr);
+	//Engine::SetViewPort(width, height);
 }
 
 void RenderTarget::ChangeResourceState() {

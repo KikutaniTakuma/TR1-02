@@ -272,6 +272,7 @@ private:
 
 public:
 	static void SetResolution(Resolution set);
+	static void SetViewPort(uint32_t widht, uint32_t height);
 
 private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource;

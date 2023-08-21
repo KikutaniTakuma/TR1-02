@@ -200,8 +200,8 @@ void Mat4x4::HoriRotateZ(float rad) {
 	this->m[3][3] = 1.0f;
 	
 	this->m[0][0] = std::cos(rad);
-	this->m[0][1] = std::sin(rad);
-	this->m[1][0] = -std::sin(rad);
+	this->m[0][1] = -std::sin(rad);
+	this->m[1][0] = std::sin(rad);
 	this->m[1][1] = std::cos(rad);
 }
 void Mat4x4::VertRotateZ(float rad) {

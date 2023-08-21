@@ -647,6 +647,28 @@ void Engine::SetResolution(Resolution set) {
 	engine->setResolution = set;
 }
 
+void Engine::SetViewPort(uint32_t width, uint32_t height) {
+	// ビューポート
+	D3D12_VIEWPORT viewport{};
+	// クライアント領域のサイズと一緒にして画面全体に表示
+	viewport.Width = static_cast<float>(width);
+	viewport.Height = static_cast<float>(height);
+	viewport.TopLeftX = 0;
+	viewport.TopLeftY = 0;
+	viewport.MinDepth = 0.0f;
+	viewport.MaxDepth = 1.0f;
+	engine->commandList->RSSetViewports(1, &viewport);
+
+	// シザー矩形
+	D3D12_RECT scissorRect{};
+	// 基本的にビューポートと同じ矩形が構成されるようになる
+	scissorRect.left = 0;
+	scissorRect.right = LONG(WinApp::GetInstance()->GetWindowSize().x);
+	scissorRect.top = 0;
+	scissorRect.bottom = LONG(WinApp::GetInstance()->GetWindowSize().y);
+	engine->commandList->RSSetScissorRects(1, &scissorRect);
+}
+
 void Engine::Barrier(ID3D12Resource* resource, D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after, UINT subResource) {
 	// TransitionBarrierの設定
 	D3D12_RESOURCE_BARRIER barrier{};
@@ -714,25 +736,7 @@ void Engine::FrameStart() {
 
 
 	// ビューポート
-	D3D12_VIEWPORT viewport{};
-	// クライアント領域のサイズと一緒にして画面全体に表示
-	viewport.Width = static_cast<float>(engine->clientWidth);
-	viewport.Height = static_cast<float>(engine->clientHeight);
-	viewport.TopLeftX = 0;
-	viewport.TopLeftY = 0;
-	viewport.MinDepth = 0.0f;
-	viewport.MaxDepth = 1.0f;
-	engine->commandList->RSSetViewports(1, &viewport);
-
-
-	// シザー矩形
-	D3D12_RECT scissorRect{};
-	// 基本的にビューポートと同じ矩形が構成されるようになる
-	scissorRect.left = 0;
-	scissorRect.right = LONG(WinApp::GetInstance()->GetWindowSize().x);
-	scissorRect.top = 0;
-	scissorRect.bottom = LONG(WinApp::GetInstance()->GetWindowSize().y);
-	engine->commandList->RSSetScissorRects(1, &scissorRect);
+	SetViewPort(engine->clientWidth, engine->clientHeight);
 }
 
 void Engine::FrameEnd() {

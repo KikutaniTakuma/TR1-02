@@ -56,21 +56,31 @@ public:
 	Vector3 Cross(const Vector3& right) const noexcept;
 	float Length() const noexcept;
 	Vector3 Normalize() const noexcept;
-
-/// <summary>
-/// フレンド関数
-/// </summary>
-public:
-	friend Vector3 NormalizeToRad(const Vector3& vec);
+	Vector3 GetRad()const noexcept;
 
 /// <summary>
 /// 静的定数
 /// </summary>
 public:
+	/// <summary>
+	/// x = 1.0f, y = 1.0f, z = 1.0f
+	/// </summary>
 	static const Vector3 identity;
+	/// <summary>
+	/// x = 0.0f, y = 0.0f, z = 0.0f
+	/// </summary>
 	static const Vector3 zero;
+	/// <summary>
+	/// x = 1.0f, y = 0.0f, z = 0.0f
+	/// </summary>
 	static const Vector3 xIdy;
+	/// <summary>
+	/// x = 0.0f, y = 1.0f, z = 0.0f
+	/// </summary>
 	static const Vector3 yIdy;
+	/// <summary>
+	/// x = 0.0f, y = 0.0f, z = 1.0f
+	/// </summary>
 	static const Vector3 zIdy;
 
 /// <summary>
