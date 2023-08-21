@@ -36,4 +36,6 @@ private:
 	D3D12_CPU_DESCRIPTOR_HANDLE srvHeapHandle;
 
 	bool isResourceStateChange;
+
+	uint32_t width, height;
 };

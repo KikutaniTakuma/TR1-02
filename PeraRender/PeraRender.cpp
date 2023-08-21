@@ -13,6 +13,14 @@ PeraRender::PeraRender():
 	piplines{nullptr, nullptr}
 {}
 
+PeraRender::PeraRender(uint32_t width_, uint32_t height_):
+	render(width_, height_),
+	peraVertexResource(nullptr),
+	peraVertexView(),
+	shader{},
+	piplines{ nullptr, nullptr } 
+{}
+
 PeraRender::~PeraRender() {
 	peraVertexResource->Release();
 }

@@ -25,6 +25,7 @@ public:
 
 public:
 	PeraRender();
+	PeraRender(uint32_t width_, uint32_t height_);
 	~PeraRender();
 
 	PeraRender& operator=(const PeraRender&) = default;
