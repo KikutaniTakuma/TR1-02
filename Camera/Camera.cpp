@@ -56,63 +56,6 @@ Camera::Camera(Camera&& right) noexcept
 	*this = std::move(right);
 }
 
-Camera& Camera::operator=(const Camera& right) noexcept {
-	pos = right.pos;
-	scale = right.scale;
-	rotate = right.rotate;
-
-	drawScale = right.drawScale;
-
-	moveVec = right.moveVec;
-	moveSpd = right.moveSpd;
-	moveRotateSpd = right.moveRotateSpd;
-	gazePointRotate = right.gazePointRotate;
-	gazePointRotateSpd = right.gazePointRotateSpd;
-
-	farClip = right.farClip;
-	fov = right.fov;
-
-	view = right.view;
-	projection = right.projection;
-	othograohics = right.othograohics;
-
-	viewProjecction = right.viewProjecction;
-	viewOthograohics = right.viewOthograohics;
-
-	mode = right.mode;
-	isDebug = right.isDebug;
-
-	return *this;
-}
-Camera& Camera::operator=(Camera&& right) noexcept {
-	pos = std::move(right.pos);
-	scale = std::move(right.scale);
-	rotate = std::move(right.rotate);
-
-	drawScale = std::move(right.drawScale);
-
-	moveVec = std::move(right.moveVec);
-	moveSpd = std::move(right.moveSpd);
-	moveRotateSpd = std::move(right.moveRotateSpd);
-	gazePointRotate = std::move(right.gazePointRotate);
-	gazePointRotateSpd = std::move(right.gazePointRotateSpd);
-
-	farClip = std::move(right.farClip);
-	fov = std::move(right.fov);
-
-	view = std::move(right.view);
-	projection = std::move(right.projection);
-	othograohics = std::move(right.othograohics);
-
-	viewProjecction = std::move(right.viewProjecction);
-	viewOthograohics = std::move(right.viewOthograohics);
-
-	mode = std::move(right.mode);
-	isDebug = std::move(right.isDebug);
-
-	return *this;
-}
-
 void Camera::Update(const Vector3& gazePoint) {
 	if (isDebug) {
 		moveVec = Vector3();
@@ -215,7 +158,7 @@ void Camera::Update(const Vector3& gazePoint) {
 
 void Camera::Update(const Mat4x4& worldMat) {
 	view.VertAffin(scale, rotate, pos);
-	view = view * worldMat;
+	view = worldMat * view;
 	worldPos = { view[0][3],view[1][3], view[2][3] };
 	view.Inverse();
 

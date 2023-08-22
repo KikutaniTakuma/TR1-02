@@ -73,7 +73,7 @@ void Player::Update() {
 		bullet.Update();
 	}
 
-	camera->Update(VertMakeMatrixAffin(model->scale, model->rotate, model->pos));
+	camera->Update(VertMakeMatrixAffin(model->scale, model->rotate, pos));
 	model->Update();
 }
 

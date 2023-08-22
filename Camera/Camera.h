@@ -19,8 +19,8 @@ public:
 	~Camera() noexcept = default;
 
 public:
-	Camera& operator=(const Camera& right) noexcept;
-	Camera& operator=(Camera&& right) noexcept;
+	Camera& operator=(const Camera& right) noexcept = default;
+	Camera& operator=(Camera&& right) noexcept = default;
 
 public:
 	void Update(const Vector3& gazePoint = {});
