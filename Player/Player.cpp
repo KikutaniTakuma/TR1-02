@@ -69,7 +69,7 @@ void Player::Update() {
 
 	if (KeyInput::Pushed(DIK_SPACE) || Gamepad::Pushed(Gamepad::Button::X)) {
  		bullets.push_back(Bullet());
-		bullets.back().Initialize(pos, model->rotate);
+		bullets.back().Initialize(pos, moveVec.GetRad());
 	}
 
 	for (auto& bullet : bullets) {

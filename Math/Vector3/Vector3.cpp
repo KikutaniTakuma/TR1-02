@@ -197,7 +197,7 @@ Vector3 Vector3::GetRad() const noexcept {
 
 	Vector3 result;
 	result.z = std::atan2(y, x);
-	result.y = std::atan2(z, x);
+	result.y = std::atan2(x, z);
 	result.x = std::atan2(y, z);
 
 	return result;

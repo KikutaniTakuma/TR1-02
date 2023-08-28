@@ -97,7 +97,7 @@ void Bullet::Initialize(const Vector3& pos_, const Vector3& rotate_) {
 	pos = pos_;
 	rotate = rotate_;
 	moveVec = Vector3::zIdy * spd;
-	moveVec *= HoriMakeMatrixAffin(Vector3::identity, rotate, Vector3::zero);
+	moveVec *= HoriMakeMatrixRotateY(rotate.y);
 	
 	attenuation = -moveVec;
 	attenuation = attenuation.Normalize();
