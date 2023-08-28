@@ -73,7 +73,7 @@ void PeraRender::CreateGraphicsPipeline() {
 	roootParamater[0].DescriptorTable.pDescriptorRanges = descriptorRange;
 	roootParamater[0].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);
 	
-	PipelineManager::CreateRootSgnature(roootParamater[0], true);
+	PipelineManager::CreateRootSgnature(roootParamater, 1, true);
 
 	PipelineManager::SetVertexInput("POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT);
 	PipelineManager::SetVertexInput("TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT);

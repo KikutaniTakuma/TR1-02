@@ -5,7 +5,7 @@ std::unique_ptr<Model> Bullet::model;
 
 void Bullet::LoadModel() {
 	if (!model) {
-		model = std::make_unique<Model>();
+		model = std::make_unique<Model>(30);
 		model->LoadObj("./Resources/Cube.obj");
 		model->LoadShader();
 		model->CreateGraphicsPipeline();
@@ -17,7 +17,7 @@ void Bullet::UnloadModel() {
 
 Bullet::Bullet():
 	isCollision(false),
-	spd(5.0f),
+	spd(15.0f),
 	moveVec(),
 	radius(5.0f),
 	attenuation(),
@@ -35,7 +35,7 @@ Bullet::Bullet():
 
 Bullet::Bullet(const Bullet& right) :
 	isCollision(false),
-	spd(5.0f),
+	spd(15.0f),
 	moveVec(Vector3::zero),
 	radius(5.0f),
 	attenuation(),
@@ -54,7 +54,7 @@ Bullet::Bullet(const Bullet& right) :
 }
 Bullet::Bullet(Bullet&& right) noexcept :
 	isCollision(false),
-	spd(5.0f),
+	spd(15.0f),
 	moveVec(Vector3::zero),
 	radius(5.0f),
 	attenuation(),
@@ -96,7 +96,7 @@ Bullet& Bullet::operator=(Bullet&& right) noexcept {
 void Bullet::Initialize(const Vector3& pos_, const Vector3& rotate_) {
 	pos = pos_;
 	rotate = rotate_;
-	moveVec = Vector3::xIdy * spd;
+	moveVec = Vector3::zIdy * spd;
 	moveVec *= HoriMakeMatrixAffin(Vector3::identity, rotate, Vector3::zero);
 	
 	attenuation = -moveVec;

@@ -5,7 +5,8 @@
 RootSignature::RootSignature():
 	rootSignature{},
 	rootParamater{},
-	isTexture(false)
+	isTexture(false),
+	rootParamaterSize(0)
 {}
 RootSignature::RootSignature(const RootSignature& right) {
 	*this = right;
@@ -29,40 +30,29 @@ RootSignature& RootSignature::operator=(RootSignature&& right) noexcept {
 }
 
 bool RootSignature::operator==(const RootSignature& right) const {
-	return (rootParamater.ParameterType == right.rootParamater.ParameterType
-		&& (
-			(
-				rootParamater.DescriptorTable.NumDescriptorRanges == right.rootParamater.DescriptorTable.NumDescriptorRanges
-				&& rootParamater.DescriptorTable.pDescriptorRanges == right.rootParamater.DescriptorTable.pDescriptorRanges
-			)
-			||
-			(
-				rootParamater.Constants.ShaderRegister == right.rootParamater.Constants.ShaderRegister
-				&& rootParamater.Constants.RegisterSpace == right.rootParamater.Constants.RegisterSpace
-				&& rootParamater.Constants.Num32BitValues == right.rootParamater.Constants.Num32BitValues
-			)
-			||
-			(
-				rootParamater.Descriptor.ShaderRegister == right.rootParamater.Descriptor.ShaderRegister
-				&& rootParamater.Descriptor.RegisterSpace == right.rootParamater.Descriptor.RegisterSpace
-			)
-			)
-		&& rootParamater.ShaderVisibility == right.rootParamater.ShaderVisibility
-		)
-		&& isTexture == right.isTexture;
+	if (rootParamaterSize != right.rootParamaterSize) {
+		return false;
+	}
+	for (size_t i = 0; i < rootParamaterSize; i++) {
+		if (rootParamater[i] != right.rootParamater[i]) {
+			return false;
+		}
+	}
+	return  isTexture == right.isTexture;
 }
 bool RootSignature::operator!=(const RootSignature& right) const {
 	return !(*this == right);
 }
 
-void RootSignature::Create(const D3D12_ROOT_PARAMETER& rootParamater_, bool isTexture_) {
+void RootSignature::Create(D3D12_ROOT_PARAMETER* rootParamater_, size_t rootParamaterSize_, bool isTexture_) {
 	// RootSignatureの生成
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
 	descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
 	rootParamater = rootParamater_;
-	descriptionRootSignature.pParameters = &rootParamater;
-	descriptionRootSignature.NumParameters = 1;
+	rootParamaterSize = rootParamaterSize_;
+	descriptionRootSignature.pParameters = rootParamater;
+	descriptionRootSignature.NumParameters = static_cast<decltype(descriptionRootSignature.NumParameters)>(rootParamaterSize_);
 
 	isTexture = isTexture_;
 
@@ -100,17 +90,17 @@ void RootSignature::Create(const D3D12_ROOT_PARAMETER& rootParamater_, bool isTe
 	signatureBlob.Reset();
 }
 
-bool RootSignature::IsSame(const D3D12_ROOT_PARAMETER& rootParamater_, bool isTexture_) const {
+bool operator==(const D3D12_ROOT_PARAMETER& left, const D3D12_ROOT_PARAMETER& right) {
 	bool isSameDescriptorTable = false;
 
-	if (rootParamater.DescriptorTable.NumDescriptorRanges == rootParamater_.DescriptorTable.NumDescriptorRanges) {
-		for (uint32_t i = 0; i < rootParamater.DescriptorTable.NumDescriptorRanges; i++) {
+	if (left.DescriptorTable.NumDescriptorRanges == right.DescriptorTable.NumDescriptorRanges) {
+		for (uint32_t i = 0; i < left.DescriptorTable.NumDescriptorRanges; i++) {
 			isSameDescriptorTable =
-				rootParamater.DescriptorTable.pDescriptorRanges[i].BaseShaderRegister == rootParamater_.DescriptorTable.pDescriptorRanges[i].BaseShaderRegister
-				&& rootParamater.DescriptorTable.pDescriptorRanges[i].NumDescriptors == rootParamater_.DescriptorTable.pDescriptorRanges[i].NumDescriptors
-				&& rootParamater.DescriptorTable.pDescriptorRanges[i].OffsetInDescriptorsFromTableStart == rootParamater_.DescriptorTable.pDescriptorRanges[i].OffsetInDescriptorsFromTableStart
-				&& rootParamater.DescriptorTable.pDescriptorRanges[i].RangeType == rootParamater_.DescriptorTable.pDescriptorRanges[i].RangeType
-				&& rootParamater.DescriptorTable.pDescriptorRanges[i].RegisterSpace == rootParamater_.DescriptorTable.pDescriptorRanges[i].RegisterSpace;
+				left.DescriptorTable.pDescriptorRanges[i].BaseShaderRegister == right.DescriptorTable.pDescriptorRanges[i].BaseShaderRegister
+				&& left.DescriptorTable.pDescriptorRanges[i].NumDescriptors == right.DescriptorTable.pDescriptorRanges[i].NumDescriptors
+				&& left.DescriptorTable.pDescriptorRanges[i].OffsetInDescriptorsFromTableStart == right.DescriptorTable.pDescriptorRanges[i].OffsetInDescriptorsFromTableStart
+				&& left.DescriptorTable.pDescriptorRanges[i].RangeType == right.DescriptorTable.pDescriptorRanges[i].RangeType
+				&& left.DescriptorTable.pDescriptorRanges[i].RegisterSpace == right.DescriptorTable.pDescriptorRanges[i].RegisterSpace;
 
 			if (!isSameDescriptorTable) {
 				return false;
@@ -121,8 +111,23 @@ bool RootSignature::IsSame(const D3D12_ROOT_PARAMETER& rootParamater_, bool isTe
 		return false;
 	}
 
-	return (rootParamater.ParameterType == rootParamater_.ParameterType
-		&& rootParamater.ShaderVisibility == rootParamater_.ShaderVisibility
-		)
-		&& isTexture == isTexture_;
+	return (left.ParameterType == right.ParameterType
+		&& left.ShaderVisibility == right.ShaderVisibility
+		);
+}
+
+bool operator!=(const D3D12_ROOT_PARAMETER& left, const D3D12_ROOT_PARAMETER& right) {
+	return !(left == right);
+}
+
+bool RootSignature::IsSame(D3D12_ROOT_PARAMETER* rootParamater_, size_t rootParamaterSize_, bool isTexture_) const {
+	if (rootParamaterSize != rootParamaterSize_) {
+		return false;
+	}
+	for (size_t i = 0; i < rootParamaterSize;i++) {
+		if (rootParamater[i] != rootParamater_[i]) {
+			return false;
+		}
+	}
+	return isTexture == isTexture_;
 }

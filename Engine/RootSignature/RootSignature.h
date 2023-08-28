@@ -17,16 +17,20 @@ public:
 	bool operator!=(const RootSignature& right) const;
 
 public:
-	void Create(const D3D12_ROOT_PARAMETER& rootParamater_, bool isTexture_ = false);
+	void Create(D3D12_ROOT_PARAMETER* rootParamater_, size_t rootParamaterSize_, bool isTexture_);
 
 	inline ID3D12RootSignature* Get() const {
 		return rootSignature.Get();
 	}
 
-	bool IsSame(const D3D12_ROOT_PARAMETER& rootParamater_, bool isTexture_) const;
+	bool IsSame(D3D12_ROOT_PARAMETER* rootParamater_, size_t rootParamaterSize_, bool isTexture_) const;
 
 private:
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature;
-	D3D12_ROOT_PARAMETER rootParamater;
+	D3D12_ROOT_PARAMETER* rootParamater;
+	size_t rootParamaterSize;
 	bool isTexture;
 };
+
+bool operator==(const D3D12_ROOT_PARAMETER& left, const D3D12_ROOT_PARAMETER& right);
+bool operator!=(const D3D12_ROOT_PARAMETER& left, const D3D12_ROOT_PARAMETER& right);

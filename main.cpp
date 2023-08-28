@@ -79,15 +79,13 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	bool fullscreen = false;
 
-	auto watame = std::make_unique<Model>();
+	/*auto watame = std::make_unique<Model>();
 	watame->LoadObj("Resources/Watame/Watame.obj");
 	watame->LoadShader();
-	watame->CreateGraphicsPipeline();
+	watame->CreateGraphicsPipeline();*/
 
 	auto player = std::make_unique<Player>(nullptr);
 	player->SetCamera(&camera);
-	Bullet bullet;
-	bullet.Initialize(Vector3::zero, Vector3::zero);
 
 	/// 
 	/// メインループ
@@ -148,8 +146,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		player->Update();
 
-		watame->Update();
-
 		///
 		/// 更新処理ここまで
 		/// 
@@ -157,22 +153,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		///
 		/// 描画処理
 		/// 
-		watame->Draw(camera.GetViewProjection(), camera.pos);
-		//pera->PreDraw();
-		//
-		//watame->Draw(camera.GetViewProjection(), camera.pos);
-
-		//// peraに描画されたやつから輝度を抽出するレンダーに描画
-		//pera->Draw(Pipeline::None, luminance.get());
-
-		//// 輝度を抽出したものをブラーをかけるものに描画
-		//luminance->Draw(Pipeline::None, averaging.get());
-
-		//// 平均化ブラーを更に平均化ブラーをかけるものに描画
-		//averaging->Draw(Pipeline::None, averaging2.get());
-
-		//// 平均化ブラーしたものを加算合成
-		//averaging2->Draw(Pipeline::Add);
+		
 
 		player->Draw();
 

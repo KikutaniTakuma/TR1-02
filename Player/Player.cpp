@@ -59,6 +59,9 @@ void Player::Update() {
 	if (Gamepad::GetStick(Gamepad::Stick::LEFT_X) > 0.2f || Gamepad::GetStick(Gamepad::Stick::LEFT_X) < -0.2f) {
 		moveVec.x += spd * Gamepad::GetStick(Gamepad::Stick::LEFT_X);
 	}
+	if (Gamepad::GetStick(Gamepad::Stick::LEFT_Y) > 0.2f || Gamepad::GetStick(Gamepad::Stick::LEFT_Y) < -0.2f) {
+		moveVec.z += spd * Gamepad::GetStick(Gamepad::Stick::LEFT_Y);
+	}
 
 	pos += moveVec.Normalize() * spd * ImGui::GetIO().DeltaTime;
 
@@ -66,7 +69,7 @@ void Player::Update() {
 
 	if (KeyInput::Pushed(DIK_SPACE) || Gamepad::Pushed(Gamepad::Button::X)) {
  		bullets.push_back(Bullet());
-		bullets.back().Initialize(pos, moveVec.GetRad());
+		bullets.back().Initialize(pos, model->rotate);
 	}
 
 	for (auto& bullet : bullets) {

@@ -129,7 +129,8 @@ void Texture2D::LoadShader(const std::string& vsFileName, const std::string& psF
 }
 
 void Texture2D::CreateGraphicsPipeline() {
-	PipelineManager::CreateRootSgnature(SRVHeap.GetParameter(), true);
+	auto paramaterTmp = SRVHeap.GetParameter();
+	PipelineManager::CreateRootSgnature(&paramaterTmp, 1, true);
 	PipelineManager::SetShader(shader);
 	PipelineManager::SetVertexInput("POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT);
 	PipelineManager::SetVertexInput("TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT);

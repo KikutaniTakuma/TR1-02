@@ -11,6 +11,7 @@
 #include "Engine/ShaderManager/ShaderManager.h"
 #include "externals/imgui/imgui.h"
 #include "Engine/ErrorCheck/ErrorCheck.h"
+#include "ModelManager/ModelManager.h"
 
 
 Model::Model() :
@@ -30,22 +31,81 @@ Model::Model() :
 	colorBuf(),
 	SRVHeap(),
 	tex(0),
-	drawIndexNumber(0)
+	drawIndexNumber(0),
+	maxDrawIndex(1)
 {
-	// 単位行列を書き込んでおく
-	wvpData->worldMat = MakeMatrixIndentity();
-	wvpData->viewProjectoionMat = MakeMatrixIndentity();
+	wvpData.resize(maxDrawIndex);
+	for (auto& i : wvpData) {
+		i.shaderRegister = 0;
+		i->worldMat = MakeMatrixIndentity();
+		i->viewProjectoionMat = MakeMatrixIndentity();
+	}
 
-	dirLig->ligDirection = { 1.0f,-1.0f,-1.0f };
-	dirLig->ligDirection = dirLig->ligDirection.Normalize();
-	Vector4 colorTmp = UintToVector4(0xffffadff);
-	dirLig->ligColor = colorTmp.GetVector3();
+	dirLig.resize(maxDrawIndex);
+	for (auto& i : dirLig) {
+		i.shaderRegister = 1;
+		i->ligDirection = { 1.0f,-1.0f,-1.0f };
+		i->ligDirection = dirLig.back()->ligDirection.Normalize();
+		Vector4 colorTmp = UintToVector4(0xffffadff);
+		i->ligColor = colorTmp.GetVector3();
 
-	dirLig->ptPos = { 5.0f,5.0f,5.0f };
-	dirLig->ptColor = { 15.0f,15.0f,15.0f };
-	dirLig->ptRange = 10.0f;
+		i->ptPos = { 5.0f,5.0f,5.0f };
+		i->ptColor = { 15.0f,15.0f,15.0f };
+		i->ptRange = 10.0f;
+	}
 
-	*colorBuf = UintToVector4(color);
+	colorBuf.resize(maxDrawIndex);
+	for (auto& i : colorBuf) {
+		i.shaderRegister = 2;
+		*i = UintToVector4(color);
+	}
+}
+
+Model::Model(UINT maxDrawIndex_) :
+	pos(),
+	rotate(),
+	scale(Vector3::identity),
+	color(0xffffffff),
+	parent(nullptr),
+	meshData(),
+	shader(),
+	pipeline(nullptr),
+	loadObjFlg(false),
+	loadShaderFlg(false),
+	createGPFlg(false),
+	wvpData(),
+	dirLig(),
+	colorBuf(),
+	SRVHeap(),
+	tex(0),
+	drawIndexNumber(0),
+	maxDrawIndex(maxDrawIndex_)
+{
+	wvpData.resize(maxDrawIndex);
+	for (auto& i : wvpData) {
+		i.shaderRegister = 0;
+		i->worldMat = MakeMatrixIndentity();
+		i->viewProjectoionMat = MakeMatrixIndentity();
+	}
+
+	dirLig.resize(maxDrawIndex);
+	for (auto& i : dirLig) {
+		i.shaderRegister = 1;
+		i->ligDirection = { 1.0f,-1.0f,-1.0f };
+		i->ligDirection = dirLig.back()->ligDirection.Normalize();
+		Vector4 colorTmp = UintToVector4(0xffffadff);
+		i->ligColor = colorTmp.GetVector3();
+
+		i->ptPos = { 5.0f,5.0f,5.0f };
+		i->ptColor = { 15.0f,15.0f,15.0f };
+		i->ptRange = 10.0f;
+	}
+
+	colorBuf.resize(maxDrawIndex);
+	for (auto& i : colorBuf) {
+		i.shaderRegister = 2;
+		*i = UintToVector4(color);
+	}
 }
 
 void Model::LoadObj(const std::string& fileName) {
@@ -140,7 +200,7 @@ void Model::LoadObj(const std::string& fileName) {
 				line >> useMtlName;
 				indexDatas.insert({ useMtlName,std::vector<IndexData>(0) });
 				indicesItr = indexDatas.find(useMtlName);
-				meshData.insert({ useMtlName,Mesh() });
+				meshData[useMtlName];
 			}
 			else if (identifier == "mtllib") {
 				std::string mtlFileName;
@@ -250,12 +310,12 @@ void Model::LoadShader(
 
 void Model::CreateGraphicsPipeline() {
 	if (loadShaderFlg && loadObjFlg) {
-		for (auto& i : SRVHeap) {
-			i.second.CreateConstBufferView(wvpData);
-			i.second.CreateConstBufferView(dirLig);
-			i.second.CreateConstBufferView(colorBuf);
-		}
-		PipelineManager::CreateRootSgnature(SRVHeap.begin()->second.GetParameter(), true);
+		std::array<D3D12_ROOT_PARAMETER, 4> paramates;
+		paramates[0] = SRVHeap.begin()->second.GetParameter();
+		paramates[1] = wvpData.front().GetRoootParamater();
+		paramates[2] = dirLig.front().GetRoootParamater();
+		paramates[3] = colorBuf.front().GetRoootParamater();
+		PipelineManager::CreateRootSgnature(paramates.data(), paramates.size(), true);
 
 		PipelineManager::SetShader(shader);
 
@@ -279,17 +339,20 @@ void Model::Update() {
 
 void Model::Draw(const Mat4x4& viewProjectionMat, const Vector3& cameraPos) {
 	assert(createGPFlg);
-
-	wvpData->worldMat.HoriAffin(scale, rotate, pos);
-	if (parent) {
-		wvpData->worldMat *= MakeMatrixTransepose(parent->wvpData->worldMat);
+	if (drawIndexNumber >= maxDrawIndex) {
+		drawIndexNumber = 0;
 	}
-	wvpData->worldMat.Transepose();
-	wvpData->viewProjectoionMat = viewProjectionMat;
 
-	*colorBuf = UintToVector4(color);
+	wvpData[drawIndexNumber]->worldMat.HoriAffin(scale, rotate, pos);
+	if (parent) {
+		wvpData[drawIndexNumber]->worldMat *= MakeMatrixTransepose(parent->wvpData.back()->worldMat);
+	}
+	wvpData[drawIndexNumber]->worldMat.Transepose();
+	wvpData[drawIndexNumber]->viewProjectoionMat = viewProjectionMat;
 
-	dirLig->eyePos = cameraPos;
+	*colorBuf[drawIndexNumber] = UintToVector4(color);
+
+	dirLig[drawIndexNumber]->eyePos = cameraPos;
 
 
 	auto commandlist = Engine::GetCommandList();
@@ -306,6 +369,10 @@ void Model::Draw(const Mat4x4& viewProjectionMat, const Vector3& cameraPos) {
 
 		commandlist->IASetVertexBuffers(0, 1, &i.second.vertexView);
 
+		commandlist->SetGraphicsRootConstantBufferView(1, wvpData[drawIndexNumber].GetGPUVtlAdrs());
+		commandlist->SetGraphicsRootConstantBufferView(2, dirLig[drawIndexNumber].GetGPUVtlAdrs());
+		commandlist->SetGraphicsRootConstantBufferView(3, colorBuf[drawIndexNumber].GetGPUVtlAdrs());
+
 		commandlist->DrawInstanced(i.second.vertNum, 1, 0, 0);
 	}
 
@@ -317,13 +384,13 @@ void Model::Debug(const std::string& guiName) {
 	ImGui::DragFloat3("pos", &pos.x, 0.01f);
 	ImGui::DragFloat3("rotate", &rotate.x, 0.01f);
 	ImGui::DragFloat3("scale", &scale.x, 0.01f);
-	ImGui::ColorEdit4("SphereColor", &colorBuf->color.r);
-	ImGui::DragFloat3("ligDirection", &dirLig->ligDirection.x, 0.01f);
-	dirLig->ligDirection = dirLig->ligDirection.Normalize();
-	ImGui::DragFloat3("ligColor", &dirLig->ligColor.x, 0.01f);
-	ImGui::DragFloat3("ptPos", &dirLig->ptPos.x, 0.01f);
-	ImGui::DragFloat3("ptColor", &dirLig->ptColor.x, 0.01f);
-	ImGui::DragFloat("ptRange", &dirLig->ptRange);
+	ImGui::ColorEdit4("SphereColor", &colorBuf.back()->color.r);
+	ImGui::DragFloat3("ligDirection", &dirLig.back()->ligDirection.x, 0.01f);
+	dirLig.back()->ligDirection = dirLig.back()->ligDirection.Normalize();
+	ImGui::DragFloat3("ligColor", &dirLig.back()->ligColor.x, 0.01f);
+	ImGui::DragFloat3("ptPos", &dirLig.back()->ptPos.x, 0.01f);
+	ImGui::DragFloat3("ptColor", &dirLig.back()->ptColor.x, 0.01f);
+	ImGui::DragFloat("ptRange", &dirLig.back()->ptRange);
 	ImGui::End();
 }
 

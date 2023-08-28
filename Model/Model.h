@@ -14,13 +14,12 @@
 #include <wrl.h>
 
 class Model {
-private:
+public:
 	struct VertData {
 		Vector4 position;
 		Vector3 normal;
 		Vector2 uv;
 	};
-
 	struct IndexData {
 		uint32_t vertNum;
 		uint32_t uvNum;
@@ -47,6 +46,7 @@ private:
 		uint32_t vertNum = 0;
 	};
 
+private:
 	struct MatrixData {
 		Mat4x4 worldMat;
 		Mat4x4 viewProjectoionMat;
@@ -67,6 +67,7 @@ private:
 
 public:
 	Model();
+	Model(UINT maxDrawIndex_);
 	Model(const Model&) = default;
 	~Model();
 
@@ -119,13 +120,14 @@ private:
 	bool loadShaderFlg;
 	bool createGPFlg;
 
-	ConstBuffer<MatrixData> wvpData;
+	std::deque<ConstBuffer<MatrixData>> wvpData;
 
-	ConstBuffer<DirectionLight> dirLig;
+	std::deque<ConstBuffer<DirectionLight>> dirLig;
 
-	ConstBuffer<Vector4> colorBuf;
+	std::deque<ConstBuffer<Vector4>> colorBuf;
 
 	std::unordered_map<std::string, Texture*> tex;
 
 	UINT drawIndexNumber;
+	UINT maxDrawIndex;
 };

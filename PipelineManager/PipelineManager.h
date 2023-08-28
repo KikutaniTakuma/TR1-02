@@ -36,7 +36,7 @@ public:
 	/// </summary>
 	/// <param name="rootParamater_">ルートパラメータ</param>
 	/// <param name="isTexture_">テクスチャを使う場合はtrue</param>
-	static void CreateRootSgnature(const D3D12_ROOT_PARAMETER& rootParamater_, bool isTexture_);
+	static void CreateRootSgnature(D3D12_ROOT_PARAMETER* rootParamater_, size_t rootParamaterSize_, bool isTexture_);
 
 	static void SetRootSgnature(RootSignature* rootSignature);
 

@@ -23,7 +23,8 @@ Line::Line() :
 	shader.vertex = ShaderManager::LoadVertexShader("./LineShader/Line.VS.hlsl");
 	shader.pixel = ShaderManager::LoadPixelShader("./LineShader/Line.PS.hlsl");
 
-	PipelineManager::CreateRootSgnature(heap.GetParameter(), false);
+	auto paramaterTmp = heap.GetParameter();
+	PipelineManager::CreateRootSgnature(&paramaterTmp, 1, false);
 	PipelineManager::SetVertexInput("POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT);
 	PipelineManager::SetVertexInput("COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT);
 	PipelineManager::SetShader(shader);
