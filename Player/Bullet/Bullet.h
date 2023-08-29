@@ -1,5 +1,6 @@
 #pragma once
 #include "Model/Model.h"
+#include <chrono>
 
 class Bullet {
 public:
@@ -22,6 +23,10 @@ public:
 	static void LoadModel();
 	static void UnloadModel();
 
+	inline bool GetIsDeath() const {
+		return isDeath;
+	}
+
 private:
 	static std::unique_ptr<Model> model;
 	bool isCollision;
@@ -35,4 +40,9 @@ private:
 	Vector3 pos;
 	Vector3 size;
 	Vector3 rotate;
+
+	std::chrono::steady_clock::time_point startTime;
+	std::chrono::seconds deathTime;
+
+	bool isDeath;
 };

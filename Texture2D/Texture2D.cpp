@@ -2,6 +2,7 @@
 #include "Engine/ShaderManager/ShaderManager.h"
 #include "externals/imgui/imgui.h"
 #include "Engine/ErrorCheck/ErrorCheck.h"
+#include <numeric>
 
 Texture2D::Texture2D() :
 	scale(Vector2::identity),
@@ -19,7 +20,8 @@ Texture2D::Texture2D() :
 	graphicsPipelineState(),
 	tex(nullptr),
 	isFirstLoad(true),
-	isLoad(false)
+	isLoad(false),
+	color(std::numeric_limits<uint32_t>::max())
 {}
 
 Texture2D::Texture2D(const Texture2D& right) :
@@ -38,7 +40,8 @@ Texture2D::Texture2D(const Texture2D& right) :
 	graphicsPipelineState(),
 	tex(nullptr),
 	isFirstLoad(true),
-	isLoad(false)
+	isLoad(false),
+	color(std::numeric_limits<uint32_t>::max())
 {
 	*this = right;
 }
@@ -58,7 +61,8 @@ Texture2D::Texture2D(Texture2D&& right) noexcept :
 	graphicsPipelineState(),
 	tex(nullptr),
 	isFirstLoad(true),
-	isLoad(false)
+	isLoad(false),
+	color(std::numeric_limits<uint32_t>::max())
 {
 	*this = right;
 }
@@ -88,7 +92,7 @@ Texture2D& Texture2D::operator=(const Texture2D& right) {
 	}
 
 	*wvpMat = *right.wvpMat;
-	*color = *right.color;
+	*colorBuf = *right.colorBuf;
 
 	return *this;
 }
@@ -118,7 +122,7 @@ void Texture2D::Initialize(const std::string& vsFileName, const std::string& psF
 	indexResource->Unmap(0, nullptr);
 
 
-	*color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+	*colorBuf = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 }
 
 void Texture2D::LoadShader(const std::string& vsFileName, const std::string& psFileName) {
@@ -161,7 +165,7 @@ void Texture2D::Update() {
 			SRVHeap.Reset();
 			SRVHandle = SRVHeap.CreateTxtureView(tex);
 			SRVHeap.CreateConstBufferView(wvpMat);
-			SRVHeap.CreateConstBufferView(color);
+			SRVHeap.CreateConstBufferView(colorBuf);
 			CreateGraphicsPipeline();
 			isFirstLoad = false;
 		}
@@ -223,6 +227,8 @@ void Texture2D::Draw(
 			}
 		}
 
+		*colorBuf = UintToVector4(color);
+
 		// 各種描画コマンドを積む
 		graphicsPipelineState[blend]->Use();
 		SRVHeap.Use();
@@ -239,7 +245,8 @@ void Texture2D::Debug(const std::string& guiName) {
 	ImGui::DragFloat3("pos", &pos.x, 1.0f);
 	ImGui::DragFloat2("uvPibot", &uvPibot.x, 0.01f);
 	ImGui::DragFloat2("uvSize", &uvSize.x, 0.01f);
-	ImGui::ColorEdit4("SphereColor", &color->color.r);
+	ImGui::ColorEdit4("SphereColor", &colorBuf->color.r);
+	color = Vector4ToUint(*colorBuf);
 	ImGui::End();
 }
 

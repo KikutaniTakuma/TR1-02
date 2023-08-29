@@ -203,3 +203,14 @@ Vector4 UintToVector4(uint32_t color) {
 	};
 	return result;
 }
+
+uint32_t Vector4ToUint(const Vector4& color) {
+	uint32_t result = 0u;
+
+	result += static_cast<decltype(result)>(color.color.r * 255.0f) << 24;
+	result += static_cast<decltype(result)>(color.color.g * 255.0f) << 16;
+	result += static_cast<decltype(result)>(color.color.b * 255.0f) << 8;
+	result += static_cast<decltype(result)>(color.color.a * 255.0f);
+
+	return result;
+}

@@ -24,7 +24,10 @@ Bullet::Bullet():
 	attenuationSpd(radius * 0.5f),
 	pos(),
 	size(Vector3::identity),
-	rotate()
+	rotate(),
+	startTime(),
+	deathTime(5),
+	isDeath(false)
 {
 	if (!model) {
 		model->LoadObj("./Resources/Ball.obj");
@@ -34,15 +37,7 @@ Bullet::Bullet():
 }
 
 Bullet::Bullet(const Bullet& right) :
-	isCollision(false),
-	spd(15.0f),
-	moveVec(Vector3::zero),
-	radius(5.0f),
-	attenuation(),
-	attenuationSpd(radius * 0.5f),
-	pos(),
-	size(Vector3::identity),
-	rotate()
+	Bullet()
 {
 	if (!model) {
 		model->LoadObj("./Resources/Ball.obj");
@@ -53,15 +48,7 @@ Bullet::Bullet(const Bullet& right) :
 	*this = right;
 }
 Bullet::Bullet(Bullet&& right) noexcept :
-	isCollision(false),
-	spd(15.0f),
-	moveVec(Vector3::zero),
-	radius(5.0f),
-	attenuation(),
-	attenuationSpd(radius * 0.5f),
-	pos(),
-	size(Vector3::identity),
-	rotate()
+	Bullet()
 {
 	if (!model) {
 		model->LoadObj("./Resources/Ball.obj");
@@ -82,6 +69,9 @@ Bullet& Bullet::operator=(const Bullet& right) {
 	moveVec = right.moveVec;
 	radius = right.radius;
 
+	startTime = right.startTime;
+	deathTime = right.deathTime;
+
 	return *this;
 }
 Bullet& Bullet::operator=(Bullet&& right) noexcept {
@@ -89,6 +79,9 @@ Bullet& Bullet::operator=(Bullet&& right) noexcept {
 	spd = std::move(right.spd);
 	moveVec = std::move(right.moveVec);
 	radius = std::move(right.radius);
+
+	startTime = std::move(right.startTime);
+	deathTime = std::move(right.deathTime);
 
 	return *this;
 }
@@ -102,9 +95,18 @@ void Bullet::Initialize(const Vector3& pos_, const Vector3& rotate_) {
 	attenuation = -moveVec;
 	attenuation = attenuation.Normalize();
 	attenuation *= attenuationSpd;
+
+	startTime = std::chrono::steady_clock::now();
 }
 void Bullet::Update() {
-	if (moveVec.Length() >= 0.01f) {
+	auto nowTime = std::chrono::steady_clock::now();
+	if (std::chrono::duration_cast<std::chrono::seconds>(nowTime - startTime)
+		> deathTime
+		) {
+		isDeath = true;
+	}
+
+	if (moveVec.Length() >= 0.01f && !isDeath) {
 		pos += moveVec * ImGui::GetIO().DeltaTime;
 		moveVec += attenuation * ImGui::GetIO().DeltaTime;
 	}

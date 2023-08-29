@@ -1,6 +1,8 @@
 #pragma once
 
 #include <Windows.h>
+#undef max
+#undef min
 #include <Xinput.h>
 #pragma comment (lib, "xinput.lib")
 #include <stdint.h>

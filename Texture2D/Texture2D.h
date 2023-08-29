@@ -70,6 +70,8 @@ public:
 
 	std::array<Vector3, 4> worldPos;
 
+	uint32_t color;
+
 private:
 	ShaderResourceHeap SRVHeap;
 
@@ -86,7 +88,7 @@ private:
 	std::array<Pipeline*, size_t(Pipeline::Blend::BlendTypeNum)> graphicsPipelineState;
 
 	ConstBuffer<Mat4x4> wvpMat;
-	ConstBuffer<Vector4> color;
+	ConstBuffer<Vector4> colorBuf;
 
 	Texture* tex;
 	bool isFirstLoad;

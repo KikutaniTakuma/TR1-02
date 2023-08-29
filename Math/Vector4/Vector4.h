@@ -86,3 +86,8 @@ public:
 /// uint32_tからVector4への変換
 /// </summary>
 Vector4 UintToVector4(uint32_t color);
+
+/// <summary>
+/// Vector4からuint32_tへの変換
+/// </summary>
+uint32_t Vector4ToUint(const Vector4& color);

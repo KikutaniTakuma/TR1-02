@@ -72,6 +72,13 @@ void Player::Update() {
 		bullets.back().Initialize(pos, moveVec.GetRad());
 	}
 
+	std::erase_if(
+		bullets, 
+		[](const Bullet& num) {
+			return num.GetIsDeath();
+		}
+	);
+
 	for (auto& bullet : bullets) {
 		bullet.Update();
 	}
