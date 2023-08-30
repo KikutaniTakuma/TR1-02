@@ -81,6 +81,10 @@ Model::Model(UINT maxDrawIndex_) :
 	drawIndexNumber(0),
 	maxDrawIndex(maxDrawIndex_)
 {
+	if (maxDrawIndex < 1) {
+		maxDrawIndex = 1;
+	}
+
 	wvpData.resize(maxDrawIndex);
 	for (auto& i : wvpData) {
 		i.shaderRegister = 0;
