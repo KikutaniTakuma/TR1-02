@@ -14,7 +14,7 @@ public:
 	Bullet& operator=(Bullet&& right) noexcept;
 
 public:
-	void Initialize(const Vector3& pos_, const Vector3& rotate_);
+	void Initialize(const Vector3& pos_, const Vector3& rotate_, const Vector3& scale_ = Vector3::identity);
 	void Update();
 	void Draw(const Mat4x4& viewProjection, const Vector3& cameraPos);
 
@@ -32,25 +32,30 @@ public:
 	static void LoadModel();
 	static void UnloadModel();
 
+public:
+	Vector3 pos;
+	Vector3 scale;
+	Vector3 rotate;
+	float spd;
+	float radius;
+
+	// state
+	float attack;
+
 private:
 	static std::unique_ptr<Model> model;
 	bool isCollision;
-	float spd;
+	
 	Vector3 moveVec;
-	float radius;
+	
 
 	Vector3 attenuation;
 	float attenuationSpd;
 
-	Vector3 pos;
-	Vector3 size;
-	Vector3 rotate;
+	float attenuationAttack;
 
 	std::chrono::steady_clock::time_point startTime;
 	std::chrono::seconds deathTime;
 
 	bool isDeath;
-
-	// state
-	float attack;
 };

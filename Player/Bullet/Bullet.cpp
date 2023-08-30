@@ -5,7 +5,7 @@ std::unique_ptr<Model> Bullet::model;
 
 void Bullet::LoadModel() {
 	if (!model) {
-		model = std::make_unique<Model>(30);
+		model = std::make_unique<Model>(1000);
 		model->LoadObj("./Resources/Cube.obj");
 		model->LoadShader();
 		model->CreateGraphicsPipeline();
@@ -23,40 +23,25 @@ Bullet::Bullet():
 	attenuation(),
 	attenuationSpd(radius * 0.5f),
 	pos(),
-	size(Vector3::identity),
+	scale(Vector3::identity),
 	rotate(),
 	startTime(),
-	deathTime(5),
+	deathTime(3),
 	isDeath(false),
-	attack(10.0f)
+	attack(10.0f),
+	attenuationAttack()
 {
-	if (!model) {
-		model->LoadObj("./Resources/Ball.obj");
-		model->LoadShader();
-		model->CreateGraphicsPipeline();
-	}
+	
 }
 
 Bullet::Bullet(const Bullet& right) :
 	Bullet()
 {
-	if (!model) {
-		model->LoadObj("./Resources/Ball.obj");
-		model->LoadShader();
-		model->CreateGraphicsPipeline();
-	}
-
 	*this = right;
 }
 Bullet::Bullet(Bullet&& right) noexcept :
 	Bullet()
 {
-	if (!model) {
-		model->LoadObj("./Resources/Ball.obj");
-		model->LoadShader();
-		model->CreateGraphicsPipeline();
-	}
-
 	*this = std::move(right);
 }
 
@@ -87,9 +72,10 @@ Bullet& Bullet::operator=(Bullet&& right) noexcept {
 	return *this;
 }
 
-void Bullet::Initialize(const Vector3& pos_, const Vector3& rotate_) {
+void Bullet::Initialize(const Vector3& pos_, const Vector3& rotate_, const Vector3& scale_) {
 	pos = pos_;
 	rotate = rotate_;
+	scale = scale_;
 	moveVec = Vector3::zIdy * spd;
 	moveVec *= HoriMakeMatrixRotateY(rotate.y);
 	
@@ -98,6 +84,8 @@ void Bullet::Initialize(const Vector3& pos_, const Vector3& rotate_) {
 	attenuation *= attenuationSpd;
 
 	startTime = std::chrono::steady_clock::now();
+
+	attenuationAttack = attack / 3.0f;
 }
 void Bullet::Update() {
 	auto nowTime = std::chrono::steady_clock::now();
@@ -110,13 +98,14 @@ void Bullet::Update() {
 	if (moveVec.Length() >= 0.01f && !isDeath) {
 		pos += moveVec * ImGui::GetIO().DeltaTime;
 		moveVec += attenuation * ImGui::GetIO().DeltaTime;
+		attack -= attenuationAttack * ImGui::GetIO().DeltaTime;
 	}
 
 	model->Update();
 }
 void Bullet::Draw(const Mat4x4& viewProjection, const Vector3& cameraPos) {
 	model->pos = pos;
-	model->scale = size;
+	model->scale = scale;
 
 	model->Draw(viewProjection, cameraPos);
 }
@@ -124,6 +113,7 @@ void Bullet::Draw(const Mat4x4& viewProjection, const Vector3& cameraPos) {
 bool Bullet::Collision(const Bullet& bullet) {
 	Vector3 length = pos - bullet.pos;
 	if (radius + bullet.radius <= length.Length()) {
+		isDeath = true;
 		return true;
 	}
 	return false;
