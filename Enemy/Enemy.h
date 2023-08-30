@@ -3,8 +3,20 @@
 #include <memory>
 #include "Camera/Camera.h"
 #include <vector>
+#include "Action/Frame/Frame.h"
 
 class Enemy {
+public:
+	enum class Type {
+		Bomb,
+		Recovery
+	};
+	struct State {
+		float hp;
+		float attack;
+		float recovery;
+	};
+
 public:
 	Enemy();
 	Enemy(const Enemy&) = default;
@@ -12,20 +24,37 @@ public:
 	Enemy& operator=(const Enemy&) = default;
 
 public:
+	void Initialize(Enemy::Type type_, class Boss* boss_, float stateScale = 1.0f);
+
 	void Update();
 
 	void Draw();
 
 	inline Vector3 GetPos() const {
-		return (*model.begin())->pos;
+		return model.pos;
 	}
 
 	inline void SetCamera(Camera* camera_) {
 		camera = camera_;
 	}
 
+	void SetPlayer(class Player* player_);
+
+	bool Collision(const Vector3& pos_, float radius_) const;
+
+	bool GetIsDeath() const {
+		return isDeath;
+	}
+
+public:
+	Vector3 pos;
+	Vector3 scale;
+	Vector3 rotate;
+
 private:
-	std::vector<std::unique_ptr<Model>> model;
+	Type type;
+
+	Model model;
 
 	float spd;
 
@@ -36,4 +65,25 @@ private:
 	float freqSpd;
 	float freq;
 	float radius;
+	
+	Frame attack;
+	Frame standBy;
+
+	float blastRange;
+
+	bool isDeath;
+	bool isRed;
+	long long redFreq;
+	long long redFreqMax;
+	long long redFreqMin;
+	float redFreqT;
+	float redFreqSpd;
+
+	class Player* player;
+	class Boss* boss;
+
+	float range;
+
+	// state
+	State state;
 };
