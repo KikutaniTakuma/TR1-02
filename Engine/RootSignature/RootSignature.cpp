@@ -94,16 +94,27 @@ bool operator==(const D3D12_ROOT_PARAMETER& left, const D3D12_ROOT_PARAMETER& ri
 	bool isSameDescriptorTable = false;
 
 	if (left.DescriptorTable.NumDescriptorRanges == right.DescriptorTable.NumDescriptorRanges) {
-		for (uint32_t i = 0; i < left.DescriptorTable.NumDescriptorRanges; i++) {
-			isSameDescriptorTable =
-				left.DescriptorTable.pDescriptorRanges[i].BaseShaderRegister == right.DescriptorTable.pDescriptorRanges[i].BaseShaderRegister
-				&& left.DescriptorTable.pDescriptorRanges[i].NumDescriptors == right.DescriptorTable.pDescriptorRanges[i].NumDescriptors
-				&& left.DescriptorTable.pDescriptorRanges[i].OffsetInDescriptorsFromTableStart == right.DescriptorTable.pDescriptorRanges[i].OffsetInDescriptorsFromTableStart
-				&& left.DescriptorTable.pDescriptorRanges[i].RangeType == right.DescriptorTable.pDescriptorRanges[i].RangeType
-				&& left.DescriptorTable.pDescriptorRanges[i].RegisterSpace == right.DescriptorTable.pDescriptorRanges[i].RegisterSpace;
 
+		if (left.DescriptorTable.pDescriptorRanges == nullptr || right.DescriptorTable.pDescriptorRanges == nullptr) {
+			isSameDescriptorTable =
+			left.Descriptor.RegisterSpace == right.Descriptor.RegisterSpace
+			&& left.Descriptor.ShaderRegister == right.Descriptor.ShaderRegister;
 			if (!isSameDescriptorTable) {
 				return false;
+			}
+		}
+		else {
+			for (uint32_t i = 0; i < left.DescriptorTable.NumDescriptorRanges; i++) {
+				isSameDescriptorTable =
+					left.DescriptorTable.pDescriptorRanges[i].BaseShaderRegister == right.DescriptorTable.pDescriptorRanges[i].BaseShaderRegister
+					&& left.DescriptorTable.pDescriptorRanges[i].NumDescriptors == right.DescriptorTable.pDescriptorRanges[i].NumDescriptors
+					&& left.DescriptorTable.pDescriptorRanges[i].OffsetInDescriptorsFromTableStart == right.DescriptorTable.pDescriptorRanges[i].OffsetInDescriptorsFromTableStart
+					&& left.DescriptorTable.pDescriptorRanges[i].RangeType == right.DescriptorTable.pDescriptorRanges[i].RangeType
+					&& left.DescriptorTable.pDescriptorRanges[i].RegisterSpace == right.DescriptorTable.pDescriptorRanges[i].RegisterSpace;
+
+				if (!isSameDescriptorTable) {
+					return false;
+				}
 			}
 		}
 	}
