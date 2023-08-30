@@ -20,12 +20,17 @@ public:
 
 	bool Collision(const Bullet& bullet);
 
-	static void LoadModel();
-	static void UnloadModel();
-
 	inline bool GetIsDeath() const {
 		return isDeath;
 	}
+
+	inline float GetAttack() const {
+		return attack;
+	}
+
+public:
+	static void LoadModel();
+	static void UnloadModel();
 
 private:
 	static std::unique_ptr<Model> model;
@@ -45,4 +50,7 @@ private:
 	std::chrono::seconds deathTime;
 
 	bool isDeath;
+
+	// state
+	float attack;
 };

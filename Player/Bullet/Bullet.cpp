@@ -27,7 +27,8 @@ Bullet::Bullet():
 	rotate(),
 	startTime(),
 	deathTime(5),
-	isDeath(false)
+	isDeath(false),
+	attack(10.0f)
 {
 	if (!model) {
 		model->LoadObj("./Resources/Ball.obj");
