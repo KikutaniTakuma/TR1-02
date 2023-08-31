@@ -18,7 +18,8 @@ public:
 	void Update();
 	void Draw(const Mat4x4& viewProjection, const Vector3& cameraPos);
 
-	bool Collision(const Bullet& bullet);
+	bool Collision(Bullet& bullet);
+	bool Collision(const Vector3& pos, float radius);
 
 	inline bool GetIsDeath() const {
 		return isDeath;
@@ -26,6 +27,10 @@ public:
 
 	inline float GetAttack() const {
 		return attack;
+	}
+
+	inline void SetColor(const Vector4& color){
+		model->color = Vector4ToUint(color);
 	}
 
 public:

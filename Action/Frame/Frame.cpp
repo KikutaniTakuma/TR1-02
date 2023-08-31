@@ -19,7 +19,7 @@ void Frame::Puase() {
 }
 void Frame::Stop() {
 	isStart = false;
-	startTime = std::chrono::steady_clock::time_point();
+	startTime = std::chrono::steady_clock::time_point::min();
 	timeFormStart = std::chrono::milliseconds(0);
 	frameCount = 0;
 }

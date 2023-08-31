@@ -10,18 +10,11 @@
 #include "Engine/KeyInput/KeyInput.h"
 #include "Engine/Mouse/Mouse.h"
 #include "PeraRender/PeraRender.h"
-#include "Texture2D/Texture2D.h"
 #include "AudioManager/AudioManager.h"
 #include "Camera/Camera.h"
-#include "StringOut/StringOut.h"
-#include "Line/Line.h"
-#include "Editor/Node/Node.h"
-#include "Player/Player.h"
-#include "Enemy/Enemy.h"
-#include "GlobalVariables/GlobalVariables.h"
-#include "SceneManager/Scene/Scene.h"
-#include "UIeditor/UIeditor.h"
 #include <filesystem>
+#include "Enemy/Boss/Boss.h"
+#include "SceneManger/GameScene/GameScene.h"
 
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
@@ -38,13 +31,13 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	// フォントロード
 	Engine::LoadFont("Font/JapaneseGothic.spritefont");
 
-	Camera camera;
+	/*Camera camera;
 	camera.farClip = 5000.0f;
 	camera.pos = { 0.0f,0.0f,-10.0f };
 
 	camera.isDebug = true;
 
-	Camera camera2D(Camera::Mode::Othographic);
+	Camera camera2D(Camera::Mode::Othographic);*/
 
 	//// シーンをレンダリング
 	//auto pera = std::make_unique<PeraRender>();
@@ -84,8 +77,10 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	watame->LoadShader();
 	watame->CreateGraphicsPipeline();*/
 
-	auto player = std::make_unique<Player>(nullptr);
-	player->SetCamera(&camera);
+	auto scene = std::make_unique<GameScene>();
+	scene->Initialize();
+
+	
 
 	/// 
 	/// メインループ
@@ -117,34 +112,42 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			WinApp::GetInstance()->SetFullscreen(fullscreen);
 		}
 
-		if (camera2D.isDebug) {
-			camera.isDebug = !camera2D.isDebug;
-		}
-		ImGui::Begin("Camera");
-		ImGui::Checkbox("Debug", &camera.isDebug);
-		static auto cameraPos =  camera.GetPos();
-		cameraPos =  camera.GetPos();
-		ImGui::DragFloat3("cameraPos", &camera.pos.x, 0.01f);
-		ImGui::DragFloat3("cameraRotate", &camera.rotate.x, 0.01f);
-		ImGui::DragFloat3("cameraScale", &camera.scale.x, 0.01f);
-		ImGui::DragFloat("cameraFoV", &camera.fov, 0.01f);
-		ImGui::End();
+		//if (camera2D.isDebug) {
+		//	camera.isDebug = !camera2D.isDebug;
+		//}
+		//ImGui::Begin("Camera");
+		//ImGui::Checkbox("Debug", &camera.isDebug);
+		//static auto cameraPos =  camera.GetPos();
+		//cameraPos =  camera.GetPos();
+		//ImGui::DragFloat3("cameraPos", &camera.pos.x, 0.01f);
+		//ImGui::DragFloat3("cameraRotate", &camera.rotate.x, 0.01f);
+		//ImGui::DragFloat3("cameraScale", &camera.scale.x, 0.01f);
+		//ImGui::DragFloat("cameraFoV", &camera.fov, 0.01f);
+		//ImGui::End();
 
-		if (camera.isDebug) {
-			camera2D.isDebug = !camera.isDebug;
-		}
-		ImGui::Begin("Camera2D");
-		ImGui::Checkbox("Debug", &camera2D.isDebug);
-		ImGui::DragFloat3("cameraPos", &camera2D.pos.x, 0.01f);
-		ImGui::DragFloat3("cameraRotate", &camera2D.rotate.x, 0.01f);
-		ImGui::DragFloat3("cameraScale", &camera2D.scale.x, 0.01f);
-		ImGui::DragFloat("cameraFoV", &camera2D.fov, 0.01f);
-		ImGui::End();
 
-		//camera.Update();
-		camera2D.Update();
+		//if (camera.isDebug) {
+		//	camera2D.isDebug = !camera.isDebug;
+		//}
+		//ImGui::Begin("Camera2D");
+		//ImGui::Checkbox("Debug", &camera2D.isDebug);
+		//ImGui::DragFloat3("cameraPos", &camera2D.pos.x, 0.01f);
+		//ImGui::DragFloat3("cameraRotate", &camera2D.rotate.x, 0.01f);
+		//ImGui::DragFloat3("cameraScale", &camera2D.scale.x, 0.01f);
+		//ImGui::DragFloat("cameraFoV", &camera2D.fov, 0.01f);
+		//ImGui::End();
 
-		player->Update();
+		////camera.Update();
+		//camera2D.Update();
+
+		/*player->Update();
+
+		boss->Update();
+
+		enemy->Update();*/
+
+		scene->Update();
+		scene->Collision();
 
 		///
 		/// 更新処理ここまで
@@ -154,8 +157,13 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// 描画処理
 		/// 
 		
+		/*boss->Draw();
 
 		player->Draw();
+
+		enemy->Draw();*/
+
+		scene->Draw();
 
 		///
 		/// 描画処理ここまで

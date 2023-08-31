@@ -16,7 +16,7 @@ Scene::Scene(const std::string& sceneName_):
 }
 
 bool Scene::InitializePlayer() {
-	player = std::make_unique<Player>(&globalVariables);
+	player = std::make_unique<Player>();
 	assert(player);
 	player->SetCamera(&camera);
 	return static_cast<bool>(player);

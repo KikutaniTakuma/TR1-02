@@ -131,6 +131,15 @@
     <ClCompile Include="Player\Bullet\Bullet.cpp">
       <Filter>Player\Bullet</Filter>
     </ClCompile>
+    <ClCompile Include="Action\Frame\Frame.cpp">
+      <Filter>Action\Frame</Filter>
+    </ClCompile>
+    <ClCompile Include="Enemy\Boss\Boss.cpp">
+      <Filter>Enemy\Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneManger\GameScene\GameScene.cpp">
+      <Filter>SceneManager\GameScene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -240,6 +249,18 @@
     </Filter>
     <Filter Include="Player\Bullet">
       <UniqueIdentifier>{c6f59de6-0979-425a-b701-0605843e2e73}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Action">
+      <UniqueIdentifier>{d9155807-1673-4565-be3a-edfdf537e04f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Action\Frame">
+      <UniqueIdentifier>{607698ed-b760-4d10-b8a3-22a385153c5f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Enemy\Boss">
+      <UniqueIdentifier>{0a63b731-b7be-4463-a0f7-3c86ac6f2b25}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SceneManager\GameScene">
+      <UniqueIdentifier>{f4128c39-9d69-4559-b680-2c30ab2a8b23}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -377,6 +398,15 @@
     </ClInclude>
     <ClInclude Include="Player\Bullet\Bullet.h">
       <Filter>Player\Bullet</Filter>
+    </ClInclude>
+    <ClInclude Include="Action\Frame\Frame.h">
+      <Filter>Action\Frame</Filter>
+    </ClInclude>
+    <ClInclude Include="Enemy\Boss\Boss.h">
+      <Filter>Enemy\Boss</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneManger\GameScene\GameScene.h">
+      <Filter>SceneManager\GameScene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

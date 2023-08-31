@@ -30,10 +30,6 @@ public:
 
 	void Draw();
 
-	inline Vector3 GetPos() const {
-		return model.pos;
-	}
-
 	inline void SetCamera(Camera* camera_) {
 		camera = camera_;
 	}
@@ -46,6 +42,9 @@ public:
 		return isDeath;
 	}
 
+	static void LoadModel();
+	static void UnloadModel();
+
 public:
 	Vector3 pos;
 	Vector3 scale;
@@ -54,7 +53,7 @@ public:
 private:
 	Type type;
 
-	Model model;
+	static std::unique_ptr<Model> model;
 
 	float spd;
 

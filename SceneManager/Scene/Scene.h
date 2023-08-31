@@ -1,6 +1,7 @@
 #pragma once
 #include <list>
 #include "Enemy/Enemy.h"
+#include "Enemy/Boss/Boss.h"
 #include "Player/Player.h"
 #include "Camera/Camera.h"
 #include "Texture2D/Texture2D.h"
@@ -27,6 +28,7 @@ private:
 	std::string sceneName;
 
 	std::unique_ptr<Player> player;
+	std::unique_ptr<Boss> boss;
 
 	std::list<Enemy> enemys;
 

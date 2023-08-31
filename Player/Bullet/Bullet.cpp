@@ -6,7 +6,7 @@ std::unique_ptr<Model> Bullet::model;
 void Bullet::LoadModel() {
 	if (!model) {
 		model = std::make_unique<Model>(1000);
-		model->LoadObj("./Resources/Cube.obj");
+		model->LoadObj("./Resources/Ball.obj");
 		model->LoadShader();
 		model->CreateGraphicsPipeline();
 	}
@@ -110,9 +110,19 @@ void Bullet::Draw(const Mat4x4& viewProjection, const Vector3& cameraPos) {
 	model->Draw(viewProjection, cameraPos);
 }
 
-bool Bullet::Collision(const Bullet& bullet) {
+bool Bullet::Collision(Bullet& bullet) {
 	Vector3 length = pos - bullet.pos;
-	if (radius + bullet.radius <= length.Length()) {
+	if (radius + bullet.radius >= length.Length()) {
+		isDeath = true;
+		bullet.isDeath = true;
+		return true;
+	}
+	return false;
+}
+
+bool Bullet::Collision(const Vector3& pos_, float radius_) {
+	Vector3 length = pos - pos_;
+	if (radius + radius_ >= length.Length()) {
 		isDeath = true;
 		return true;
 	}

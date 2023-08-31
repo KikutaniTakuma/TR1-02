@@ -5,33 +5,33 @@
 #include <numbers>
 #include <cmath>
 #include "externals/nlohmann/json.hpp"
-#include "GlobalVariables/GlobalVariables.h"
+#include <random>
 
-Player::Player(GlobalVariables* data_):
+Player::Player() :
 	spd(10.0f),
 	moveVec(),
 	pos(),
 	camera(nullptr),
-	bullets(0)
+	bullets(0),
+	state({ 100.0f, 20.0f, 10.0f }),
+	damageTime(),
+	isRed(false),
+	redFreq(0.0f),
+	redFreqSpd(8.0f),
+	radius(1.0f)
 {
-	data = data_;
-	model = std::make_unique<Model>();
-	model->LoadObj("Resources/Cube.obj");
-	model->LoadShader();
-	model->CreateGraphicsPipeline();
+	model.LoadObj("Resources/Player/Player.obj");
+	model.LoadShader();
+	model.CreateGraphicsPipeline();
+	model.scale = Vector3::identity * 0.3f;
 
 	Bullet::LoadModel();
+
+	pos.z = -10.0f;
 }
 
 Player::~Player() {
 	Bullet::UnloadModel();
-}
-
-void Player::ApplyGlobalVariables() {
-	const std::string groupName = "Player";
-	const std::string groupName2 = "PlayerParts";
-	model->pos = data->GetVector3Value(groupName2, "Body Translation");
-	spd = data->GetFloatValue(groupName, "Speed");
 }
 
 void Player::Animation() {
@@ -39,7 +39,6 @@ void Player::Animation() {
 }
 
 void Player::Update() {
-	//ApplyGlobalVariables();
 	moveVec = {};
 	//Animation();
 
@@ -65,11 +64,13 @@ void Player::Update() {
 
 	pos += moveVec.Normalize() * spd * ImGui::GetIO().DeltaTime;
 
-	model->pos = pos;
+	model.pos = pos;
+
+	model.rotate.y = moveVec.GetRad().y;
 
 	if (KeyInput::Pushed(DIK_SPACE) || Gamepad::Pushed(Gamepad::Button::X)) {
  		bullets.push_back(Bullet());
-		bullets.back().Initialize(pos, moveVec.GetRad());
+		bullets.back().Initialize(pos, model.rotate);
 	}
 
 	std::erase_if(
@@ -83,14 +84,53 @@ void Player::Update() {
 		bullet.Update();
 	}
 
-	camera->Update(VertMakeMatrixAffin(model->scale, model->rotate, pos));
-	model->Update();
+	auto nowTime = std::chrono::steady_clock::now();
+	auto cameraPos = camera->pos;
+	auto timeFromDamge = std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - damageTime);
+	if (timeFromDamge < std::chrono::milliseconds(1000)) {
+		if (timeFromDamge < std::chrono::milliseconds(100)) {
+			std::random_device rnd;
+			camera->pos += Vector3::identity * static_cast<float>(rnd() % 2);
+		}
+
+		if (static_cast<int32_t>(redFreq) % 2 == 0) {
+			isRed = !isRed;
+		}
+		redFreq += redFreqSpd * ImGui::GetIO().DeltaTime;
+	}
+	else {
+		isRed = false;
+		redFreq = 0.0f;
+	}
+	if (timeFromDamge < std::chrono::milliseconds(10000) && state.hp < 100.0f) {
+		state.hp += state.recovery * ImGui::GetIO().DeltaTime;
+	}
+
+	if (isRed) {
+		model.color = 0xff0000ff;
+	}
+
+
+
+	state.hp = std::clamp(state.hp, 0.0f, 100.0f);
+
+	camera->Update(VertMakeMatrixAffin(model.scale, Vector3::zero, pos));
+	model.Update();
+
+	camera->pos = camera->pos;
+
+	ImGui::Begin("Player");
+	ImGui::Text("hp : %f", state.hp);
+	ImGui::End();
 }
 
 void Player::Draw() {
-	model->Draw(camera->GetViewProjection(), camera->pos);
-	for (auto& bullet : bullets) {
-		bullet.Draw(camera->GetViewProjection(), camera->pos);
+	if (state.hp > 0.0f) {
+		model.Draw(camera->GetViewProjection(), camera->pos);
+		for (auto& bullet : bullets) {
+			bullet.SetColor(Vector4(0.0f, 0.0f, 1.0f, 0.0f));
+			bullet.Draw(camera->GetViewProjection(), camera->pos);
+		}
 	}
 }
 

@@ -1141,3 +1141,329 @@ Over HeapSize
 
 2023/08/30 01:39:14 JST : ErrorCheck Start
 2023/08/30 01:39:53 JST : ErrorCheck End
+
+2023/08/30 17:21:22 JST : ErrorCheck Start
+2023/08/30 17:22:00 JST : ErrorCheck End
+
+2023/08/30 17:22:48 JST : ErrorCheck Start
+2023/08/30 17:23:11 JST : ErrorCheck End
+
+2023/08/30 17:24:12 JST : ErrorCheck Start
+2023/08/30 17:24:30 JST : ErrorCheck End
+
+2023/08/30 17:25:20 JST : ErrorCheck Start
+2023/08/30 17:25:39 JST : ErrorCheck End
+
+2023/08/30 17:26:05 JST : ErrorCheck Start
+2023/08/30 17:26:17 JST : ErrorCheck End
+
+2023/08/30 17:27:33 JST : ErrorCheck Start
+2023/08/30 17:28:07 JST : ErrorCheck End
+
+2023/08/30 17:28:09 JST : ErrorCheck Start
+2023/08/30 17:28:24 JST : ErrorCheck End
+
+2023/08/30 17:29:50 JST : ErrorCheck Start
+
+2023/08/30 17:31:32 JST : ErrorCheck Start
+
+2023/08/30 17:32:34 JST : ErrorCheck Start
+2023/08/30 17:32:42 JST : ErrorCheck End
+
+2023/08/30 17:32:45 JST : ErrorCheck Start
+2023/08/30 17:33:00 JST : ErrorCheck End
+
+2023/08/30 17:33:12 JST : ErrorCheck Start
+2023/08/30 17:33:16 JST : ErrorCheck End
+
+2023/08/30 17:33:33 JST : ErrorCheck Start
+2023/08/30 17:33:52 JST : ErrorCheck End
+
+2023/08/30 17:43:51 JST : ErrorCheck Start
+2023/08/30 17:44:19 JST : ErrorCheck End
+
+2023/08/30 17:45:53 JST : ErrorCheck Start
+2023/08/30 17:45:58 JST : ErrorCheck End
+
+2023/08/30 17:46:13 JST : ErrorCheck Start
+2023/08/30 17:46:51 JST : ErrorCheck End
+
+2023/08/30 17:55:58 JST : ErrorCheck Start
+2023/08/30 17:56:12 JST : ErrorCheck End
+
+2023/08/30 17:57:43 JST : ErrorCheck Start
+2023/08/30 17:58:00 JST : ErrorCheck End
+
+2023/08/30 17:58:29 JST : ErrorCheck Start
+2023/08/30 17:58:55 JST : ErrorCheck End
+
+2023/08/30 17:59:34 JST : ErrorCheck Start
+2023/08/30 17:59:50 JST : ErrorCheck End
+
+2023/08/30 18:01:05 JST : ErrorCheck Start
+2023/08/30 18:01:16 JST : ErrorCheck End
+
+2023/08/30 18:01:39 JST : ErrorCheck Start
+2023/08/30 18:01:47 JST : ErrorCheck End
+
+2023/08/30 18:02:11 JST : ErrorCheck Start
+2023/08/30 18:02:34 JST : ErrorCheck End
+
+2023/08/30 18:02:47 JST : ErrorCheck Start
+2023/08/30 18:03:04 JST : ErrorCheck End
+
+2023/08/30 18:03:13 JST : ErrorCheck Start
+2023/08/30 18:03:49 JST : ErrorCheck End
+
+2023/08/30 18:04:23 JST : ErrorCheck Start
+2023/08/30 18:04:34 JST : ErrorCheck End
+
+2023/08/30 21:24:37 JST : ErrorCheck Start
+2023/08/30 21:25:19 JST : ErrorCheck End
+
+2023/08/30 22:39:44 JST : ErrorCheck Start
+2023/08/30 22:39:52 JST : ErrorCheck End
+
+2023/08/30 22:40:51 JST : ErrorCheck Start
+2023/08/30 22:41:01 JST : ErrorCheck End
+
+2023/08/30 22:42:03 JST : ErrorCheck Start
+2023/08/30 22:42:12 JST : ErrorCheck End
+
+2023/08/30 22:45:21 JST : ErrorCheck Start
+2023/08/30 22:45:36 JST : ErrorCheck End
+
+2023/08/30 22:46:08 JST : ErrorCheck Start
+2023/08/30 22:46:17 JST : ErrorCheck End
+
+2023/08/30 22:46:55 JST : ErrorCheck Start
+2023/08/30 22:47:04 JST : ErrorCheck End
+
+2023/08/30 22:47:17 JST : ErrorCheck Start
+2023/08/30 22:47:25 JST : ErrorCheck End
+
+2023/08/30 22:48:30 JST : ErrorCheck Start
+2023/08/30 22:48:41 JST : ErrorCheck End
+
+2023/08/30 22:49:45 JST : ErrorCheck Start
+2023/08/30 22:49:57 JST : ErrorCheck End
+
+2023/08/30 22:51:34 JST : ErrorCheck Start
+2023/08/30 22:51:42 JST : ErrorCheck End
+
+2023/08/30 22:52:28 JST : ErrorCheck Start
+2023/08/30 22:52:42 JST : ErrorCheck End
+
+2023/08/30 22:53:17 JST : ErrorCheck Start
+2023/08/30 22:53:27 JST : ErrorCheck End
+
+2023/08/30 22:53:36 JST : ErrorCheck Start
+2023/08/30 22:53:47 JST : ErrorCheck End
+
+2023/08/30 22:56:34 JST : ErrorCheck Start
+2023/08/30 22:56:44 JST : ErrorCheck End
+
+2023/08/30 22:57:07 JST : ErrorCheck Start
+2023/08/30 22:57:14 JST : ErrorCheck End
+
+2023/08/30 23:10:15 JST : ErrorCheck Start
+2023/08/30 23:10:28 JST : ErrorCheck End
+
+2023/08/30 23:10:49 JST : ErrorCheck Start
+
+2023/08/30 23:11:26 JST : ErrorCheck Start
+
+2023/08/30 23:12:01 JST : ErrorCheck Start
+2023/08/30 23:12:15 JST : ErrorCheck End
+
+2023/08/30 23:12:19 JST : ErrorCheck Start
+2023/08/30 23:12:33 JST : ErrorCheck End
+
+2023/08/30 23:13:04 JST : ErrorCheck Start
+2023/08/30 23:13:16 JST : ErrorCheck End
+
+2023/08/30 23:42:09 JST : ErrorCheck Start
+2023/08/30 23:42:11 JST : ErrorCheck End
+
+2023/08/30 23:42:33 JST : ErrorCheck Start
+2023/08/30 23:42:44 JST : ErrorCheck End
+
+2023/08/30 23:42:49 JST : ErrorCheck Start
+2023/08/30 23:42:59 JST : ErrorCheck End
+
+2023/08/30 23:43:30 JST : ErrorCheck Start
+2023/08/30 23:43:40 JST : ErrorCheck End
+
+2023/08/31 14:12:01 JST : ErrorCheck Start
+2023/08/31 14:12:22 JST : ErrorCheck End
+
+2023/08/31 14:14:53 JST : ErrorCheck Start
+2023/08/31 14:15:04 JST : ErrorCheck End
+
+2023/08/31 20:37:30 JST : ErrorCheck Start
+2023/08/31 20:37:30 : Texture / LoadTexture() : DirectX::LoadFromWICFile() failed
+
+2023/08/31 20:37:56 JST : ErrorCheck Start
+2023/08/31 20:37:56 : Model / LoadObj() : Not supported for rectangles or more
+
+2023/08/31 20:40:35 JST : ErrorCheck Start
+2023/08/31 20:40:45 JST : ErrorCheck End
+
+2023/08/31 20:42:17 JST : ErrorCheck Start
+2023/08/31 20:42:23 JST : ErrorCheck End
+
+2023/08/31 20:47:20 JST : ErrorCheck Start
+2023/08/31 20:47:38 JST : ErrorCheck End
+
+2023/08/31 20:48:02 JST : ErrorCheck Start
+2023/08/31 20:48:26 JST : ErrorCheck End
+
+2023/08/31 20:49:37 JST : ErrorCheck Start
+2023/08/31 20:49:46 JST : ErrorCheck End
+
+2023/08/31 20:52:59 JST : ErrorCheck Start
+2023/08/31 20:53:13 JST : ErrorCheck End
+
+2023/08/31 20:55:49 JST : ErrorCheck Start
+2023/08/31 20:56:07 JST : ErrorCheck End
+
+2023/08/31 20:56:29 JST : ErrorCheck Start
+2023/08/31 20:56:34 JST : ErrorCheck End
+
+2023/08/31 20:57:09 JST : ErrorCheck Start
+2023/08/31 20:57:18 JST : ErrorCheck End
+
+2023/08/31 20:58:44 JST : ErrorCheck Start
+2023/08/31 20:58:51 JST : ErrorCheck End
+
+2023/08/31 20:59:16 JST : ErrorCheck Start
+
+2023/08/31 21:00:27 JST : ErrorCheck Start
+
+2023/08/31 21:01:12 JST : ErrorCheck Start
+2023/08/31 21:01:32 JST : ErrorCheck End
+
+2023/08/31 21:03:30 JST : ErrorCheck Start
+2023/08/31 21:03:37 JST : ErrorCheck End
+
+2023/08/31 21:06:03 JST : ErrorCheck Start
+2023/08/31 21:06:44 JST : ErrorCheck End
+
+2023/08/31 21:13:36 JST : ErrorCheck Start
+2023/08/31 21:13:52 JST : ErrorCheck End
+
+2023/08/31 21:14:38 JST : ErrorCheck Start
+2023/08/31 21:14:57 JST : ErrorCheck End
+
+2023/08/31 21:15:24 JST : ErrorCheck Start
+2023/08/31 21:15:31 JST : ErrorCheck End
+
+2023/08/31 21:15:51 JST : ErrorCheck Start
+2023/08/31 21:15:54 JST : ErrorCheck End
+
+2023/08/31 21:16:09 JST : ErrorCheck Start
+2023/08/31 21:16:58 JST : ErrorCheck End
+
+2023/08/31 21:49:02 JST : ErrorCheck Start
+
+2023/08/31 21:52:32 JST : ErrorCheck Start
+2023/08/31 21:52:40 JST : ErrorCheck End
+
+2023/08/31 21:54:14 JST : ErrorCheck Start
+2023/08/31 21:54:54 JST : ErrorCheck End
+
+2023/08/31 21:55:13 JST : ErrorCheck Start
+2023/08/31 21:55:39 JST : ErrorCheck End
+
+2023/08/31 22:12:15 JST : ErrorCheck Start
+2023/08/31 22:12:20 JST : ErrorCheck End
+
+2023/08/31 22:13:33 JST : ErrorCheck Start
+2023/08/31 22:13:42 JST : ErrorCheck End
+
+2023/08/31 22:13:54 JST : ErrorCheck Start
+
+2023/08/31 22:28:17 JST : ErrorCheck Start
+2023/08/31 22:28:21 JST : ErrorCheck End
+
+2023/08/31 22:28:54 JST : ErrorCheck Start
+2023/08/31 22:29:00 JST : ErrorCheck End
+
+2023/08/31 22:29:15 JST : ErrorCheck Start
+2023/08/31 22:29:23 JST : ErrorCheck End
+
+2023/08/31 22:29:49 JST : ErrorCheck Start
+2023/08/31 22:29:56 JST : ErrorCheck End
+
+2023/08/31 22:43:09 JST : ErrorCheck Start
+
+2023/08/31 22:43:51 JST : ErrorCheck Start
+
+2023/08/31 22:45:57 JST : ErrorCheck Start
+2023/08/31 22:46:15 JST : ErrorCheck End
+
+2023/08/31 22:48:18 JST : ErrorCheck Start
+
+2023/08/31 22:53:19 JST : ErrorCheck Start
+2023/08/31 22:53:39 JST : ErrorCheck End
+
+2023/08/31 22:54:45 JST : ErrorCheck Start
+2023/08/31 22:55:12 JST : ErrorCheck End
+
+2023/08/31 22:56:14 JST : ErrorCheck Start
+2023/08/31 22:56:34 JST : ErrorCheck End
+
+2023/08/31 22:57:35 JST : ErrorCheck Start
+2023/08/31 22:58:43 JST : ErrorCheck End
+
+2023/08/31 22:59:35 JST : ErrorCheck Start
+
+2023/08/31 23:01:56 JST : ErrorCheck Start
+2023/08/31 23:02:37 JST : ErrorCheck End
+
+2023/08/31 23:06:24 JST : ErrorCheck Start
+2023/08/31 23:06:27 JST : ErrorCheck End
+
+2023/08/31 23:06:56 JST : ErrorCheck Start
+2023/08/31 23:07:11 JST : ErrorCheck End
+
+2023/08/31 23:08:27 JST : ErrorCheck Start
+2023/08/31 23:08:59 JST : ErrorCheck End
+
+2023/08/31 23:09:52 JST : ErrorCheck Start
+2023/08/31 23:10:05 JST : ErrorCheck End
+
+2023/08/31 23:10:30 JST : ErrorCheck Start
+2023/08/31 23:10:43 JST : ErrorCheck End
+
+2023/08/31 23:26:14 JST : ErrorCheck Start
+2023/08/31 23:26:16 JST : ErrorCheck End
+
+2023/08/31 23:26:23 JST : ErrorCheck Start
+2023/08/31 23:26:33 JST : ErrorCheck End
+
+2023/08/31 23:27:40 JST : ErrorCheck Start
+
+2023/08/31 23:28:40 JST : ErrorCheck Start
+2023/08/31 23:29:05 JST : ErrorCheck End
+
+2023/08/31 23:30:10 JST : ErrorCheck Start
+2023/08/31 23:30:22 JST : ErrorCheck End
+
+2023/08/31 23:32:09 JST : ErrorCheck Start
+2023/08/31 23:32:30 JST : ErrorCheck End
+
+2023/08/31 23:33:03 JST : ErrorCheck Start
+2023/08/31 23:33:16 JST : ErrorCheck End
+
+2023/08/31 23:33:28 JST : ErrorCheck Start
+2023/08/31 23:33:55 JST : ErrorCheck End
+
+2023/08/31 23:35:24 JST : ErrorCheck Start
+2023/08/31 23:35:54 JST : ErrorCheck End
+
+2023/08/31 23:37:48 JST : ErrorCheck Start
+2023/08/31 23:38:17 JST : ErrorCheck End
+
+2023/08/31 23:39:42 JST : ErrorCheck Start
+2023/08/31 23:40:05 JST : ErrorCheck End

@@ -8,11 +8,24 @@
 #include "Boss/Boss.h"
 #include <random>
 
+std::unique_ptr<Model> Enemy::model;
+
+void Enemy::LoadModel() {
+	if (!model) {
+		model = std::make_unique<Model>(100);
+		model->LoadObj("./Resources/Enemy/Enemy.obj");
+		model->LoadShader();
+		model->CreateGraphicsPipeline();
+	}
+}
+void Enemy::UnloadModel() {
+	model.reset();
+}
+
 Enemy::Enemy() :
 	spd(5.0f),
 	moveVec(),
 	camera(nullptr),
-	model(1),
 	freqSpd(std::numbers::pi_v<float>),
 	freq(0.0f),
 	radius(1.0f),
@@ -20,7 +33,7 @@ Enemy::Enemy() :
 	pos(),
 	scale(Vector3::identity),
 	rotate(),
-	blastRange(5.0f),
+	blastRange(2.0f),
 	isDeath(false),
 	isRed(false),
 	player(nullptr),
@@ -37,9 +50,9 @@ Enemy::Enemy() :
 		50.0f
 	})
 {
-	model.LoadObj("./Resources/Cube.obj");
-	model.LoadShader();
-	model.CreateGraphicsPipeline();
+	if (!model) {
+		Enemy::LoadModel();
+	}
 }
 
 void Enemy::Initialize(Enemy::Type type_, class Boss* boss_, float stateScale) {
@@ -51,7 +64,7 @@ void Enemy::Initialize(Enemy::Type type_, class Boss* boss_, float stateScale) {
 	state.hp *= stateScale;
 
 	std::random_device rnd;
-	float rad = static_cast<float>(rnd() % 360) * (std::numbers::pi_v<float> / 180.0f);
+	float rad = static_cast<float>((rnd() % 36) * 10) * (std::numbers::pi_v<float> / 180.0f);
 
 	switch(type)
 	{
@@ -80,10 +93,10 @@ void Enemy::Initialize(Enemy::Type type_, class Boss* boss_, float stateScale) {
 			redFreqT = std::clamp(redFreqT, 0.0f, 1.0f);
 
 			if (isRed) {
-				model.color = Vector4ToUint({ 1.0f, 0.0f,0.0f,1.0f });
+				model->color = Vector4ToUint({ 1.0f, 0.0f,0.0f,1.0f });
 			}
 			else {
-				model.color = std::numeric_limits<uint32_t>::max();
+				model->color = std::numeric_limits<uint32_t>::max();
 			}
 
 			if (attack.GetFrameCount() % redFreq == 0) {
@@ -112,7 +125,7 @@ void Enemy::Initialize(Enemy::Type type_, class Boss* boss_, float stateScale) {
 		}
 	};
 
-	standBy.Start();
+	attack.Start();
 }
 
 
@@ -122,9 +135,9 @@ void Enemy::Update() {
 	attack.Update();
 	standBy.Update();
 
-	model.pos = pos;
-	model.rotate = rotate;
-	model.scale = scale;
+	model->pos = pos;
+	model->rotate = rotate;
+	model->scale = scale;
 
 	if (state.hp <= 0.0f) {
 		isDeath = true;
@@ -132,7 +145,7 @@ void Enemy::Update() {
 }
 
 void Enemy::Draw() {
-	model.Draw(camera->GetViewProjection(), camera->pos);
+	model->Draw(camera->GetViewProjection(), camera->pos);
 }
 
 void Enemy::SetPlayer(class Player* player_) {

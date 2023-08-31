@@ -147,11 +147,13 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Action\Frame\Frame.cpp" />
     <ClCompile Include="AudioManager\AudioManager.cpp" />
     <ClCompile Include="AudioManager\Audio\Audio.cpp" />
     <ClCompile Include="Camera\Camera.cpp" />
     <ClCompile Include="Editor\Editor.cpp" />
     <ClCompile Include="Editor\Node\Node.cpp" />
+    <ClCompile Include="Enemy\Boss\Boss.cpp" />
     <ClCompile Include="Enemy\Enemy.cpp" />
     <ClCompile Include="Engine\ConvertString\ConvertString.cpp" />
     <ClCompile Include="Engine\Engine.cpp">
@@ -191,6 +193,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </ClCompile>
     <ClCompile Include="SceneManager\SceneManager.cpp" />
     <ClCompile Include="SceneManager\Scene\Scene.cpp" />
+    <ClCompile Include="SceneManger\GameScene\GameScene.cpp" />
     <ClCompile Include="StringOut\StringOut.cpp" />
     <ClCompile Include="Texture2D\Texture2D.cpp" />
     <ClCompile Include="TextureManager\TextureManager.cpp" />
@@ -198,11 +201,13 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="UIeditor\UIeditor.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Action\Frame\Frame.h" />
     <ClInclude Include="AudioManager\AudioManager.h" />
     <ClInclude Include="AudioManager\Audio\Audio.h" />
     <ClInclude Include="Camera\Camera.h" />
     <ClInclude Include="Editor\Editor.h" />
     <ClInclude Include="Editor\Node\Node.h" />
+    <ClInclude Include="Enemy\Boss\Boss.h" />
     <ClInclude Include="Enemy\Enemy.h" />
     <ClInclude Include="Engine\ConstBuffer\ConstBuffer.h" />
     <ClInclude Include="Engine\ConvertString\ConvertString.h" />
@@ -238,6 +243,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Player\Player.h" />
     <ClInclude Include="SceneManager\SceneManager.h" />
     <ClInclude Include="SceneManager\Scene\Scene.h" />
+    <ClInclude Include="SceneManger\GameScene\GameScene.h" />
     <ClInclude Include="StringOut\StringOut.h" />
     <ClInclude Include="Texture2D\Texture2D.h" />
     <ClInclude Include="TextureManager\TextureManager.h" />
